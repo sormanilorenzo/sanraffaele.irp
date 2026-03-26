@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>I.R.C.C.S. Ospedale San Raffaele</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #1a4e8f;
+      --blue-dark:  #0d2b5e;
+      --blue-mid:   #2567b0;
+      --blue-light: #e8f1fb;
+      --teal:       #0f8891;
+      --dark:       #0d1b2a;
+      --gray:       #6b7a8d;
+      --light-gray: #f7f9fc;
+      --white:      #ffffff;
+      --radius:     12px;
+      --shadow:     0 4px 24px rgba(26,78,143,.10);
+      --shadow-lg:  0 12px 48px rgba(26,78,143,.18);
+      --max-w:      1200px;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--dark); }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255,255,255,.97);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(26,78,143,.08);
+      padding: 0 5%;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo img { height: 60px; width: auto; }
+    .logo-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--blue); }
+    .logo-text span   { font-size: 11px; color: var(--gray); }
+    nav ul { list-style: none; display: flex; align-items: center; gap: 28px; }
+    nav ul a { text-decoration: none; font-size: 13px; font-weight: 500; color: var(--dark); transition: color .2s; }
+    nav ul a:hover { color: var(--blue); }
+    .nav-cta { background: var(--blue) !important; color: #fff !important; padding: 10px 22px; border-radius: 6px; font-weight: 600 !important; }
+    .nav-cta:hover { background: var(--blue-mid) !important; }
+    .nav-icons { display: flex; gap: 18px; align-items: center; }
+    .nav-icons i { font-size: 17px; color: var(--gray); cursor: pointer; transition: color .2s; }
+    .nav-icons i:hover { color: var(--blue); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 86vh;
+      display: flex; align-items: center;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: url('assets/images/hero-bg.jpg') center/cover no-repeat;
+    }
+    .hero-overlay {
+      position: absolute;
+      inset: 0;
+      background: url('assets/images/hero.webp') center/cover no-repeat;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      padding: 100px 8%;
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      width: 100%;
+    }
+    .hero-content h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4.5vw, 3.4rem); font-weight: 700; color: #fff;
+      line-height: 1.2; margin-bottom: 34px; max-width: 660px;
+      text-shadow: 0 2px 16px rgba(0,0,0,.25);
+    }
+    .hero-search {
+      display: flex; align-items: center;
+      background: #fff; border-radius: 50px;
+      padding: 6px 6px 6px 24px;
+      width: 100%; max-width: 580px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.18);
+      margin-bottom: 22px;
+    }
+    .hero-search input { flex: 1; border: none; background: transparent; font-size: 15px; color: var(--dark); outline: none; font-family: 'DM Sans', sans-serif; }
+    .hero-search input::placeholder { color: var(--gray); }
+    .hero-search button { background: none; border: none; cursor: pointer; color: var(--gray); font-size: 18px; padding: 8px 14px; }
+    .hero-tags { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+    .hero-tag {
+      padding: 10px 22px; border-radius: 50px;
+      border: 2px solid rgba(255,255,255,.72); background: rgba(255,255,255,.09);
+      color: #fff; font-size: 13px; font-weight: 600;
+      text-decoration: none; backdrop-filter: blur(6px);
+      transition: all .2s; letter-spacing: .3px;
+    }
+    .hero-tag:hover { background: rgba(255,255,255,.22); border-color: #fff; }
+
+    /* ── STATS BAR (centrata) ── */
+    .stats-bar {
+      background: #fff; padding: 30px 8%;
+      display: flex; align-items: flex-start; gap: 56px; flex-wrap: wrap;
+      border-bottom: 1px solid rgba(26,78,143,.07);
+      justify-content: center;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      width: 100%;
+    }
+    /* wrapper per centrare la stats-bar nella pagina */
+    .stats-bar-wrapper {
+      background: #fff;
+      border-bottom: 1px solid rgba(26,78,143,.07);
+      display: flex;
+      justify-content: center;
+    }
+    .stat { display: flex; align-items: center; gap: 14px; }
+    .stat-icon { width: 46px; height: 46px; border-radius: 50%; border: 2px solid var(--blue); display: flex; align-items: center; justify-content: center; color: var(--blue); font-size: 19px; flex-shrink: 0; }
+    .stat-text strong { display: block; font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--dark); font-weight: 700; }
+    .stat-text span { font-size: 12.5px; color: var(--gray); line-height: 1.4; }
+
+    /* ── IN EVIDENZA ── */
+    .evidenza { padding: 80px 8%; background: var(--light-gray); }
+    .evidenza > h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,3vw,2.4rem); text-align: center; color: var(--dark); margin-bottom: 48px; }
+    .evidenza-inner { max-width: var(--max-w); margin: 0 auto; }
+
+    /* Due news orizzontali: immagine + testo affiancati */
+    .news-list { display: flex; flex-direction: column; gap: 28px; margin-bottom: 40px; }
+    .news-item {
+      display: flex; gap: 28px; align-items: flex-start;
+      background: #fff; border-radius: var(--radius);
+      overflow: hidden; box-shadow: var(--shadow);
+      transition: transform .3s, box-shadow .3s;
+    }
+    .news-item:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+    .news-item img {
+      width: 260px; height: 170px; object-fit: cover; flex-shrink: 0;
+    }
+    .news-item-body { padding: 22px 24px 22px 0; flex: 1; }
+    .news-tag { display: inline-block; font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px; color: var(--blue); background: var(--blue-light); border-radius: 20px; padding: 3px 10px; margin-bottom: 10px; }
+    .news-item-body h3 { font-size: 18px; font-weight: 700; color: var(--dark); margin-bottom: 8px; line-height: 1.35; }
+    .news-item-body p { font-size: 13.5px; color: var(--gray); line-height: 1.65; }
+
+    .mini-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 14px; }
+    .mini-card { display: flex; align-items: center; gap: 14px; background: #fff; border-radius: 10px; padding: 14px 16px; text-decoration: none; color: inherit; border: 1px solid rgba(26,78,143,.07); transition: all .25s; }
+    .mini-card:hover { box-shadow: var(--shadow); transform: translateY(-3px); }
+    .mini-img { width: 64px; height: 64px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: var(--blue-light); }
+    .mini-text h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .mini-text span { font-size: 11px; font-weight: 700; color: var(--blue); text-transform: uppercase; letter-spacing: .6px; }
+
+    /* ── RICERCA ── */
+    .research { padding: 80px 8%; background: #fff; }
+    .research-inner { max-width: var(--max-w); margin: 0 auto; }
+    .research-split { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; margin-bottom: 80px; }
+    .research-split:last-child { margin-bottom: 0; }
+    .research-split.reverse .research-text { order: -1; }
+    .research-img { border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); }
+    .research-img img { width: 100%; height: 380px; object-fit: cover; display: block; }
+    .research-text h2 { font-family: 'Playfair Display', serif; font-size: 2rem; font-style: italic; color: var(--dark); margin-bottom: 16px; }
+    .research-text p { color: var(--gray); font-size: 15px; line-height: 1.75; margin-bottom: 24px; }
+    .btn-outline-blue { display: inline-block; padding: 12px 26px; border: 1.5px solid var(--blue); color: var(--blue); border-radius: 6px; font-size: 13px; font-weight: 700; letter-spacing: .6px; text-transform: uppercase; text-decoration: none; transition: all .2s; }
+    .btn-outline-blue:hover { background: var(--blue); color: #fff; }
+
+    /* ── APP PROMO ── */
+    .app-section {
+      position: relative;
+      background: url('assets/images/app-bg.jpg') center/cover no-repeat;
+      min-height: 400px; display: flex; align-items: center; overflow: hidden;
+    }
+    .app-overlay { position: absolute; inset: 0; background: rgba(20,20,20,.58); }
+    .app-inner { position: relative; z-index: 2; display: flex; align-items: center; justify-content: flex-end; gap: 56px; padding: 64px 8%; width: 100%; }
+    .app-phone img { height: 310px; width: auto; display: block; filter: drop-shadow(0 20px 40px rgba(0,0,0,.45)); }
+    .app-text { max-width: 440px; }
+    .app-text h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.6rem,3vw,2.3rem); color: #fff; font-weight: 700; }
+    .app-qr { background: #fff; border-radius: 12px; padding: 12px; display: flex; flex-direction: column; align-items: center; gap: 8px; flex-shrink: 0; }
+    .app-qr img { width: 130px; height: 130px; object-fit: contain; display: block; }
+    .app-qr span { font-size: 11px; font-weight: 700; color: var(--dark); letter-spacing: .5px; display: flex; align-items: center; gap: 5px; }
+
+    /* ── FOOTER ── */
+    footer { background: #1a2438; color: rgba(255,255,255,.75); padding: 56px 8% 28px; }
+    .footer-tagline { font-size: 16px; font-weight: 700; color: #fff; margin-bottom: 36px; }
+    .footer-top { display: grid; grid-template-columns: 1.5fr 1fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 36px; }
+    .footer-brand { display: flex; flex-direction: column; gap: 14px; }
+    .footer-brand .logo-text strong { color: #fff; font-size: 12px; }
+    .footer-brand .logo-text span   { color: rgba(255,255,255,.45); }
+    .footer-brand address { font-style: normal; font-size: 12.5px; color: rgba(255,255,255,.5); line-height: 1.85; }
+    .footer-col h4 { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px; color: #fff; margin-bottom: 14px; }
+    .footer-col ul { list-style: none; }
+    .footer-col ul li { margin-bottom: 8px; }
+    .footer-col ul a { text-decoration: none; font-size: 13px; color: rgba(255,255,255,.58); transition: color .2s; }
+    .footer-col ul a:hover { color: #fff; }
+    .footer-bottom { border-top: 1px solid rgba(255,255,255,.09); padding-top: 22px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .footer-bottom p { font-size: 12px; color: rgba(255,255,255,.33); }
+    .social-links { display: flex; gap: 10px; }
+    .social-link { width: 34px; height: 34px; border-radius: 8px; background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center; text-decoration: none; color: rgba(255,255,255,.65); font-size: 14px; transition: background .2s; }
+    .social-link:hover { background: var(--blue); color: #fff; }
+
+    @media (max-width: 1000px) {
+      .news-item { flex-direction: column; }
+      .news-item img { width: 100%; height: 200px; }
+      .news-item-body { padding: 18px; }
+      .mini-grid { grid-template-columns: 1fr 1fr; }
+      .research-split { grid-template-columns: 1fr; }
+      .research-split.reverse .research-text { order: 0; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .app-inner { flex-direction: column; align-items: flex-start; }
+    }
+    @media (max-width: 680px) {
+      nav ul { display: none; }
+      .stats-bar { gap: 28px; }
+      .mini-grid { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="#" class="logo">
+      <img src="assets/images/logo.png" alt="Ospedale San Raffaele" />
+      <div class="logo-text">
+        <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+        <span>Gruppo San Donato</span>
+      </div>
+    </a>
+    <ul>
+      <li><a href="pazienti_index.html">Pazienti e Cura</a></li>
+      <li><a href="#">News ed Eventi</a></li>
+      <li><a href="#">Chi Siamo</a></li>
+      <li><a href="pazienti_index.html" class="nav-cta">Per Prenotare</a></li>
+    </ul>
+    <div class="nav-icons">
+      <i class="fa-regular fa-user"></i>
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1>L'eccellenza clinica, scientifica e universitaria</h1>
+      <div class="hero-search">
+        <input type="text" placeholder="Cosa stai cercando?" />
+        <button><i class="fa-solid fa-magnifying-glass"></i></button>
+      </div>
+      <div class="hero-tags">
+        <a href="#" class="hero-tag">SEDI</a>
+        <a href="#" class="hero-tag">DOTTORI</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR (centrata) -->
+  <div class="stats-bar-wrapper">
+    <div class="stats-bar">
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-hospital"></i></div>
+        <div class="stat-text">
+          <strong>60+</strong>
+          <span>Unità cliniche altamente<br>specializzate</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-solid fa-user-group"></i></div>
+        <div class="stat-text">
+          <strong>1.9 Mln</strong>
+          <span>Pazienti</span>
+        </div>
+      </div>
+      <div class="stat">
+        <div class="stat-icon"><i class="fa-regular fa-file-lines"></i></div>
+        <div class="stat-text">
+          <strong>2700</strong>
+          <span>Pubblicazioni scientifiche<br>all'anno</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IN EVIDENZA -->
+  <section class="evidenza">
+    <h2>In Evidenza</h2>
+    <div class="evidenza-inner">
+
+      <!-- Solo 2 news con immagine + testo affiancati -->
+      <div class="news-list">
+        <div class="news-item">
+          <img src="assets/images/telemedicina.webp" alt="Telemedicina" />
+          <div class="news-item-body">
+            <span class="news-tag">Servizi</span>
+            <h3>Telemedicina: i nostri specialisti a un click di distanza</h3>
+            <p>Prenota online televisite e consulti con i nostri specialisti per una prima visita, una visita di controllo o per second opinion direttamente dalla tua abitazione.</p>
+          </div>
+        </div>
+        <div class="news-item">
+          <img src="assets/images/sostieni_ricerca.webp" alt="Sostieni la ricerca" />
+          <div class="news-item-body">
+            <span class="news-tag">Ricerca</span>
+            <h3>Sostieni i medici-ricercatori del San Raffaele</h3>
+            <p>Aiuta i nostri ricercatori a trovare nuove e migliori cure per le malattie di oggi e di domani. Ogni contributo fa la differenza.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mini cards rimaste invariate -->
+      <div class="mini-grid">
+        <a href="#" class="mini-card">
+          <img src="assets/images/checkup.webp" alt="Check Up Genos" class="mini-img" />
+          <div class="mini-text"><h4>Check Up Genos</h4><span>Scopri di più</span></div>
+        </a>
+        <a href="#" class="mini-card">
+          <img src="assets/images/pain-centre.webp" alt="Pain Center" class="mini-img" />
+          <div class="mini-text"><h4>Pain Center</h4><span>Scopri di più</span></div>
+        </a>
+        <a href="#" class="mini-card">
+          <img src="assets/images/centro-salute.webp" alt="Centro Salute Metabolica" class="mini-img" />
+          <div class="mini-text"><h4>Centro Salute Metabolica</h4><span>Scopri di più</span></div>
+        </a>
+        <a href="#" class="mini-card">
+          <img src="assets/images/medicina-domicilio.webp" alt="Medicina a domicilio" class="mini-img" />
+          <div class="mini-text"><h4>Servizi di medicina a domicilio</h4><span>Scopri di più</span></div>
+        </a>
+        <a href="#" class="mini-card">
+          <img src="assets/images/ricoveri-solvenza.webp" alt="Ricoveri in solvenza" class="mini-img" />
+          <div class="mini-text"><h4>Ricoveri in solvenza</h4><span>Scopri di più</span></div>
+        </a>
+        <a href="#" class="mini-card">
+          <img src="assets/images/centro-disturbi.webp" alt="Centro disturbi dell'umore" class="mini-img" />
+          <div class="mini-text"><h4>Centro disturbi dell'umore</h4><span>Scopri di più</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- RICERCA -->
+  <section class="research">
+    <div class="research-inner">
+      <div class="research-split">
+        <div class="research-text">
+          <h2>Non c'è cura senza ricerca</h2>
+          <p>Grazie alla profonda integrazione tra ricerca di base, traslazionale e clinica, e alle numerose collaborazioni con i principali centri di ricerca internazionali, l'Ospedale San Raffaele è leader in molti campi di ricerca e offre la migliore assistenza ai suoi pazienti.</p>
+          <a href="#" class="btn-outline-blue">LEGGI DI PIÙ</a>
+        </div>
+        <div class="research-img">
+          <img src="assets/images/ricerca.webp" alt="Ricerca scientifica" />
+        </div>
+      </div>
+      <div class="research-split reverse">
+        <div class="research-img">
+          <img src="assets/images/malattie.webp" alt="DNA Malattie Rare" />
+        </div>
+        <div class="research-text">
+          <h2>Malattie Rare</h2>
+          <p>L'Ospedale San Raffaele è uno dei presidi della Rete Regionale per le Malattie Rare.</p>
+          <a href="#" class="btn-outline-blue">APPROFONDISCI</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- APP PROMO -->
+  <div class="app-section">
+    <div class="app-overlay"></div>
+    <div class="app-inner">
+      <div class="app-phone">
+        <img src="assets/images/applicazione.webp" alt="App Gruppo San Donato" />
+      </div>
+      <div class="app-text">
+        <h2>Prenota visite ed esami dai Token disponibili presso la nostra struttura</h2>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p class="footer-tagline">La sanità del futuro, oggi, per tutti.</p>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="logo">
+          <img src="assets/images/logo.png" alt="San Raffaele" />
+          <div class="logo-text">
+            <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+            <span>Gruppo San Donato</span>
+          </div>
+        </a>
+        <address>
+          Ospedale San Raffaele S.r.l. – Socio Unico Istituto di Ricovero<br>
+          e Cura a Carattere Scientifico<br>
+          Via Olgettina 60 – 20132 Milano (MI)<br>
+          Tel. +39 02.26431<br>
+          P.IVA e Reg. Imp. C.C.I.A.A. Milano<br>
+          Monza Brianza Lodi 07636600962
+        </address>
+      </div>
+      <div class="footer-col">
+        <h4>Careers</h4>
+        <ul>
+          <li><a href="#">Posizioni aperte</a></li>
+          <li><a href="#">Candidature aperte</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Contatti</h4>
+        <ul>
+          <li><a href="#">Contatti San Raffaele</a></li>
+          <li><a href="#">Contatti San Raffaele Turro</a></li>
+          <li><a href="#">Ufficio stampa</a></li>
+          <li><a href="#">Ufficio Promozione &amp; Sviluppo</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Informazioni Legali</h4>
+        <ul>
+          <li><a href="#">Privacy Policy</a></li>
+          <li><a href="#">Cookie Policy</a></li>
+          <li><a href="#">Trasparenza</a></li>
+          <li><a href="#">Dichiarazione di accessibilità</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Altre Informazioni</h4>
+        <ul>
+          <li><a href="#">Comitato Etico</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>Questo sito è un progetto videoludico non ufficiale, senza alcuna affiliazione con IRCCS San Raffaele, e tutti i contenuti sono fittizi e creati esclusivamente a scopo di intrattenimento</p>
+      <div class="social-links">
+        <a href="#" class="social-link"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="social-link"><i class="fa-brands fa-facebook-f"></i></a>
+        <a href="#" class="social-link"><i class="fa-brands fa-x-twitter"></i></a>
+        <a href="#" class="social-link"><i class="fa-brands fa-linkedin-in"></i></a>
+        <a href="#" class="social-link"><i class="fa-brands fa-youtube"></i></a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>
