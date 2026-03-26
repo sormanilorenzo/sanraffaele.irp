@@ -14,11 +14,9 @@
       --blue-dark:   #0d2b5e;
       --blue-mid:    #2567b0;
       --blue-light:  #e8f1fb;
-      --teal:        #0f8891;
       --dark:        #0d1b2a;
       --gray:        #6b7a8d;
       --light-gray:  #f7f9fc;
-      --white:       #ffffff;
       --radius:      12px;
       --shadow:      0 4px 24px rgba(26,78,143,.10);
       --shadow-lg:   0 12px 48px rgba(26,78,143,.18);
@@ -34,11 +32,9 @@
     /* ── NAV ── */
     nav {
       position: sticky; top: 0; z-index: 1000;
-      background: rgba(255,255,255,.97);
-      backdrop-filter: blur(12px);
+      background: rgba(255,255,255,.97); backdrop-filter: blur(12px);
       border-bottom: 1px solid rgba(26,78,143,.08);
-      padding: 0 5%;
-      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
       height: 68px;
     }
     .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
@@ -46,13 +42,16 @@
     .logo-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--blue); }
     .logo-text span   { font-size: 11px; color: var(--gray); }
     .nav-right { display: flex; align-items: center; gap: 14px; }
-    .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 13px; font-weight: 600; color: var(--blue); padding: 8px 16px; border: 1.5px solid var(--blue); border-radius: 6px; transition: all .2s; }
+    .nav-back {
+      display: flex; align-items: center; gap: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 600; color: var(--blue);
+      padding: 8px 16px; border: 1.5px solid var(--blue); border-radius: 6px; transition: all .2s;
+    }
     .nav-back:hover { background: var(--blue); color: #fff; }
     .nav-user { display: none; align-items: center; gap: 10px; background: #f0f2ff; border-radius: 30px; padding: 6px 14px 6px 8px; }
-    .nav-user.visible { display: flex; }
+    .nav-user.on { display: flex; }
     .nav-user img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--discord); }
-    .nav-user span { font-size: 13px; font-weight: 700; color: var(--dark); }
-    .nav-user small { font-size: 11px; color: var(--gray); display: block; }
+    .nav-user-name { font-size: 13px; font-weight: 700; color: var(--dark); }
     .nav-logout { font-size: 11px; color: var(--gray); cursor: pointer; text-decoration: underline; margin-left: 4px; }
     .nav-logout:hover { color: #c0392b; }
 
@@ -72,14 +71,15 @@
     /* ── MAIN ── */
     .main-wrap { max-width: 820px; margin: 0 auto; padding: 48px 24px 80px; }
 
-    /* ── LOGIN SCREEN ── */
+    /* ── SCHERMATE: visibilità gestita SOLO da JS con display inline ── */
+    #loginScreen, #loadingScreen, #formScreen { display: none; }
+
+    /* ── LOGIN ── */
     #loginScreen {
-      display: none;
       flex-direction: column; align-items: center;
       background: #fff; border-radius: var(--radius);
       box-shadow: var(--shadow-lg); padding: 56px 40px; text-align: center;
     }
-    #loginScreen.visible { display: flex; }
     .discord-logo-wrap {
       width: 80px; height: 80px; background: var(--discord);
       border-radius: 50%; display: flex; align-items: center; justify-content: center;
@@ -93,20 +93,18 @@
       background: var(--discord); color: #fff;
       padding: 15px 32px; border-radius: 10px; border: none;
       font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
-      cursor: pointer; transition: all .2s; text-decoration: none;
+      cursor: pointer; text-decoration: none; transition: all .2s;
       box-shadow: 0 4px 18px rgba(88,101,242,.35);
     }
-    .btn-discord:hover { background: var(--discord-hov); transform: translateY(-2px); box-shadow: 0 8px 26px rgba(88,101,242,.45); }
+    .btn-discord:hover { background: var(--discord-hov); transform: translateY(-2px); }
     .login-note { margin-top: 18px; font-size: 12px; color: var(--gray); }
 
     /* ── LOADING ── */
     #loadingScreen {
-      display: none;
       flex-direction: column; align-items: center;
       padding: 80px 40px; text-align: center;
       background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
     }
-    #loadingScreen.visible { display: flex; }
     .spinner {
       width: 48px; height: 48px; border: 4px solid var(--blue-light);
       border-top-color: var(--blue); border-radius: 50%;
@@ -114,10 +112,6 @@
     }
     @keyframes spin { to { transform: rotate(360deg); } }
     #loadingScreen p { font-size: 14px; color: var(--gray); }
-
-    /* ── FORM SCREEN ── */
-    #formScreen { display: none; }
-    #formScreen.visible { display: block; }
 
     /* ── CARD ── */
     .card {
@@ -133,6 +127,7 @@
     }
     .card-title i { color: var(--blue); font-size: 1.1rem; }
 
+    /* Badge Discord nel form */
     .discord-badge {
       display: flex; align-items: center; gap: 14px;
       background: #f0f2ff; border: 1.5px solid #c5caff;
@@ -141,19 +136,19 @@
     .discord-badge img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--discord); }
     .discord-badge-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--dark); }
     .discord-badge-text span { font-size: 12px; color: var(--gray); }
-    .discord-badge i.fa-circle-check { color: var(--discord); font-size: 1.1rem; margin-left: auto; }
+    .discord-badge .fa-circle-check { color: var(--discord); font-size: 1.1rem; margin-left: auto; }
 
-    /* ── FORM FIELDS ── */
+    /* ── FORM ── */
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
     .form-row.single { grid-template-columns: 1fr; }
     .form-group { display: flex; flex-direction: column; gap: 6px; }
     label { font-size: 13px; font-weight: 600; color: var(--dark); }
-    label span.req { color: #c0392b; margin-left: 2px; }
+    label .req { color: #c0392b; margin-left: 2px; }
     input[type="text"], input[type="tel"], input[type="date"] {
       border: 1.5px solid #dde3ee; border-radius: 8px;
       padding: 11px 14px; font-size: 14px;
       font-family: 'DM Sans', sans-serif; color: var(--dark);
-      background: #fff; transition: border-color .2s, box-shadow .2s; outline: none;
+      background: #fff; outline: none; transition: border-color .2s, box-shadow .2s;
     }
     input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,78,143,.08); }
 
@@ -164,54 +159,53 @@
       padding: 14px 18px; border: 1.5px solid #dde3ee; border-radius: 10px;
       cursor: pointer; transition: all .2s; user-select: none;
     }
-    .cert-item:hover { border-color: var(--blue); background: var(--blue-light); }
-    .cert-item.selected { border-color: var(--blue); background: var(--blue-light); }
+    .cert-item:hover, .cert-item.sel { border-color: var(--blue); background: var(--blue-light); }
     .cert-left { display: flex; align-items: center; gap: 12px; }
-    .cert-checkbox {
+    .cert-cb {
       width: 20px; height: 20px; border: 2px solid #c0cfe0;
       border-radius: 5px; display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: all .2s; background: #fff;
     }
-    .cert-item.selected .cert-checkbox { background: var(--blue); border-color: var(--blue); }
-    .cert-item.selected .cert-checkbox::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 700; }
+    .cert-item.sel .cert-cb { background: var(--blue); border-color: var(--blue); }
+    .cert-item.sel .cert-cb::after { content: '✓'; color: #fff; font-size: 12px; font-weight: 700; }
     .cert-name { font-size: 14px; font-weight: 600; color: var(--dark); }
     .cert-price { font-size: 14px; font-weight: 700; color: var(--blue); }
-    .cert-price.discounted { color: var(--green); }
+    .cert-price.scontato { color: var(--green); }
 
+    /* Rinnovo toggle */
     .rinnovo-wrap {
       margin-top: 16px; padding: 14px 18px;
       background: #fff8ec; border: 1.5px solid #f0c060;
       border-radius: 10px; display: flex; align-items: center; gap: 14px;
       cursor: pointer; user-select: none;
     }
-    .rinnovo-wrap input[type="checkbox"] { display: none; }
     .rinnovo-toggle {
       width: 44px; height: 24px; background: #dde3ee;
       border-radius: 12px; position: relative; flex-shrink: 0; transition: background .2s;
     }
     .rinnovo-toggle::after {
-      content: ''; position: absolute;
-      width: 18px; height: 18px; background: #fff;
-      border-radius: 50%; top: 3px; left: 3px;
+      content: ''; position: absolute; width: 18px; height: 18px;
+      background: #fff; border-radius: 50%; top: 3px; left: 3px;
       transition: transform .2s; box-shadow: 0 1px 4px rgba(0,0,0,.2);
     }
-    .rinnovo-wrap.active .rinnovo-toggle { background: var(--green); }
-    .rinnovo-wrap.active .rinnovo-toggle::after { transform: translateX(20px); }
+    .rinnovo-wrap.on .rinnovo-toggle { background: var(--green); }
+    .rinnovo-wrap.on .rinnovo-toggle::after { transform: translateX(20px); }
     .rinnovo-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--dark); }
     .rinnovo-text span { font-size: 12px; color: var(--gray); }
 
+    /* Preventivo */
     .preventivo {
       background: var(--blue-light); border-radius: 10px;
       padding: 20px 22px; margin-top: 20px; display: none;
     }
-    .preventivo.visible { display: block; }
+    .preventivo.on { display: block; }
     .preventivo h4 { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .7px; color: var(--blue); margin-bottom: 12px; }
     .prev-row { display: flex; justify-content: space-between; font-size: 13.5px; margin-bottom: 6px; color: var(--dark); }
     .prev-row span:last-child { font-weight: 700; }
     .prev-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; color: var(--blue); padding-top: 10px; border-top: 1.5px solid rgba(26,78,143,.18); margin-top: 8px; }
 
     /* ── DISPONIBILITÀ ── */
-    .disponibilita-note { font-size: 13px; color: var(--gray); margin-bottom: 18px; line-height: 1.6; }
+    .dispo-note { font-size: 13px; color: var(--gray); margin-bottom: 18px; line-height: 1.6; }
     .giorni-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 10px; margin-bottom: 22px; }
     .giorno-btn {
       padding: 12px 10px; border: 1.5px solid #dde3ee; border-radius: 8px;
@@ -219,11 +213,12 @@
       font-size: 13px; font-weight: 600; color: var(--dark); user-select: none;
     }
     .giorno-btn:hover { border-color: var(--blue); background: var(--blue-light); }
-    .giorno-btn.selected { border-color: var(--blue); background: var(--blue); color: #fff; }
-    .giorno-btn.disabled { opacity: .35; cursor: not-allowed; pointer-events: none; }
-    .orari-section { display: none; }
-    .orari-section.visible { display: block; }
-    .orari-section h4 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 12px; }
+    .giorno-btn.sel { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .giorno-btn.off { opacity: .35; cursor: not-allowed; pointer-events: none; }
+
+    .orari-wrap { display: none; }
+    .orari-wrap.on { display: block; }
+    .orari-wrap h4 { font-size: 13px; font-weight: 700; color: var(--dark); margin-bottom: 12px; }
     .orari-grid { display: flex; flex-wrap: wrap; gap: 8px; }
     .orario-btn {
       padding: 9px 16px; border: 1.5px solid #dde3ee; border-radius: 6px;
@@ -231,19 +226,19 @@
       color: var(--dark); user-select: none;
     }
     .orario-btn:hover { border-color: var(--blue); background: var(--blue-light); }
-    .orario-btn.selected { background: var(--blue); border-color: var(--blue); color: #fff; }
-    .slot-selezionato {
+    .orario-btn.sel { background: var(--blue); border-color: var(--blue); color: #fff; }
+
+    .slot-ok {
       margin-top: 16px; padding: 12px 16px;
       background: var(--green-light); border: 1.5px solid var(--green);
       border-radius: 8px; font-size: 13.5px; font-weight: 600; color: var(--green);
-      display: none;
+      display: none; align-items: center; gap: 8px;
     }
-    .slot-selezionato.visible { display: flex; align-items: center; gap: 8px; }
+    .slot-ok.on { display: flex; }
 
     /* ── SUBMIT ── */
     .submit-btn {
-      width: 100%; padding: 16px;
-      background: var(--blue); color: #fff;
+      width: 100%; padding: 16px; background: var(--blue); color: #fff;
       border: none; border-radius: 10px;
       font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
       cursor: pointer; transition: all .2s;
@@ -253,23 +248,23 @@
     .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
 
     /* ── ERRORE ── */
-    .error-msg {
+    .err-box {
       display: none; background: #fdf0ef; border: 1.5px solid #e74c3c;
       border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
       font-size: 13.5px; color: #c0392b; align-items: center; gap: 10px;
     }
-    .error-msg.visible { display: flex; }
+    .err-box.on { display: flex; }
 
     /* ── SUCCESSO ── */
-    .success-msg {
+    #successMsg {
       display: none; background: var(--green-light);
       border: 1.5px solid var(--green); border-radius: 12px;
-      padding: 28px 32px; text-align: center;
+      padding: 28px 32px; text-align: center; margin-top: 20px;
     }
-    .success-msg.visible { display: block; }
-    .success-msg i.big { font-size: 2.5rem; color: var(--green); margin-bottom: 14px; display: block; }
-    .success-msg h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); margin-bottom: 8px; }
-    .success-msg p { font-size: 14px; color: var(--gray); line-height: 1.65; }
+    #successMsg.on { display: block; }
+    #successMsg i { font-size: 2.5rem; color: var(--green); margin-bottom: 14px; display: block; }
+    #successMsg h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); margin-bottom: 8px; }
+    #successMsg p { font-size: 14px; color: var(--gray); line-height: 1.65; }
 
     .footer-mini { text-align: center; padding: 28px; font-size: 12px; color: var(--gray); border-top: 1px solid #e0e6f0; }
 
@@ -281,528 +276,451 @@
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="index.html" class="logo">
-      <img src="assets/images/logo.png" alt="Ospedale San Raffaele" />
-      <div class="logo-text">
-        <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
-        <span>Gruppo San Donato</span>
-      </div>
+<nav>
+  <a href="index.html" class="logo">
+    <img src="assets/images/logo.png" alt="San Raffaele" />
+    <div class="logo-text">
+      <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+      <span>Gruppo San Donato</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <div class="nav-user" id="navUser">
+      <img id="navAvatar" src="" alt="" />
+      <span class="nav-user-name" id="navUsername"></span>
+      <span class="nav-logout" onclick="logout()">Esci</span>
+    </div>
+    <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Torna alla Home</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Prenotazione Certificati Medici</h1>
+  <p>Accedi con Discord per verificare la tua identità, poi compila il modulo per richiedere il tuo certificato medico.</p>
+</div>
+
+<div class="main-wrap">
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="discord-logo-wrap"><i class="fa-brands fa-discord"></i></div>
+    <h2>Accesso richiesto</h2>
+    <p>Per prenotare un certificato medico è necessario verificare la tua identità tramite account Discord. Il processo è rapido e sicuro.</p>
+    <a id="loginBtn" href="#" class="btn-discord">
+      <i class="fa-brands fa-discord"></i> Accedi con Discord
     </a>
-    <div class="nav-right">
-      <div class="nav-user" id="navUser">
-        <img id="navAvatar" src="" alt="" />
-        <div>
-          <span id="navUsername"></span>
-          <small id="navTag"></small>
-        </div>
-        <span class="nav-logout" onclick="logout()">Esci</span>
-      </div>
-      <a href="index.html" class="nav-back">
-        <i class="fa-solid fa-arrow-left"></i> Torna alla Home
-      </a>
-    </div>
-  </nav>
-
-  <!-- HEADER -->
-  <div class="page-header">
-    <h1>Prenotazione Certificati Medici</h1>
-    <p>Accedi con Discord per verificare la tua identità, poi compila il modulo per richiedere il tuo certificato medico.</p>
+    <p class="login-note">Verranno richieste solo le informazioni base del profilo (username e avatar).</p>
   </div>
 
-  <div class="main-wrap">
-
-    <!-- ① LOGIN DISCORD -->
-    <div id="loginScreen">
-      <div class="discord-logo-wrap">
-        <i class="fa-brands fa-discord"></i>
-      </div>
-      <h2>Accesso richiesto</h2>
-      <p>Per prenotare un certificato medico è necessario verificare la tua identità tramite account Discord. Il processo è rapido e sicuro.</p>
-      <a id="discordLoginBtn" href="#" class="btn-discord">
-        <i class="fa-brands fa-discord"></i>
-        Accedi con Discord
-      </a>
-      <p class="login-note">Verranno richieste solo le informazioni base del profilo (username e avatar).</p>
-    </div>
-
-    <!-- ② LOADING -->
-    <div id="loadingScreen">
-      <div class="spinner"></div>
-      <p>Verifica in corso, attendi…</p>
-    </div>
-
-    <!-- ③ FORM -->
-    <div id="formScreen">
-
-      <!-- DATI PERSONALI -->
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-user"></i> Dati Personali</div>
-
-        <div class="discord-badge" id="discordBadge">
-          <img id="badgeAvatar" src="" alt="" />
-          <div class="discord-badge-text">
-            <strong id="badgeUsername"></strong>
-            <span id="badgeTag"></span>
-          </div>
-          <i class="fa-solid fa-circle-check"></i>
-        </div>
-
-        <div id="formError" class="error-msg">
-          <i class="fa-solid fa-circle-exclamation"></i>
-          <span id="formErrorTesto"></span>
-        </div>
-
-        <div class="form-row">
-          <div class="form-group">
-            <label>Nome e Cognome <span class="req">*</span></label>
-            <input type="text" id="nome" placeholder="Es. Mario Rossi" />
-          </div>
-          <div class="form-group">
-            <label>Data di Nascita <span class="req">*</span></label>
-            <input type="date" id="dataNascita" />
-          </div>
-        </div>
-        <div class="form-row single">
-          <div class="form-group">
-            <label>Numero di Telefono <span class="req">*</span></label>
-            <input type="tel" id="telefono" placeholder="Es. +39 333 1234567" />
-          </div>
-        </div>
-      </div>
-
-      <!-- CERTIFICATI -->
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-file-medical"></i> Tipo di Certificato</div>
-        <div class="cert-grid">
-          <div class="cert-item" data-id="anamnestico" data-prezzo="5000" data-rinnovo="1000" onclick="toggleCert(this)">
-            <div class="cert-left">
-              <div class="cert-checkbox"></div>
-              <div class="cert-name">Certificato Anamnestico</div>
-            </div>
-            <div class="cert-price">€5.000</div>
-          </div>
-          <div class="cert-item" data-id="sana-robusta" data-prezzo="5000" data-rinnovo="1000" onclick="toggleCert(this)">
-            <div class="cert-left">
-              <div class="cert-checkbox"></div>
-              <div class="cert-name">Certificato di Sana e Robusta Costituzione</div>
-            </div>
-            <div class="cert-price">€5.000</div>
-          </div>
-          <div class="cert-item" data-id="prima-classe" data-prezzo="3000" data-rinnovo="1000" onclick="toggleCert(this)">
-            <div class="cert-left">
-              <div class="cert-checkbox"></div>
-              <div class="cert-name">Certificato di Prima Classe</div>
-            </div>
-            <div class="cert-price">€3.000</div>
-          </div>
-          <div class="cert-item" data-id="prima-classe-nautico" data-prezzo="3000" data-rinnovo="1000" onclick="toggleCert(this)">
-            <div class="cert-left">
-              <div class="cert-checkbox"></div>
-              <div class="cert-name">Certificato di Prima Classe Nautico</div>
-            </div>
-            <div class="cert-price">€3.000</div>
-          </div>
-        </div>
-
-        <div class="rinnovo-wrap" id="rinnovoWrap" onclick="toggleRinnovo()">
-          <input type="checkbox" id="rinnovoCheck" />
-          <div class="rinnovo-toggle"></div>
-          <div class="rinnovo-text">
-            <strong>Devo solo rinnovarli</strong>
-            <span>Attivando questa opzione il costo scende a €1.000 per ogni certificato selezionato</span>
-          </div>
-        </div>
-
-        <div class="preventivo" id="preventivo">
-          <h4><i class="fa-solid fa-receipt"></i> Preventivo</h4>
-          <div id="prevRows"></div>
-          <div class="prev-total">
-            <span>Totale stimato</span>
-            <span id="prevTotale">€0</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- DISPONIBILITÀ -->
-      <div class="card">
-        <div class="card-title"><i class="fa-solid fa-calendar-days"></i> Disponibilità</div>
-        <p class="disponibilita-note">
-          Seleziona il giorno in cui vorresti prenotare la visita. Sono disponibili solo i giorni in cui il medico è presente. Una volta scelto il giorno compariranno gli orari disponibili (ogni visita dura circa 10 minuti).
-        </p>
-        <div class="giorni-grid" id="giorniGrid"></div>
-        <div class="orari-section" id="orariSection">
-          <h4 id="orariTitle">Scegli l'orario:</h4>
-          <div class="orari-grid" id="orariGrid"></div>
-        </div>
-        <div class="slot-selezionato" id="slotSelezionato">
-          <i class="fa-solid fa-circle-check"></i>
-          <span id="slotTesto"></span>
-        </div>
-      </div>
-
-      <!-- SUBMIT -->
-      <div id="formWrap">
-        <button class="submit-btn" id="submitBtn" onclick="inviaRichiesta()">
-          <i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione
-        </button>
-      </div>
-
-      <!-- SUCCESSO -->
-      <div class="success-msg" id="successMsg">
-        <i class="fa-solid fa-circle-check big"></i>
-        <h3>Richiesta inviata con successo!</h3>
-        <p>La tua richiesta è stata ricevuta. Sarai contattato al numero indicato per confermare l'appuntamento.<br>Grazie per aver scelto l'Ospedale San Raffaele.</p>
-      </div>
-
-    </div><!-- /formScreen -->
-  </div><!-- /main-wrap -->
-
-  <div class="footer-mini">
-    © 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962
+  <!-- LOADING -->
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+    <p>Verifica in corso, attendi…</p>
   </div>
 
-  <script>
-    // ═══════════════════════════════════════════
-    //  ▶ CONFIGURAZIONE – modifica solo qui
-    // ═══════════════════════════════════════════
-    const DISCORD_CLIENT_ID = '1484523347243958414';
-    const REDIRECT_URI = 'https://sormanilorenzo.github.io/sanraffaele.irp/pazienti_index.html';
-    const WEBHOOK_URL       = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
+  <!-- FORM -->
+  <div id="formScreen">
 
-    // Disponibilità medico: null = non disponibile
-    const DISPONIBILITA = {
-      "Lunedì":    null,
-      "Martedì":   null,
-      "Mercoledì": { inizio: "10:00", fine: "12:00" },
-      "Giovedì":   null,
-      "Venerdì":   { inizio: "15:00", fine: "17:00" },
-      "Sabato":    { inizio: "21:00", fine: "22:00" },
-      "Domenica":  { inizio: "21:00", fine: "22:00" },
-    };
-    const DURATA_MIN = 10;
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-user"></i> Dati Personali</div>
 
-    // ═══════════════════════════════════════════
-    //  STATO
-    // ═══════════════════════════════════════════
-    let discordUser    = null;
-    let selectedCerts  = {};
-    let isRinnovo      = false;
-    let selectedGiorno = null;
-    let selectedOrario = null;
+      <div class="discord-badge">
+        <img id="bdgAvatar" src="" alt="" />
+        <div class="discord-badge-text">
+          <strong id="bdgUsername"></strong>
+          <span id="bdgTag"></span>
+        </div>
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
 
-    // ═══════════════════════════════════════════
-    //  HELPERS VISIBILITÀ
-    // ═══════════════════════════════════════════
-    const $ = id => document.getElementById(id);
+      <div class="err-box" id="errBox">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="errTesto"></span>
+      </div>
 
-    function showFlex(id)  { $(id).style.display = 'flex';  }
-    function showBlock(id) { $(id).style.display = 'block'; }
-    function hideEl(id)    { $(id).style.display = 'none';  }
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome e Cognome <span class="req">*</span></label>
+          <input type="text" id="nome" placeholder="Es. Mario Rossi" />
+        </div>
+        <div class="form-group">
+          <label>Data di Nascita <span class="req">*</span></label>
+          <input type="date" id="dataNascita" />
+        </div>
+      </div>
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Numero di Telefono <span class="req">*</span></label>
+          <input type="tel" id="telefono" placeholder="Es. +39 333 1234567" />
+        </div>
+      </div>
+    </div>
 
-    // ═══════════════════════════════════════════
-    //  OAUTH2 – implicit flow (no server needed)
-    // ═══════════════════════════════════════════
-    function buildOAuthURL() {
-      const state = ([1e7]+-1e3+-4e3+-8e3+-1e11)
-        .replace(/[018]/g, c => (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16));
-      sessionStorage.setItem('discord_state', state);
-      const p = new URLSearchParams({
-        client_id:     DISCORD_CLIENT_ID,
-        redirect_uri:  REDIRECT_URI,
-        response_type: 'token',
-        scope:         'identify',
-        state,
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-file-medical"></i> Tipo di Certificato</div>
+      <div class="cert-grid">
+        <div class="cert-item" data-id="anamnestico" data-p="5000" data-r="1000" onclick="toggleCert(this)">
+          <div class="cert-left"><div class="cert-cb"></div><div class="cert-name">Certificato Anamnestico</div></div>
+          <div class="cert-price">€5.000</div>
+        </div>
+        <div class="cert-item" data-id="sana-robusta" data-p="5000" data-r="1000" onclick="toggleCert(this)">
+          <div class="cert-left"><div class="cert-cb"></div><div class="cert-name">Certificato di Sana e Robusta Costituzione</div></div>
+          <div class="cert-price">€5.000</div>
+        </div>
+        <div class="cert-item" data-id="prima-classe" data-p="3000" data-r="1000" onclick="toggleCert(this)">
+          <div class="cert-left"><div class="cert-cb"></div><div class="cert-name">Certificato di Prima Classe</div></div>
+          <div class="cert-price">€3.000</div>
+        </div>
+        <div class="cert-item" data-id="prima-classe-nautico" data-p="3000" data-r="1000" onclick="toggleCert(this)">
+          <div class="cert-left"><div class="cert-cb"></div><div class="cert-name">Certificato di Prima Classe Nautico</div></div>
+          <div class="cert-price">€3.000</div>
+        </div>
+      </div>
+
+      <div class="rinnovo-wrap" id="rinnovoWrap" onclick="toggleRinnovo()">
+        <div class="rinnovo-toggle"></div>
+        <div class="rinnovo-text">
+          <strong>Devo solo rinnovarli</strong>
+          <span>Attivando questa opzione il costo scende a €1.000 per ogni certificato selezionato</span>
+        </div>
+      </div>
+
+      <div class="preventivo" id="preventivo">
+        <h4><i class="fa-solid fa-receipt"></i> Preventivo</h4>
+        <div id="prevRows"></div>
+        <div class="prev-total"><span>Totale stimato</span><span id="prevTot">€0</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title"><i class="fa-solid fa-calendar-days"></i> Disponibilità</div>
+      <p class="dispo-note">Seleziona il giorno e poi l'orario. Ogni visita dura circa 10 minuti.</p>
+      <div class="giorni-grid" id="giorniGrid"></div>
+      <div class="orari-wrap" id="orariWrap">
+        <h4 id="orariTitle"></h4>
+        <div class="orari-grid" id="orariGrid"></div>
+      </div>
+      <div class="slot-ok" id="slotOk">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="slotTesto"></span>
+      </div>
+    </div>
+
+    <div id="formWrap">
+      <button class="submit-btn" id="submitBtn" onclick="invia()">
+        <i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione
+      </button>
+    </div>
+
+    <div id="successMsg">
+      <i class="fa-solid fa-circle-check"></i>
+      <h3>Richiesta inviata con successo!</h3>
+      <p>La tua richiesta è stata ricevuta. Sarai contattato al numero indicato per confermare l'appuntamento.<br>Grazie per aver scelto l'Ospedale San Raffaele.</p>
+    </div>
+
+  </div><!-- /formScreen -->
+</div><!-- /main-wrap -->
+
+<div class="footer-mini">© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962</div>
+
+<script>
+  /* ═══════════════════════════════════════════
+     CONFIGURAZIONE
+  ═══════════════════════════════════════════ */
+  const CLIENT_ID   = '1484523347243958414';
+  const REDIRECT    = 'https://sormanilorenzo.github.io/sanraffaele.irp/pazienti_index.html';
+  const WEBHOOK     = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
+
+  const DISPO = {
+    "Lunedì":    null,
+    "Martedì":   null,
+    "Mercoledì": { da: "10:00", a: "12:00" },
+    "Giovedì":   null,
+    "Venerdì":   { da: "15:00", a: "17:00" },
+    "Sabato":    { da: "21:00", a: "22:00" },
+    "Domenica":  { da: "21:00", a: "22:00" },
+  };
+  const SLOT_MIN = 10;
+
+  /* ═══════════════════════════════════════════
+     STATO
+  ═══════════════════════════════════════════ */
+  let user    = null;
+  let certs   = {};
+  let rinnovo = false;
+  let giorno  = null;
+  let orario  = null;
+
+  /* ═══════════════════════════════════════════
+     SCHERMATA – unica funzione di routing
+     'login' | 'loading' | 'form'
+  ═══════════════════════════════════════════ */
+  function mostra(schermata) {
+    document.getElementById('loginScreen').style.display   = schermata === 'login'   ? 'flex'  : 'none';
+    document.getElementById('loadingScreen').style.display = schermata === 'loading' ? 'flex'  : 'none';
+    document.getElementById('formScreen').style.display    = schermata === 'form'    ? 'block' : 'none';
+  }
+
+  /* ═══════════════════════════════════════════
+     OAUTH2 – implicit flow
+  ═══════════════════════════════════════════ */
+  function oauthURL() {
+    const state = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('dstate', state);
+    return 'https://discord.com/oauth2/authorize?' + new URLSearchParams({
+      client_id:     CLIENT_ID,
+      redirect_uri:  REDIRECT,
+      response_type: 'token',
+      scope:         'identify',
+      state,
+    });
+  }
+
+  async function leggiCallback() {
+    // GitHub Pages a volte mette i parametri nella query invece che nell'hash
+    // Proviamo entrambi
+    const fromHash  = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const fromQuery = new URLSearchParams(location.search.replace(/^\?/, ''));
+
+    const token = fromHash.get('access_token') || fromQuery.get('access_token');
+    if (!token) return false;
+
+    // Pulisce URL
+    history.replaceState(null, '', location.pathname);
+
+    mostra('loading');
+
+    try {
+      const res = await fetch('https://discord.com/api/users/@me', {
+        headers: { Authorization: 'Bearer ' + token }
       });
-      return `https://discord.com/oauth2/authorize?${p}`;
-    }
+      if (!res.ok) throw new Error(res.status);
+      const u = await res.json();
 
-    async function handleOAuthCallback() {
-      const hash   = window.location.hash.slice(1);
-      const params = new URLSearchParams(hash);
-      const token  = params.get('access_token');
-      if (!token) return false;
-
-      // Anti-CSRF check
-      const savedState = sessionStorage.getItem('discord_state');
-      const retState   = params.get('state');
-      if (savedState && retState && savedState !== retState) {
-        mostraErrore('Errore di sicurezza nel login. Riprova.');
-        return false;
-      }
-      sessionStorage.removeItem('discord_state');
-
-      // Pulisce l'hash dall'URL senza ricaricare
-      history.replaceState(null, '', window.location.pathname + window.location.search);
-
-      // Loading
-      hideEl('loginScreen');
-      showFlex('loadingScreen');
-
-      try {
-        const res  = await fetch('https://discord.com/api/users/@me', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (!res.ok) throw new Error('API error ' + res.status);
-        const u = await res.json();
-
-        const defaultAvatar = `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id) % 6n)}.png`;
-        discordUser = {
-          id:       u.id,
-          username: u.username,
-          tag:      u.discriminator && u.discriminator !== '0' ? `#${u.discriminator}` : `@${u.username}`,
-          avatar:   u.avatar
-            ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
-            : defaultAvatar,
-        };
-        sessionStorage.setItem('discord_user', JSON.stringify(discordUser));
-        mostraForm();
-      } catch(e) {
-        hideEl('loadingScreen');
-        showFlex('loginScreen');
-        mostraErrore('Impossibile ottenere i dati Discord. Riprova.');
-      }
-      return true;
-    }
-
-    // ═══════════════════════════════════════════
-    //  SCHERMATE
-    // ═══════════════════════════════════════════
-    function mostraForm() {
-      hideEl('loadingScreen');
-      hideEl('loginScreen');
-      showBlock('formScreen');
-
-      $('badgeAvatar').src          = discordUser.avatar;
-      $('badgeUsername').textContent = discordUser.username;
-      $('badgeTag').textContent      = discordUser.tag;
-      $('navAvatar').src            = discordUser.avatar;
-      $('navUsername').textContent   = discordUser.username;
-      $('navTag').textContent        = discordUser.tag;
-      $('navUser').classList.add('visible');
-
-      buildGiorni();
-    }
-
-    function logout() {
-      sessionStorage.removeItem('discord_user');
-      discordUser = null;
-      hideEl('formScreen');
-      showFlex('loginScreen');
-      $('navUser').classList.remove('visible');
-    }
-
-    function mostraErrore(msg) {
-      $('formErrorTesto').textContent = msg;
-      $('formError').classList.add('visible');
-      setTimeout(() => $('formError').classList.remove('visible'), 6000);
-    }
-
-    // ═══════════════════════════════════════════
-    //  SLOT ORARI
-    // ═══════════════════════════════════════════
-    function generaSlot(inizio, fine) {
-      const slots = [];
-      let [hI, mI] = inizio.split(':').map(Number);
-      let [hF, mF] = fine.split(':').map(Number);
-      let cur = hI * 60 + mI, end = hF * 60 + mF;
-      while (cur < end) {
-        slots.push(`${String(Math.floor(cur/60)).padStart(2,'0')}:${String(cur%60).padStart(2,'0')}`);
-        cur += DURATA_MIN;
-      }
-      return slots;
-    }
-
-    function buildGiorni() {
-      const grid = $('giorniGrid');
-      grid.innerHTML = '';
-      for (const [giorno, slot] of Object.entries(DISPONIBILITA)) {
-        const btn = document.createElement('div');
-        btn.className = 'giorno-btn' + (slot ? '' : ' disabled');
-        btn.textContent = giorno;
-        if (slot) btn.onclick = () => selectGiorno(btn, giorno, slot);
-        grid.appendChild(btn);
-      }
-    }
-
-    function selectGiorno(btn, giorno, slot) {
-      document.querySelectorAll('.giorno-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedGiorno = giorno;
-      selectedOrario = null;
-      $('slotSelezionato').classList.remove('visible');
-
-      const slots = generaSlot(slot.inizio, slot.fine);
-      $('orariTitle').textContent = `Scegli l'orario per ${giorno}:`;
-      const og = $('orariGrid');
-      og.innerHTML = '';
-      slots.forEach(s => {
-        const b = document.createElement('div');
-        b.className = 'orario-btn';
-        b.textContent = s;
-        b.onclick = () => selectOrario(b, giorno, s);
-        og.appendChild(b);
-      });
-      $('orariSection').classList.add('visible');
-    }
-
-    function selectOrario(btn, giorno, orario) {
-      document.querySelectorAll('.orario-btn').forEach(b => b.classList.remove('selected'));
-      btn.classList.add('selected');
-      selectedOrario = orario;
-      $('slotTesto').textContent = `Appuntamento selezionato: ${giorno} alle ${orario}`;
-      $('slotSelezionato').classList.add('visible');
-    }
-
-    // ═══════════════════════════════════════════
-    //  CERTIFICATI
-    // ═══════════════════════════════════════════
-    function toggleCert(el) {
-      el.classList.toggle('selected');
-      const id = el.dataset.id;
-      if (el.classList.contains('selected')) {
-        selectedCerts[id] = {
-          nome:    el.querySelector('.cert-name').textContent,
-          prezzo:  +el.dataset.prezzo,
-          rinnovo: +el.dataset.rinnovo,
-        };
-      } else delete selectedCerts[id];
-      aggiornaPrezzi();
-    }
-
-    function toggleRinnovo() {
-      isRinnovo = !isRinnovo;
-      $('rinnovoWrap').classList.toggle('active', isRinnovo);
-      aggiornaPrezzi();
-    }
-
-    function aggiornaPrezzi() {
-      document.querySelectorAll('.cert-item').forEach(el => {
-        const p = el.querySelector('.cert-price');
-        const v = isRinnovo ? +el.dataset.rinnovo : +el.dataset.prezzo;
-        p.textContent = `€${v.toLocaleString('it-IT')}`;
-        p.className = 'cert-price' + (isRinnovo ? ' discounted' : '');
-      });
-      const keys = Object.keys(selectedCerts);
-      const prev = $('preventivo');
-      if (!keys.length) { prev.classList.remove('visible'); return; }
-      prev.classList.add('visible');
-      $('prevRows').innerHTML = '';
-      let tot = 0;
-      keys.forEach(k => {
-        const c = selectedCerts[k], p = isRinnovo ? c.rinnovo : c.prezzo;
-        tot += p;
-        const row = document.createElement('div');
-        row.className = 'prev-row';
-        row.innerHTML = `<span>${c.nome}</span><span>€${p.toLocaleString('it-IT')}</span>`;
-        $('prevRows').appendChild(row);
-      });
-      $('prevTotale').textContent = `€${tot.toLocaleString('it-IT')}`;
-    }
-
-    // ═══════════════════════════════════════════
-    //  INVIO WEBHOOK
-    // ═══════════════════════════════════════════
-    async function inviaRichiesta() {
-      const nome  = $('nome').value.trim();
-      const dataN = $('dataNascita').value;
-      const tel   = $('telefono').value.trim();
-
-      if (!nome || !dataN || !tel) {
-        mostraErrore('Compila tutti i campi obbligatori: nome, data di nascita e telefono.');
-        return;
-      }
-      if (!Object.keys(selectedCerts).length) {
-        mostraErrore('Seleziona almeno un tipo di certificato.');
-        return;
-      }
-      if (!selectedGiorno || !selectedOrario) {
-        mostraErrore("Seleziona il giorno e l'orario preferiti per la visita.");
-        return;
-      }
-
-      const btn = $('submitBtn');
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso…';
-
-      const certLines = Object.values(selectedCerts)
-        .map(c => `• ${c.nome} → €${(isRinnovo ? c.rinnovo : c.prezzo).toLocaleString('it-IT')}`)
-        .join('\n');
-      const tot = Object.values(selectedCerts)
-        .reduce((a, c) => a + (isRinnovo ? c.rinnovo : c.prezzo), 0);
-      const dataFormattata = new Date(dataN).toLocaleDateString('it-IT',
-        { day:'2-digit', month:'2-digit', year:'numeric' });
-
-      const payload = {
-        username:   'San Raffaele – Prenotazioni',
-        embeds: [{
-          title:  '🏥 Nuova Richiesta Certificato Medico',
-          color:  0x1a4e8f,
-          fields: [
-            { name: '👤 Paziente',          value: nome,                                              inline: true  },
-            { name: '📅 Data di Nascita',   value: dataFormattata,                                    inline: true  },
-            { name: '📞 Telefono',          value: tel,                                               inline: true  },
-            { name: '🎮 Account Discord',   value: `${discordUser.username} \`${discordUser.id}\``,  inline: false },
-            { name: `📋 Certificati${isRinnovo ? ' (Rinnovo)' : ''}`, value: certLines,              inline: false },
-            { name: '💰 Totale Preventivo', value: `€${tot.toLocaleString('it-IT')}`,                inline: true  },
-            { name: '🗓️ Appuntamento',      value: `**${selectedGiorno}** alle **${selectedOrario}**`, inline: true },
-          ],
-          thumbnail: { url: discordUser.avatar },
-          footer:    { text: 'I.R.C.C.S. Ospedale San Raffaele – Prenotazioni' },
-          timestamp: new Date().toISOString(),
-        }]
+      user = {
+        id:       u.id,
+        username: u.username,
+        tag:      (u.discriminator && u.discriminator !== '0') ? '#' + u.discriminator : '@' + u.username,
+        avatar:   u.avatar
+          ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+          : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id) % 6n)}.png`,
       };
+      sessionStorage.setItem('du', JSON.stringify(user));
+      mostraForm();
+    } catch(e) {
+      mostra('login');
+      errore('Impossibile ottenere i dati Discord (' + e.message + '). Riprova.');
+    }
+    return true;
+  }
 
-      try {
-        const res = await fetch(WEBHOOK_URL, {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify(payload),
-        });
-        if (!res.ok) throw new Error('HTTP ' + res.status);
+  function mostraForm() {
+    mostra('form');
+    document.getElementById('bdgAvatar').src        = user.avatar;
+    document.getElementById('bdgUsername').textContent = user.username;
+    document.getElementById('bdgTag').textContent   = user.tag;
+    document.getElementById('navAvatar').src        = user.avatar;
+    document.getElementById('navUsername').textContent = user.username;
+    document.getElementById('navUser').classList.add('on');
+    buildGiorni();
+  }
 
-        $('formWrap').style.display = 'none';
-        // Nasconde tutte le card del form
-        document.querySelectorAll('#formScreen .card').forEach(c => c.style.display = 'none');
-        $('successMsg').classList.add('visible');
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+  function logout() {
+    sessionStorage.removeItem('du');
+    user = null;
+    mostra('login');
+    document.getElementById('navUser').classList.remove('on');
+  }
 
-      } catch(e) {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione';
-        mostraErrore("Errore durante l'invio. Controlla la connessione e riprova.");
-      }
+  function errore(msg) {
+    const box = document.getElementById('errBox');
+    document.getElementById('errTesto').textContent = msg;
+    box.classList.add('on');
+    setTimeout(() => box.classList.remove('on'), 7000);
+  }
+
+  /* ═══════════════════════════════════════════
+     SLOT ORARI
+  ═══════════════════════════════════════════ */
+  function slot(da, a) {
+    const out = [];
+    let [h, m] = da.split(':').map(Number);
+    let [hf, mf] = a.split(':').map(Number);
+    let cur = h * 60 + m, end = hf * 60 + mf;
+    while (cur < end) {
+      out.push(String(Math.floor(cur/60)).padStart(2,'0') + ':' + String(cur%60).padStart(2,'0'));
+      cur += SLOT_MIN;
+    }
+    return out;
+  }
+
+  function buildGiorni() {
+    const g = document.getElementById('giorniGrid');
+    g.innerHTML = '';
+    for (const [nome, dispo] of Object.entries(DISPO)) {
+      const b = document.createElement('div');
+      b.className = 'giorno-btn' + (dispo ? '' : ' off');
+      b.textContent = nome;
+      if (dispo) b.onclick = () => selGiorno(b, nome, dispo);
+      g.appendChild(b);
+    }
+  }
+
+  function selGiorno(btn, nome, dispo) {
+    document.querySelectorAll('.giorno-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    giorno = nome; orario = null;
+    document.getElementById('slotOk').classList.remove('on');
+
+    const slots = slot(dispo.da, dispo.a);
+    document.getElementById('orariTitle').textContent = 'Scegli l\'orario per ' + nome + ':';
+    const og = document.getElementById('orariGrid');
+    og.innerHTML = '';
+    slots.forEach(s => {
+      const b = document.createElement('div');
+      b.className = 'orario-btn';
+      b.textContent = s;
+      b.onclick = () => selOrario(b, nome, s);
+      og.appendChild(b);
+    });
+    document.getElementById('orariWrap').classList.add('on');
+  }
+
+  function selOrario(btn, g, o) {
+    document.querySelectorAll('.orario-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+    orario = o;
+    document.getElementById('slotTesto').textContent = 'Appuntamento: ' + g + ' alle ' + o;
+    document.getElementById('slotOk').classList.add('on');
+  }
+
+  /* ═══════════════════════════════════════════
+     CERTIFICATI
+  ═══════════════════════════════════════════ */
+  function toggleCert(el) {
+    el.classList.toggle('sel');
+    const id = el.dataset.id;
+    if (el.classList.contains('sel')) {
+      certs[id] = { nome: el.querySelector('.cert-name').textContent, p: +el.dataset.p, r: +el.dataset.r };
+    } else delete certs[id];
+    aggPrezzi();
+  }
+
+  function toggleRinnovo() {
+    rinnovo = !rinnovo;
+    document.getElementById('rinnovoWrap').classList.toggle('on', rinnovo);
+    aggPrezzi();
+  }
+
+  function aggPrezzi() {
+    document.querySelectorAll('.cert-item').forEach(el => {
+      const lbl = el.querySelector('.cert-price');
+      const val = rinnovo ? +el.dataset.r : +el.dataset.p;
+      lbl.textContent = '€' + val.toLocaleString('it-IT');
+      lbl.className = 'cert-price' + (rinnovo ? ' scontato' : '');
+    });
+    const keys = Object.keys(certs);
+    const prev = document.getElementById('preventivo');
+    if (!keys.length) { prev.classList.remove('on'); return; }
+    prev.classList.add('on');
+    const rows = document.getElementById('prevRows');
+    rows.innerHTML = '';
+    let tot = 0;
+    keys.forEach(k => {
+      const c = certs[k], val = rinnovo ? c.r : c.p;
+      tot += val;
+      rows.innerHTML += `<div class="prev-row"><span>${c.nome}</span><span>€${val.toLocaleString('it-IT')}</span></div>`;
+    });
+    document.getElementById('prevTot').textContent = '€' + tot.toLocaleString('it-IT');
+  }
+
+  /* ═══════════════════════════════════════════
+     INVIO WEBHOOK
+  ═══════════════════════════════════════════ */
+  async function invia() {
+    const nome  = document.getElementById('nome').value.trim();
+    const dataN = document.getElementById('dataNascita').value;
+    const tel   = document.getElementById('telefono').value.trim();
+
+    if (!nome || !dataN || !tel)       return errore('Compila tutti i campi obbligatori.');
+    if (!Object.keys(certs).length)    return errore('Seleziona almeno un certificato.');
+    if (!giorno || !orario)            return errore('Seleziona giorno e orario.');
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso…';
+
+    const righe = Object.values(certs)
+      .map(c => '• ' + c.nome + ' → €' + (rinnovo ? c.r : c.p).toLocaleString('it-IT'))
+      .join('\n');
+    const tot = Object.values(certs).reduce((a, c) => a + (rinnovo ? c.r : c.p), 0);
+    const data = new Date(dataN).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+    const payload = {
+      username: 'San Raffaele – Prenotazioni',
+      embeds: [{
+        title: '🏥 Nuova Richiesta Certificato Medico',
+        color: 0x1a4e8f,
+        fields: [
+          { name: '👤 Paziente',        value: nome,                                         inline: true  },
+          { name: '📅 Data di nascita', value: data,                                         inline: true  },
+          { name: '📞 Telefono',        value: tel,                                          inline: true  },
+          { name: '🎮 Discord',         value: user.username + ' (`' + user.id + '`)',       inline: false },
+          { name: '📋 Certificati' + (rinnovo ? ' – Rinnovo' : ''), value: righe,           inline: false },
+          { name: '💰 Totale',          value: '€' + tot.toLocaleString('it-IT'),           inline: true  },
+          { name: '🗓️ Appuntamento',    value: '**' + giorno + '** alle **' + orario + '**', inline: true },
+        ],
+        thumbnail: { url: user.avatar },
+        footer:    { text: 'I.R.C.C.S. Ospedale San Raffaele' },
+        timestamp: new Date().toISOString(),
+      }]
+    };
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      document.getElementById('formWrap').style.display = 'none';
+      document.querySelectorAll('#formScreen .card').forEach(c => c.style.display = 'none');
+      document.getElementById('successMsg').classList.add('on');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia Richiesta di Prenotazione';
+      errore('Errore durante l\'invio (' + e.message + '). Riprova.');
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════ */
+  (async function init() {
+    // Imposta URL bottone login
+    document.getElementById('loginBtn').href = oauthURL();
+
+    // Caso 1: stiamo tornando dal callback OAuth2?
+    if (location.hash.includes('access_token') || location.search.includes('access_token')) {
+      await leggiCallback();
+      return;
     }
 
-    // ═══════════════════════════════════════════
-    //  INIT
-    // ═══════════════════════════════════════════
-    (async function init() {
-      // Imposta URL del bottone Discord
-      $('discordLoginBtn').href = buildOAuthURL();
-
-      // Caso 1: ritorno dal callback OAuth2 (token nell'hash)
-      if (window.location.hash.includes('access_token')) {
-        await handleOAuthCallback();
+    // Caso 2: sessione già salvata?
+    try {
+      const saved = sessionStorage.getItem('du');
+      if (saved) {
+        user = JSON.parse(saved);
+        mostraForm();
         return;
       }
+    } catch(e) { sessionStorage.removeItem('du'); }
 
-      // Caso 2: sessione già salvata
-      const saved = sessionStorage.getItem('discord_user');
-      if (saved) {
-        try {
-          discordUser = JSON.parse(saved);
-          mostraForm();
-          return;
-        } catch(e) {
-          sessionStorage.removeItem('discord_user');
-        }
-      }
-
-      // Caso 3: nessuna sessione → mostra login
-      showFlex('loginScreen');
-    })();
-  </script>
+    // Caso 3: nessuna sessione → login
+    mostra('login');
+  })();
+</script>
 </body>
 </html>
