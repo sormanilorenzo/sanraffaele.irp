@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Candidature Aperte – I.R.C.C.S. Ospedale San Raffaele</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:        #1a4e8f;
+      --blue-dark:   #0d2b5e;
+      --blue-mid:    #2567b0;
+      --blue-light:  #e8f1fb;
+      --teal:        #0f8891;
+      --dark:        #0d1b2a;
+      --gray:        #6b7a8d;
+      --light-gray:  #f7f9fc;
+      --radius:      12px;
+      --shadow:      0 4px 24px rgba(26,78,143,.10);
+      --shadow-lg:   0 12px 48px rgba(26,78,143,.18);
+      --green:       #1a8f5a;
+      --green-light: #e6f7f0;
+      --discord:     #5865F2;
+      --discord-hov: #4752c4;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--light-gray); color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255,255,255,.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(26,78,143,.08);
+      padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo img { height: 60px; width: auto; }
+    .logo-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--blue); }
+    .logo-text span   { font-size: 11px; color: var(--gray); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-back {
+      display: flex; align-items: center; gap: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 600; color: var(--blue);
+      padding: 8px 16px; border: 1.5px solid var(--blue); border-radius: 6px; transition: all .2s;
+    }
+    .nav-back:hover { background: var(--blue); color: #fff; }
+    .nav-user { display: none; align-items: center; gap: 10px; background: #f0f2ff; border-radius: 30px; padding: 6px 14px 6px 8px; }
+    .nav-user.on { display: flex; }
+    .nav-user img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--discord); }
+    .nav-user-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .nav-logout { font-size: 11px; color: var(--gray); cursor: pointer; text-decoration: underline; margin-left: 4px; }
+    .nav-logout:hover { color: #c0392b; }
+
+    /* HEADER */
+    .page-header {
+      background: linear-gradient(130deg, #0d2b5e 0%, #1a4e8f 50%, #0f8891 100%);
+      padding: 70px 5% 60px; text-align: center; position: relative; overflow: hidden;
+    }
+    .page-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: #fff; font-weight: 700; margin-bottom: 14px;
+      text-shadow: 0 2px 16px rgba(0,0,0,.25); position: relative;
+    }
+    .page-header p { font-size: 15px; color: rgba(255,255,255,.8); max-width: 560px; margin: 0 auto; line-height: 1.7; position: relative; }
+
+    /* MAIN */
+    .main-wrap { max-width: 860px; margin: 0 auto; padding: 56px 24px 80px; }
+
+    /* SCHERMATE */
+    #loginScreen, #loadingScreen, #formScreen { display: none; }
+    #loginScreen {
+      flex-direction: column; align-items: center;
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); padding: 56px 40px; text-align: center;
+    }
+    .discord-logo-wrap {
+      width: 80px; height: 80px; background: var(--discord);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px; box-shadow: 0 8px 24px rgba(88,101,242,.35);
+    }
+    .discord-logo-wrap i { font-size: 2.2rem; color: #fff; }
+    #loginScreen h2 { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--dark); margin-bottom: 12px; }
+    #loginScreen p { font-size: 14px; color: var(--gray); max-width: 400px; line-height: 1.7; margin-bottom: 32px; }
+    .btn-discord {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: var(--discord); color: #fff;
+      padding: 15px 32px; border-radius: 10px; border: none;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; text-decoration: none; transition: all .2s;
+      box-shadow: 0 4px 18px rgba(88,101,242,.35);
+    }
+    .btn-discord:hover { background: var(--discord-hov); transform: translateY(-2px); }
+    .login-note { margin-top: 18px; font-size: 12px; color: var(--gray); }
+
+    #loadingScreen {
+      flex-direction: column; align-items: center;
+      padding: 80px 40px; text-align: center;
+      background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+    }
+    .spinner {
+      width: 48px; height: 48px; border: 4px solid var(--blue-light);
+      border-top-color: var(--blue); border-radius: 50%;
+      animation: spin .8s linear infinite; margin-bottom: 20px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingScreen p { font-size: 14px; color: var(--gray); }
+
+    /* CARD */
+    .card {
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 36px 40px; margin-bottom: 28px;
+    }
+    .card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem; font-weight: 700; color: var(--dark);
+      margin-bottom: 24px; padding-bottom: 14px;
+      border-bottom: 2px solid var(--blue-light);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .card-title i { color: var(--blue); font-size: 1rem; }
+    .card-title .ooc-label {
+      margin-left: auto; font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .7px;
+      background: #fff3e0; color: #e67e22; padding: 3px 10px; border-radius: 20px;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    /* Discord badge */
+    .discord-badge {
+      display: flex; align-items: center; gap: 14px;
+      background: #f0f2ff; border: 1.5px solid #c5caff;
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;
+    }
+    .discord-badge img { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--discord); }
+    .discord-badge-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--dark); }
+    .discord-badge-text span { font-size: 12px; color: var(--gray); }
+    .discord-badge .fa-circle-check { color: var(--discord); font-size: 1.1rem; margin-left: auto; }
+
+    /* FORM */
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    .form-row.single { grid-template-columns: 1fr; }
+    .form-row.triple { grid-template-columns: 1fr 1fr 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    label { font-size: 13px; font-weight: 600; color: var(--dark); }
+    label .req { color: #c0392b; margin-left: 2px; }
+    input[type="text"], input[type="date"], input[type="number"], select, textarea {
+      border: 1.5px solid #dde3ee; border-radius: 8px;
+      padding: 11px 14px; font-size: 14px;
+      font-family: 'DM Sans', sans-serif; color: var(--dark);
+      background: #fff; outline: none; transition: border-color .2s, box-shadow .2s;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,78,143,.08);
+    }
+    textarea { resize: vertical; min-height: 100px; line-height: 1.6; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7a8d' d='M1 1l5 5 5-5'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; }
+
+    /* Radio / Checkbox group */
+    .radio-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 16px; border: 1.5px solid #dde3ee; border-radius: 8px;
+      cursor: pointer; transition: all .2s; user-select: none; font-size: 13.5px; font-weight: 500;
+    }
+    .radio-opt input { display: none; }
+    .radio-opt .dot {
+      width: 16px; height: 16px; border: 2px solid #c0cfe0; border-radius: 50%;
+      flex-shrink: 0; transition: all .2s; display: flex; align-items: center; justify-content: center;
+    }
+    .radio-opt.sel { border-color: var(--blue); background: var(--blue-light); }
+    .radio-opt.sel .dot { border-color: var(--blue); background: var(--blue); }
+    .radio-opt.sel .dot::after { content: ''; width: 6px; height: 6px; background: #fff; border-radius: 50%; }
+
+    .check-group { display: flex; flex-wrap: wrap; gap: 10px; }
+    .check-opt {
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 16px; border: 1.5px solid #dde3ee; border-radius: 8px;
+      cursor: pointer; transition: all .2s; user-select: none; font-size: 13.5px; font-weight: 500;
+    }
+    .check-opt input { display: none; }
+    .check-box {
+      width: 16px; height: 16px; border: 2px solid #c0cfe0; border-radius: 4px;
+      flex-shrink: 0; transition: all .2s; display: flex; align-items: center; justify-content: center;
+    }
+    .check-opt.sel { border-color: var(--blue); background: var(--blue-light); }
+    .check-opt.sel .check-box { border-color: var(--blue); background: var(--blue); }
+    .check-opt.sel .check-box::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+
+    /* Divisore sezione */
+    .sezione-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .9px;
+      color: var(--gray); margin-bottom: 16px; margin-top: 8px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sezione-label::after { content: ''; flex: 1; height: 1px; background: #dde3ee; }
+
+    /* Errore */
+    .err-box {
+      display: none; background: #fdf0ef; border: 1.5px solid #e74c3c;
+      border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+      font-size: 13.5px; color: #c0392b; align-items: center; gap: 10px;
+    }
+    .err-box.on { display: flex; }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%; padding: 16px; background: var(--blue); color: #fff;
+      border: none; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+      cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .submit-btn:hover { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,78,143,.28); }
+    .submit-btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    /* Successo */
+    #successMsg {
+      display: none; background: var(--green-light);
+      border: 1.5px solid var(--green); border-radius: 12px;
+      padding: 36px 32px; text-align: center; margin-top: 20px;
+    }
+    #successMsg.on { display: block; }
+    #successMsg i { font-size: 2.5rem; color: var(--green); margin-bottom: 14px; display: block; }
+    #successMsg h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); margin-bottom: 8px; }
+    #successMsg p { font-size: 14px; color: var(--gray); line-height: 1.65; }
+
+    .footer-mini { text-align: center; padding: 28px; font-size: 12px; color: var(--gray); border-top: 1px solid #e0e6f0; }
+
+    @media (max-width: 680px) {
+      .card { padding: 24px 20px; }
+      .form-row, .form-row.triple { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <img src="assets/images/logo.png" alt="San Raffaele" />
+    <div class="logo-text">
+      <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+      <span>Gruppo San Donato</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <div class="nav-user" id="navUser">
+      <img id="navAvatar" src="" alt="" />
+      <span class="nav-user-name" id="navUsername"></span>
+      <span class="nav-logout" onclick="logout()">Esci</span>
+    </div>
+    <a href="posizioni_aperte.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Posizioni Aperte</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <h1>Modulo di Candidatura</h1>
+  <p>Compila il modulo con i tuoi dati IC e OOC. La candidatura verrà esaminata dallo staff del San Raffaele.</p>
+</div>
+
+<div class="main-wrap">
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="discord-logo-wrap"><i class="fa-brands fa-discord"></i></div>
+    <h2>Accesso richiesto</h2>
+    <p>Per inviare la candidatura è necessario accedere con il tuo account Discord, in modo da verificare la tua identità nel server.</p>
+    <a id="loginBtn" href="#" class="btn-discord">
+      <i class="fa-brands fa-discord"></i> Accedi con Discord
+    </a>
+    <p class="login-note">Verranno richieste solo le informazioni base del profilo (username e avatar).</p>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+    <p>Verifica identità Discord in corso…</p>
+  </div>
+
+  <!-- FORM -->
+  <div id="formScreen">
+
+    <!-- INFO IC -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fa-solid fa-id-card"></i> Informazioni IC
+        <span style="margin-left:auto;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;background:#e8f1fb;color:#1a4e8f;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;">Dati del Personaggio</span>
+      </div>
+
+      <div class="discord-badge">
+        <img id="bdgAvatar" src="" alt="" />
+        <div class="discord-badge-text">
+          <strong id="bdgUsername"></strong>
+          <span id="bdgTag"></span>
+        </div>
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <div class="err-box" id="errBox">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="errTesto"></span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome <span class="req">*</span></label>
+          <input type="text" id="ic_nome" placeholder="Nome del personaggio" />
+        </div>
+        <div class="form-group">
+          <label>Cognome <span class="req">*</span></label>
+          <input type="text" id="ic_cognome" placeholder="Cognome del personaggio" />
+        </div>
+      </div>
+
+      <div class="form-row triple">
+        <div class="form-group">
+          <label>Cittadinanza <span class="req">*</span></label>
+          <input type="text" id="ic_cittadinanza" placeholder="Es. Italiana" />
+        </div>
+        <div class="form-group">
+          <label>Data di Nascita <span class="req">*</span></label>
+          <input type="date" id="ic_nascita" />
+        </div>
+        <div class="form-group">
+          <label>Numero di Telefono <span class="req">*</span></label>
+          <input type="text" id="ic_telefono" placeholder="Es. 555-1234" />
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:20px;">
+        <div class="form-group">
+          <label>Titolo di Studio <span class="req">*</span></label>
+          <select id="ic_titolo">
+            <option value="">— Seleziona —</option>
+            <option>Licenza media</option>
+            <option>Diploma di maturità</option>
+            <option>Laurea triennale</option>
+            <option>Laurea magistrale</option>
+            <option>Specializzazione / Master</option>
+            <option>Dottorato</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="sezione-label">Domande aggiuntive</div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Possiedi certificazioni sanitarie? <span class="req">*</span></label>
+          <div class="radio-group" id="rg_cert">
+            <label class="radio-opt" onclick="selRadio('rg_cert',this)"><input type="radio" name="cert" value="Sì" /><div class="dot"></div>Sì</label>
+            <label class="radio-opt" onclick="selRadio('rg_cert',this)"><input type="radio" name="cert" value="No" /><div class="dot"></div>No</label>
+            <label class="radio-opt" onclick="selRadio('rg_cert',this)"><input type="radio" name="cert" value="In corso" /><div class="dot"></div>In corso</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Hai esperienza in ambito sanitario? <span class="req">*</span></label>
+          <div class="radio-group" id="rg_exp">
+            <label class="radio-opt" onclick="selRadio('rg_exp',this)"><input type="radio" name="exp" value="Sì" /><div class="dot"></div>Sì</label>
+            <label class="radio-opt" onclick="selRadio('rg_exp',this)"><input type="radio" name="exp" value="No" /><div class="dot"></div>No</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Possiedi patente di guida? <span class="req">*</span></label>
+          <div class="radio-group" id="rg_pat">
+            <label class="radio-opt" onclick="selRadio('rg_pat',this)"><input type="radio" name="pat" value="Sì" /><div class="dot"></div>Sì</label>
+            <label class="radio-opt" onclick="selRadio('rg_pat',this)"><input type="radio" name="pat" value="No" /><div class="dot"></div>No</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Disponibilità ai turni <span class="req">*</span></label>
+          <div class="check-group" id="cg_turni">
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>Mattina</label>
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>Pomeriggio</label>
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>Notte</label>
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>Reperibilità</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Motivazione della candidatura <span class="req">*</span></label>
+          <textarea id="ic_motivazione" placeholder="Spiega perché vuoi entrare nel servizio sanitario…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO OOC -->
+    <div class="card">
+      <div class="card-title">
+        <i class="fa-solid fa-gamepad"></i> Informazioni OOC
+        <span style="margin-left:auto;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;background:#fff3e0;color:#e67e22;padding:3px 10px;border-radius:20px;font-family:'DM Sans',sans-serif;">Dati del Giocatore</span>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Nome (reale) <span class="req">*</span></label>
+          <input type="text" id="ooc_nome" placeholder="Il tuo nome" />
+        </div>
+        <div class="form-group">
+          <label>Età <span class="req">*</span></label>
+          <input type="number" id="ooc_eta" placeholder="Es. 22" min="1" max="99" />
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Da quanto tempo sei nel server? <span class="req">*</span></label>
+          <select id="ooc_server">
+            <option value="">— Seleziona —</option>
+            <option>Meno di 1 settimana</option>
+            <option>1–4 settimane</option>
+            <option>1–3 mesi</option>
+            <option>3–6 mesi</option>
+            <option>Più di 6 mesi</option>
+            <option>Più di 1 anno</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Hai già avuto esperienze in altri reparti RP sanitari? <span class="req">*</span></label>
+          <div class="radio-group" id="rg_rp">
+            <label class="radio-opt" onclick="selRadio('rg_rp',this)"><input type="radio" name="rp" value="Sì" /><div class="dot"></div>Sì</label>
+            <label class="radio-opt" onclick="selRadio('rg_rp',this)"><input type="radio" name="rp" value="No" /><div class="dot"></div>No</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Conosci le basi del Roleplay da soccorritore? <span class="req">*</span></label>
+          <div class="radio-group" id="rg_basi">
+            <label class="radio-opt" onclick="selRadio('rg_basi',this)"><input type="radio" name="basi" value="Sì" /><div class="dot"></div>Sì</label>
+            <label class="radio-opt" onclick="selRadio('rg_basi',this)"><input type="radio" name="basi" value="No" /><div class="dot"></div>No</label>
+            <label class="radio-opt" onclick="selRadio('rg_basi',this)"><input type="radio" name="basi" value="In parte" /><div class="dot"></div>In parte</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single" style="margin-bottom:16px;">
+        <div class="form-group">
+          <label>Fasce orarie in cui sei più attivo <span class="req">*</span></label>
+          <div class="check-group" id="cg_fasce">
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>08:00–14:00</label>
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>14:00–20:00</label>
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>20:00–00:00</label>
+            <label class="check-opt" onclick="selCheck(this)"><input type="checkbox" /><div class="check-box"></div>00:00–08:00</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-row single">
+        <div class="form-group">
+          <label>Note aggiuntive <span style="color:var(--gray);font-weight:400;">(opzionale)</span></label>
+          <textarea id="ooc_note" placeholder="Qualcosa che vuoi aggiungere…"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMIT -->
+    <div id="formWrap">
+      <button class="submit-btn" id="submitBtn" onclick="invia()">
+        <i class="fa-solid fa-paper-plane"></i> Invia Candidatura
+      </button>
+    </div>
+
+    <div id="successMsg">
+      <i class="fa-solid fa-circle-check"></i>
+      <h3>Candidatura inviata con successo!</h3>
+      <p>La tua candidatura è stata ricevuta dallo staff del San Raffaele.<br>Verrai contattato tramite Discord entro breve. Grazie per il tuo interesse!</p>
+    </div>
+
+  </div><!-- /formScreen -->
+</div><!-- /main-wrap -->
+
+<div class="footer-mini">© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962</div>
+
+<script>
+  /* ═══════════════════════════════════════════
+     CONFIGURAZIONE
+  ═══════════════════════════════════════════ */
+  const CLIENT_ID = '1484523347243958414';
+  const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/candidature_aperte.html';
+  const WEBHOOK   = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
+
+  /* ═══════════════════════════════════════════
+     STATO
+  ═══════════════════════════════════════════ */
+  let user = null;
+
+  /* ═══════════════════════════════════════════
+     SCHERMATE
+  ═══════════════════════════════════════════ */
+  function mostra(s) {
+    document.getElementById('loginScreen').style.display   = s === 'login'   ? 'flex'  : 'none';
+    document.getElementById('loadingScreen').style.display = s === 'loading' ? 'flex'  : 'none';
+    document.getElementById('formScreen').style.display    = s === 'form'    ? 'block' : 'none';
+  }
+
+  /* ═══════════════════════════════════════════
+     OAUTH2
+  ═══════════════════════════════════════════ */
+  function oauthURL() {
+    const state = Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2);
+    sessionStorage.setItem('dstate', state);
+    return 'https://discord.com/oauth2/authorize?' + new URLSearchParams({
+      client_id:     CLIENT_ID,
+      redirect_uri:  REDIRECT,
+      response_type: 'token',
+      scope:         'identify',
+      state,
+    });
+  }
+
+  async function leggiCallback() {
+    const fromHash  = new URLSearchParams(location.hash.replace(/^#/, ''));
+    const fromQuery = new URLSearchParams(location.search.replace(/^\?/, ''));
+    const token = fromHash.get('access_token') || fromQuery.get('access_token');
+    if (!token) return false;
+
+    history.replaceState(null, '', location.pathname);
+    mostra('loading');
+
+    try {
+      const res = await fetch('https://discord.com/api/users/@me', {
+        headers: { Authorization: 'Bearer ' + token }
+      });
+      if (!res.ok) throw new Error(res.status);
+      const u = await res.json();
+      user = {
+        id:       u.id,
+        username: u.username,
+        tag:      (u.discriminator && u.discriminator !== '0') ? '#' + u.discriminator : '@' + u.username,
+        avatar:   u.avatar
+          ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+          : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id) % 6n)}.png`,
+      };
+      sessionStorage.setItem('du_cand', JSON.stringify(user));
+      mostraForm();
+    } catch(e) {
+      mostra('login');
+      errore('Impossibile ottenere i dati Discord. Riprova.');
+    }
+    return true;
+  }
+
+  function mostraForm() {
+    mostra('form');
+    document.getElementById('bdgAvatar').src           = user.avatar;
+    document.getElementById('bdgUsername').textContent = user.username;
+    document.getElementById('bdgTag').textContent      = user.tag;
+    document.getElementById('navAvatar').src           = user.avatar;
+    document.getElementById('navUsername').textContent = user.username;
+    document.getElementById('navUser').classList.add('on');
+  }
+
+  function logout() {
+    sessionStorage.removeItem('du_cand');
+    user = null;
+    mostra('login');
+    document.getElementById('navUser').classList.remove('on');
+  }
+
+  function errore(msg) {
+    const b = document.getElementById('errBox');
+    document.getElementById('errTesto').textContent = msg;
+    b.classList.add('on');
+    setTimeout(() => b.classList.remove('on'), 7000);
+  }
+
+  /* ═══════════════════════════════════════════
+     RADIO & CHECKBOX
+  ═══════════════════════════════════════════ */
+  function selRadio(groupId, clicked) {
+    document.querySelectorAll('#' + groupId + ' .radio-opt').forEach(o => o.classList.remove('sel'));
+    clicked.classList.add('sel');
+  }
+
+  function selCheck(el) {
+    el.classList.toggle('sel');
+  }
+
+  function getRadio(groupId) {
+    const sel = document.querySelector('#' + groupId + ' .radio-opt.sel input');
+    return sel ? sel.value : null;
+  }
+
+  function getChecks(groupId) {
+    const vals = [];
+    document.querySelectorAll('#' + groupId + ' .check-opt.sel').forEach(o => {
+      vals.push(o.textContent.trim());
+    });
+    return vals;
+  }
+
+  /* ═══════════════════════════════════════════
+     INVIO WEBHOOK
+  ═══════════════════════════════════════════ */
+  async function invia() {
+    // Raccolta valori
+    const ic_nome       = document.getElementById('ic_nome').value.trim();
+    const ic_cognome    = document.getElementById('ic_cognome').value.trim();
+    const ic_citt       = document.getElementById('ic_cittadinanza').value.trim();
+    const ic_nascita    = document.getElementById('ic_nascita').value;
+    const ic_tel        = document.getElementById('ic_telefono').value.trim();
+    const ic_titolo     = document.getElementById('ic_titolo').value;
+    const ic_cert       = getRadio('rg_cert');
+    const ic_exp        = getRadio('rg_exp');
+    const ic_pat        = getRadio('rg_pat');
+    const ic_turni      = getChecks('cg_turni');
+    const ic_motiv      = document.getElementById('ic_motivazione').value.trim();
+
+    const ooc_nome      = document.getElementById('ooc_nome').value.trim();
+    const ooc_eta       = document.getElementById('ooc_eta').value.trim();
+    const ooc_server    = document.getElementById('ooc_server').value;
+    const ooc_rp        = getRadio('rg_rp');
+    const ooc_basi      = getRadio('rg_basi');
+    const ooc_fasce     = getChecks('cg_fasce');
+    const ooc_note      = document.getElementById('ooc_note').value.trim();
+
+    // Validazione
+    if (!ic_nome || !ic_cognome || !ic_citt || !ic_nascita || !ic_tel || !ic_titolo)
+      return errore('Compila tutti i campi obbligatori nella sezione IC.');
+    if (!ic_cert || !ic_exp || !ic_pat)
+      return errore('Rispondi a tutte le domande nella sezione IC.');
+    if (!ic_turni.length)
+      return errore('Seleziona almeno una disponibilità ai turni.');
+    if (!ic_motiv)
+      return errore('Scrivi la tua motivazione nella sezione IC.');
+    if (!ooc_nome || !ooc_eta || !ooc_server)
+      return errore('Compila tutti i campi obbligatori nella sezione OOC.');
+    if (!ooc_rp || !ooc_basi)
+      return errore('Rispondi a tutte le domande nella sezione OOC.');
+    if (!ooc_fasce.length)
+      return errore('Seleziona almeno una fascia oraria nella sezione OOC.');
+
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso…';
+
+    const dataN = new Date(ic_nascita).toLocaleDateString('it-IT', { day:'2-digit', month:'2-digit', year:'numeric' });
+
+    const payload = {
+      username: 'San Raffaele – Candidature',
+      embeds: [{
+        title: '📋 Nuova Candidatura – Personale Sanitario',
+        color: 0x0d2b5e,
+        fields: [
+          // IC
+          { name: '━━━ 🧑‍⚕️ DATI IC',               value: '\u200b',                                                   inline: false },
+          { name: '👤 Nome e Cognome',               value: ic_nome + ' ' + ic_cognome,                                inline: true  },
+          { name: '🌍 Cittadinanza',                 value: ic_citt,                                                   inline: true  },
+          { name: '📅 Data di nascita',              value: dataN,                                                     inline: true  },
+          { name: '📞 Telefono',                     value: ic_tel,                                                    inline: true  },
+          { name: '🎓 Titolo di studio',             value: ic_titolo,                                                 inline: true  },
+          { name: '🩺 Certificazioni sanitarie',     value: ic_cert,                                                   inline: true  },
+          { name: '🏥 Esperienza sanitaria',         value: ic_exp,                                                    inline: true  },
+          { name: '🚗 Patente di guida',             value: ic_pat,                                                    inline: true  },
+          { name: '🕐 Disponibilità turni',          value: ic_turni.join(', '),                                       inline: false },
+          { name: '💬 Motivazione',                  value: ic_motiv.slice(0, 1024),                                   inline: false },
+          // OOC
+          { name: '━━━ 🎮 DATI OOC',                value: '\u200b',                                                   inline: false },
+          { name: '🎮 Discord',                      value: user.username + ' (`' + user.id + '`)',                   inline: true  },
+          { name: '👤 Nome reale',                   value: ooc_nome,                                                  inline: true  },
+          { name: '🔞 Età',                          value: ooc_eta + ' anni',                                         inline: true  },
+          { name: '⏱️ Nel server da',                value: ooc_server,                                                inline: true  },
+          { name: '🏨 Exp altri reparti RP sanitari',value: ooc_rp,                                                    inline: true  },
+          { name: '📖 Basi RP soccorritore',         value: ooc_basi,                                                  inline: true  },
+          { name: '🕐 Fasce orarie attive',          value: ooc_fasce.join(', '),                                      inline: false },
+          ...(ooc_note ? [{ name: '📝 Note aggiuntive', value: ooc_note.slice(0, 512), inline: false }] : []),
+        ],
+        thumbnail: { url: user.avatar },
+        footer:    { text: 'I.R.C.C.S. Ospedale San Raffaele – Selezione Personale' },
+        timestamp: new Date().toISOString(),
+      }]
+    };
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+
+      document.getElementById('formWrap').style.display = 'none';
+      document.querySelectorAll('#formScreen .card').forEach(c => c.style.display = 'none');
+      document.getElementById('successMsg').classList.add('on');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia Candidatura';
+      errore('Errore durante l\'invio (' + e.message + '). Riprova.');
+    }
+  }
+
+  /* ═══════════════════════════════════════════
+     INIT
+  ═══════════════════════════════════════════ */
+  (async function init() {
+    document.getElementById('loginBtn').href = oauthURL();
+
+    if (location.hash.includes('access_token') || location.search.includes('access_token')) {
+      await leggiCallback();
+      return;
+    }
+
+    try {
+      const saved = sessionStorage.getItem('du_cand');
+      if (saved) { user = JSON.parse(saved); mostraForm(); return; }
+    } catch(e) { sessionStorage.removeItem('du_cand'); }
+
+    mostra('login');
+  })();
+</script>
+</body>
+</html>

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Posizioni Aperte – I.R.C.C.S. Ospedale San Raffaele</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --blue:       #1a4e8f;
+      --blue-dark:  #0d2b5e;
+      --blue-mid:   #2567b0;
+      --blue-light: #e8f1fb;
+      --teal:       #0f8891;
+      --dark:       #0d1b2a;
+      --gray:       #6b7a8d;
+      --light-gray: #f7f9fc;
+      --white:      #ffffff;
+      --radius:     12px;
+      --shadow:     0 4px 24px rgba(26,78,143,.10);
+      --shadow-lg:  0 12px 48px rgba(26,78,143,.18);
+      --red:        #c0392b;
+      --red-light:  #fdf0ef;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--light-gray); color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 1000;
+      background: rgba(255,255,255,.97); backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(26,78,143,.08);
+      padding: 0 5%; display: flex; align-items: center; justify-content: space-between;
+      height: 68px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo img { height: 60px; width: auto; }
+    .logo-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--blue); }
+    .logo-text span   { font-size: 11px; color: var(--gray); }
+    .nav-back {
+      display: flex; align-items: center; gap: 8px; text-decoration: none;
+      font-size: 13px; font-weight: 600; color: var(--blue);
+      padding: 8px 16px; border: 1.5px solid var(--blue); border-radius: 6px; transition: all .2s;
+    }
+    .nav-back:hover { background: var(--blue); color: #fff; }
+
+    /* HEADER */
+    .page-header {
+      background: linear-gradient(130deg, #0d2b5e 0%, #1a4e8f 50%, #0f8891 100%);
+      padding: 70px 5% 60px; text-align: center; position: relative; overflow: hidden;
+    }
+    .page-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .page-header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      color: #fff; font-weight: 700; margin-bottom: 14px;
+      text-shadow: 0 2px 16px rgba(0,0,0,.25); position: relative;
+    }
+    .page-header p { font-size: 15px; color: rgba(255,255,255,.8); max-width: 560px; margin: 0 auto; line-height: 1.7; position: relative; }
+
+    /* MAIN */
+    .main-wrap { max-width: 960px; margin: 0 auto; padding: 56px 24px 80px; }
+
+    /* INTRO BANNER */
+    .intro-banner {
+      background: #fff; border-radius: var(--radius); box-shadow: var(--shadow);
+      padding: 32px 36px; margin-bottom: 40px;
+      border-left: 4px solid var(--teal);
+      display: flex; align-items: flex-start; gap: 20px;
+    }
+    .intro-banner i { font-size: 1.8rem; color: var(--teal); flex-shrink: 0; margin-top: 2px; }
+    .intro-banner h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; color: var(--dark); margin-bottom: 8px; }
+    .intro-banner p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+    /* RUOLI GRID */
+    .ruoli-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 48px; }
+
+    .ruolo-card {
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow); overflow: hidden;
+      transition: transform .3s, box-shadow .3s;
+      display: flex; flex-direction: column;
+    }
+    .ruolo-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+
+    .ruolo-header {
+      padding: 28px 28px 20px;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 14px;
+    }
+    .ruolo-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.5rem;
+    }
+    .ruolo-icon.soccorritore { background: #fff0e6; color: #e67e22; }
+    .ruolo-icon.infermiere   { background: #e8f8f5; color: var(--teal); }
+    .ruolo-icon.medico       { background: var(--blue-light); color: var(--blue); }
+
+    .ruolo-badge {
+      font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+      padding: 3px 10px; border-radius: 20px;
+    }
+    .ruolo-badge.aperto { background: #e8f8f0; color: #1a8f5a; }
+
+    .ruolo-header h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--dark); }
+    .ruolo-header p  { font-size: 13.5px; color: var(--gray); line-height: 1.65; }
+
+    .ruolo-tags { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 28px 16px; }
+    .tag {
+      font-size: 11.5px; font-weight: 600; padding: 4px 12px; border-radius: 20px;
+      background: var(--blue-light); color: var(--blue);
+    }
+
+    .ruolo-footer {
+      margin-top: auto; padding: 16px 28px 24px;
+      border-top: 1px solid rgba(26,78,143,.07);
+    }
+    .ruolo-footer a {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 13px; font-weight: 700; color: var(--blue); text-decoration: none;
+      transition: gap .2s, color .2s;
+    }
+    .ruolo-footer a:hover { gap: 12px; color: var(--teal); }
+
+    /* REQUISITI */
+    .req-section { margin-bottom: 48px; }
+    .req-section h2 {
+      font-family: 'Playfair Display', serif; font-size: 1.6rem;
+      color: var(--dark); margin-bottom: 24px; text-align: center;
+    }
+    .req-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+
+    .req-card {
+      background: #fff; border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 28px 30px;
+    }
+    .req-card h3 {
+      font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .8px;
+      margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+    }
+    .req-card.obbligatori h3 { color: var(--red); }
+    .req-card.preferenziali h3 { color: var(--blue); }
+    .req-card ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .req-card ul li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13.5px; color: var(--dark); line-height: 1.5;
+    }
+    .req-card ul li i { flex-shrink: 0; margin-top: 2px; font-size: 13px; }
+    .req-card.obbligatori ul li i { color: var(--red); }
+    .req-card.preferenziali ul li i { color: var(--blue); }
+
+    /* CTA FINALE */
+    .cta-box {
+      background: linear-gradient(130deg, #1a4e8f 0%, #0f8891 100%);
+      border-radius: var(--radius); padding: 48px 40px; text-align: center;
+      box-shadow: var(--shadow-lg);
+    }
+    .cta-box h2 { font-family: 'Playfair Display', serif; font-size: 1.9rem; color: #fff; margin-bottom: 12px; }
+    .cta-box p  { font-size: 15px; color: rgba(255,255,255,.8); margin-bottom: 30px; line-height: 1.65; }
+    .btn-cta {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: #fff; color: var(--blue);
+      padding: 16px 36px; border-radius: 10px;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700;
+      text-decoration: none; transition: all .2s;
+      box-shadow: 0 4px 18px rgba(0,0,0,.15);
+    }
+    .btn-cta:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,.22); }
+
+    .footer-mini { text-align: center; padding: 28px; font-size: 12px; color: var(--gray); border-top: 1px solid #e0e6f0; }
+
+    @media (max-width: 860px) {
+      .ruoli-grid { grid-template-columns: 1fr; }
+      .req-grid   { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 680px) {
+      .intro-banner { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <img src="assets/images/logo.png" alt="San Raffaele" />
+    <div class="logo-text">
+      <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+      <span>Gruppo San Donato</span>
+    </div>
+  </a>
+  <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Torna alla Home</a>
+</nav>
+
+<div class="page-header">
+  <h1>Posizioni Aperte</h1>
+  <p>Unisciti al team del San Raffaele. Cerchiamo professionisti appassionati, pronti a fare la differenza nel servizio sanitario.</p>
+</div>
+
+<div class="main-wrap">
+
+  <!-- INTRO -->
+  <div class="intro-banner">
+    <i class="fa-solid fa-circle-info"></i>
+    <div>
+      <h3>Selezione del Personale in corso</h3>
+      <p>L'Ospedale San Raffaele è attualmente alla ricerca di nuovo personale sanitario. Tutte le posizioni richiedono il rispetto dei requisiti obbligatori elencati in questa pagina. Per candidarti utilizza il pulsante in fondo alla pagina.</p>
+    </div>
+  </div>
+
+  <!-- RUOLI -->
+  <div class="ruoli-grid">
+
+    <!-- Soccorritore -->
+    <div class="ruolo-card">
+      <div class="ruolo-header">
+        <div class="ruolo-icon soccorritore"><i class="fa-solid fa-truck-medical"></i></div>
+        <span class="ruolo-badge aperto">● Posizione aperta</span>
+        <h2>Soccorritore</h2>
+        <p>Intervieni in prima linea nelle emergenze sanitarie sul territorio. Il soccorritore è il primo contatto con il paziente in situazioni critiche.</p>
+      </div>
+      <div class="ruolo-tags">
+        <span class="tag">Emergenze</span>
+        <span class="tag">Turni</span>
+        <span class="tag">BLS / BLSD</span>
+        <span class="tag">Patente B</span>
+      </div>
+      <div class="ruolo-footer">
+        <a href="candidature_aperte.html">Candidati ora <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Infermiere -->
+    <div class="ruolo-card">
+      <div class="ruolo-header">
+        <div class="ruolo-icon infermiere"><i class="fa-solid fa-user-nurse"></i></div>
+        <span class="ruolo-badge aperto">● Posizione aperta</span>
+        <h2>Infermiere</h2>
+        <p>Assisti i pazienti nei reparti ospedalieri, coordina le cure con il personale medico e garantisci il benessere dei degenti.</p>
+      </div>
+      <div class="ruolo-tags">
+        <span class="tag">Reparto</span>
+        <span class="tag">Assistenza</span>
+        <span class="tag">Laurea infermieristica</span>
+      </div>
+      <div class="ruolo-footer">
+        <a href="candidature_aperte.html">Candidati ora <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+    <!-- Medico -->
+    <div class="ruolo-card">
+      <div class="ruolo-header">
+        <div class="ruolo-icon medico"><i class="fa-solid fa-stethoscope"></i></div>
+        <span class="ruolo-badge aperto">● Posizione aperta</span>
+        <h2>Medico</h2>
+        <p>Diagnostica, tratta e segui i pazienti con professionalità e dedizione. Collabora con un team multidisciplinare d'eccellenza.</p>
+      </div>
+      <div class="ruolo-tags">
+        <span class="tag">Diagnosi</span>
+        <span class="tag">Specializzazione</span>
+        <span class="tag">Abilitazione</span>
+      </div>
+      <div class="ruolo-footer">
+        <a href="candidature_aperte.html">Candidati ora <i class="fa-solid fa-arrow-right"></i></a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- REQUISITI -->
+  <div class="req-section">
+    <h2>Requisiti di Selezione</h2>
+    <div class="req-grid">
+
+      <div class="req-card obbligatori">
+        <h3><i class="fa-solid fa-circle-exclamation"></i> Obbligatori</h3>
+        <ul>
+          <li><i class="fa-solid fa-check"></i> Età minima 18 anni (IC)</li>
+          <li><i class="fa-solid fa-check"></i> Documento d'identità valido</li>
+          <li><i class="fa-solid fa-check"></i> Certificato di sana e robusta costituzione fisica</li>
+          <li><i class="fa-solid fa-check"></i> Idoneità psico-fisica al servizio di emergenza</li>
+          <li><i class="fa-solid fa-check"></i> Casellario giudiziale pulito</li>
+          <li><i class="fa-solid fa-check"></i> Condivisione dei valori della Croce Rossa Italiana</li>
+          <li><i class="fa-solid fa-check"></i> Patente di guida categoria B</li>
+        </ul>
+      </div>
+
+      <div class="req-card preferenziali">
+        <h3><i class="fa-solid fa-star"></i> Preferenziali</h3>
+        <ul>
+          <li><i class="fa-solid fa-plus"></i> Certificazioni BLS / BLSD</li>
+          <li><i class="fa-solid fa-plus"></i> Esperienza in ambito sanitario</li>
+          <li><i class="fa-solid fa-plus"></i> Disponibilità ai turni serali o notturni</li>
+          <li><i class="fa-solid fa-plus"></i> Conoscenze informatiche di base</li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box">
+    <h2>Pronto a far parte del team?</h2>
+    <p>Compila il modulo di candidatura. Il processo richiede l'accesso tramite Discord per verificare la tua identità nel server.</p>
+    <a href="candidature_aperte.html" class="btn-cta">
+      <i class="fa-solid fa-file-pen"></i> Vai alle Candidature
+    </a>
+  </div>
+
+</div>
+
+<div class="footer-mini">© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962</div>
+
+</body>
+</html>
