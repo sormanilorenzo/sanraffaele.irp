@@ -409,7 +409,7 @@
      CONFIG
   ═══════════════════════════════════ */
   const CLIENT_ID = '1484523347243958414';
-  const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/donazioni_pdf.html';
+  const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/donazioni.html';
   const WEBHOOK   = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
 
   /* ═══════════════════════════════════
@@ -547,10 +547,10 @@
   function generaPDF(pratica, oggi) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-    const W = 210, ML = 14, MR = 14, CW = W - ML - MR;
+
+    const W = 210, ML = 10, MR = 10, CW = W - ML - MR;
     let y = 0;
 
-    // ── Colori ──
     const RED   = [192, 57, 43];
     const DARK  = [26, 26, 46];
     const GRAY  = [107, 122, 141];
@@ -558,125 +558,175 @@
     const GREEN = [26, 143, 90];
     const WHITE = [255,255,255];
 
-    function checkY(needed = 10) {
-      if (y + needed > 275) { doc.addPage(); y = 16; }
-    }
+    // ── Fattori di compressione ──
+    const RH = 5.8;   // altezza riga YN
+    const CH = 5.8;   // altezza campo testo
+    const SH = 6.5;   // altezza section header
+    const GAP_S = 1.8;// spazio tra sezioni
+    const GAP_R = 0.8;// spazio tra righe
 
     // ── HEADER ──
     doc.setFillColor(...RED);
-    doc.rect(0, 0, W, 38, 'F');
+    doc.rect(0, 0, W, 22, 'F');
     doc.setFillColor(146, 43, 33);
-    doc.rect(0, 0, 8, 38, 'F');
+    doc.rect(0, 0, 5, 22, 'F');
 
     doc.setTextColor(...WHITE);
     doc.setFont('helvetica','bold');
-    doc.setFontSize(16);
-    doc.text('I.R.C.C.S. OSPEDALE SAN RAFFAELE', ML + 4, 13);
     doc.setFontSize(10);
+    doc.text('I.R.C.C.S. OSPEDALE SAN RAFFAELE', ML + 2, 7);
+    doc.setFontSize(6.5);
     doc.setFont('helvetica','normal');
-    doc.text('MODULO DI PRE-DONAZIONE DEL SANGUE', ML + 4, 20);
+    doc.text('MODULO DI PRE-DONAZIONE DEL SANGUE', ML + 2, 12);
+    doc.setFontSize(5.5);
+    doc.text('Pratica N°: ' + pratica, ML + 2, 16.5);
+    doc.text('Data: ' + oggi, ML + 2, 20);
+    doc.text('Discord: ' + user.username + ' (' + user.id + ')', W / 2 + 5, 16.5);
+    doc.text('Stato: ' + (statoDon === 'nuovo' ? 'Nuovo donatore' : 'Donatore abituale'), W / 2 + 5, 20);
 
-    doc.setFontSize(8.5);
-    doc.text('Pratica N°: ' + pratica, ML + 4, 27);
-    doc.text('Data: ' + oggi, ML + 4, 32);
-    doc.text('Discord: ' + user.username + ' (' + user.id + ')', W - MR - 80, 27);
-    doc.text('Stato: ' + (statoDon === 'nuovo' ? 'Nuovo donatore' : 'Donatore abituale'), W - MR - 80, 32);
+    y = 25;
 
-    y = 46;
-
-    // ── Funzione sezione header ──
+    // ── section header ──
     function sezHeader(num, titolo) {
-      checkY(14);
       doc.setFillColor(...RED);
-      doc.roundedRect(ML, y, CW, 9, 1.5, 1.5, 'F');
+      doc.roundedRect(ML, y, CW, SH, 1, 1, 'F');
       doc.setTextColor(...WHITE);
       doc.setFont('helvetica','bold');
-      doc.setFontSize(9);
-      doc.text(num + '  ' + titolo, ML + 4, y + 6);
-      y += 13;
+      doc.setFontSize(6);
+      doc.text(num + '  ' + titolo, ML + 2.5, y + 4.3);
+      y += SH + 1.2;
     }
 
-    // ── Funzione riga campo ──
-    function campo(label, valore, halfLeft = false, startX = ML, width = CW) {
-      checkY(9);
+    // ── campo singolo ──
+    function campo(label, valore, startX = ML, width = CW) {
       doc.setFillColor(...LGRAY);
-      doc.roundedRect(startX, y, width, 8, 1, 1, 'F');
+      doc.roundedRect(startX, y, width, CH, 0.8, 0.8, 'F');
       doc.setTextColor(...GRAY);
       doc.setFont('helvetica','normal');
-      doc.setFontSize(7.5);
-      doc.text(label, startX + 3, y + 3.2);
+      doc.setFontSize(4.5);
+      doc.text(label, startX + 2, y + 1.9);
       doc.setTextColor(...DARK);
       doc.setFont('helvetica','bold');
-      doc.setFontSize(9);
+      doc.setFontSize(5.5);
       const val = valore || '—';
-      doc.text(val.length > 45 ? val.substring(0,44)+'…' : val, startX + 3, y + 6.8);
-      y += 10;
+      doc.text(val.length > 55 ? val.substring(0,54)+'…' : val, startX + 2, y + 4.5);
+      y += CH + GAP_R;
     }
 
-    // ── Funzione riga 2 colonne ──
+    // ── riga 2 colonne ──
     function riga2(l1,v1,l2,v2) {
-      const half = (CW - 4) / 2;
+      const half = (CW - 2) / 2;
       const y0 = y;
-      campo(l1, v1, false, ML, half);
+      campo(l1, v1, ML, half);
       y = y0;
-      campo(l2, v2, false, ML + half + 4, half);
-    }
-    function riga3(l1,v1,l2,v2,l3,v3) {
-      const third = (CW - 8) / 3;
-      const y0 = y;
-      campo(l1,v1,false,ML,third); y=y0;
-      campo(l2,v2,false,ML+third+4,third); y=y0;
-      campo(l3,v3,false,ML+third*2+8,third);
+      campo(l2, v2, ML + half + 2, half);
     }
 
-    // ── Funzione griglia SI/NO ──
-    function grigliaYN(domande) {
+    // ── riga 3 colonne ──
+    function riga3(l1,v1,l2,v2,l3,v3) {
+      const third = (CW - 4) / 3;
+      const y0 = y;
+      campo(l1,v1,ML,third); y=y0;
+      campo(l2,v2,ML+third+2,third); y=y0;
+      campo(l3,v3,ML+third*2+4,third);
+    }
+
+    // ── riga 4 colonne ──
+    function riga4(l1,v1,l2,v2,l3,v3,l4,v4) {
+      const q = (CW - 6) / 4;
+      const y0 = y;
+      campo(l1,v1,ML,q); y=y0;
+      campo(l2,v2,ML+q+2,q); y=y0;
+      campo(l3,v3,ML+q*2+4,q); y=y0;
+      campo(l4,v4,ML+q*3+6,q);
+    }
+
+    // ── griglia YN singola colonna ──
+    function grigliaYN1col(domande, startX = ML, width = CW) {
       domande.forEach(([label, id]) => {
-        checkY(9);
         const val = ynState[id];
+        const btnW = 8, gap = 1.5;
+        const labelW = width - btnW*2 - gap*3;
         doc.setFillColor(...LGRAY);
-        doc.roundedRect(ML, y, CW - 28, 8, 1, 1, 'F');
+        doc.roundedRect(startX, y, labelW, RH, 0.8, 0.8, 'F');
         doc.setTextColor(...DARK);
         doc.setFont('helvetica','normal');
-        doc.setFontSize(8.5);
-        doc.text(label, ML + 3, y + 5.5);
+        doc.setFontSize(5.2);
+        doc.text(label, startX + 2, y + 3.8);
 
-        // SI box
-        const siX = ML + CW - 26;
-        if (val === 'si') { doc.setFillColor(...GREEN); } else { doc.setFillColor(220,220,220); }
-        doc.roundedRect(siX, y, 11, 8, 1, 1, 'F');
+        const siX = startX + labelW + gap;
+        if (val === 'si') { doc.setFillColor(...GREEN); } else { doc.setFillColor(210,210,210); }
+        doc.roundedRect(siX, y, btnW, RH, 0.8, 0.8, 'F');
         doc.setTextColor(...WHITE);
         doc.setFont('helvetica','bold');
-        doc.setFontSize(8);
-        doc.text('SI', siX + 2.5, y + 5.5);
+        doc.setFontSize(5);
+        doc.text('SI', siX + 1.8, y + 3.8);
 
-        // NO box
-        const noX = siX + 13;
-        if (val === 'no') { doc.setFillColor(...RED); } else { doc.setFillColor(220,220,220); }
-        doc.roundedRect(noX, y, 11, 8, 1, 1, 'F');
+        const noX = siX + btnW + gap;
+        if (val === 'no') { doc.setFillColor(...RED); } else { doc.setFillColor(210,210,210); }
+        doc.roundedRect(noX, y, btnW, RH, 0.8, 0.8, 'F');
         doc.setTextColor(val === 'no' ? 255 : 80, val === 'no' ? 255 : 80, val === 'no' ? 255 : 80);
-        doc.text('NO', noX + 2, y + 5.5);
-        y += 10;
+        doc.text('NO', noX + 1.5, y + 3.8);
+
+        y += RH + GAP_R;
       });
     }
 
-    // ══ SEZ 1 – DATI PERSONALI ══
+    // ── griglia YN 2 colonne affiancate ──
+    function grigliaYN2col(domande) {
+      const colW = (CW - 3) / 2;
+      const mid = ML + colW + 3;
+      const savedY = y;
+      const col1 = domande.filter((_,i) => i % 2 === 0);
+      const col2 = domande.filter((_,i) => i % 2 === 1);
+      const maxY1R = col1.length;
+      const maxY2R = col2.length;
+      let y1 = savedY, y2 = savedY;
+      const origY = y;
+
+      // Colonna sinistra
+      y = y1;
+      grigliaYN1col(col1, ML, colW);
+      y1 = y;
+
+      // Colonna destra
+      y = y2;
+      grigliaYN1col(col2, mid, colW);
+      y2 = y;
+
+      y = Math.max(y1, y2);
+    }
+
+    // ══ LAYOUT PRINCIPALE ══
+
+    // SEZ 1 – DATI PERSONALI
     sezHeader('1', 'DATI PERSONALI');
     riga2('NOME', gv('p_nome'), 'COGNOME', gv('p_cognome'));
-    y += 2;
     riga3('DATA DI NASCITA', new Date(gv('p_nascita')||'').toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})||'—',
            'SESSO', g('p_sesso').value, 'GRUPPO SANGUIGNO', g('p_sangue').value);
-    y += 2;
-    riga2('ALTEZZA (cm)', gv('p_altezza'), 'PESO (kg)', gv('p_peso'));
-    y += 2;
-    riga2('TELEFONO', gv('p_tel'), 'EMAIL', gv('p_email'));
-    y += 2;
+    riga4('ALTEZZA (cm)', gv('p_altezza'), 'PESO (kg)', gv('p_peso'), 'TELEFONO', gv('p_tel'), 'EMAIL', gv('p_email'));
     campo('DOCUMENTO D\'IDENTITA\'', gv('p_doc'));
-    y += 4;
+    y += GAP_S;
 
-    // ══ SEZ 2 – CONDIZIONI GENERALI ══
-    sezHeader('2', 'CONDIZIONI GENERALI');
-    grigliaYN([
+    // SEZ 2 e SEZ 3 affiancate
+    const colW2 = (CW - 3) / 2;
+    const midCol = ML + colW2 + 3;
+
+    // Sezione header sez2 e sez3 sulla stessa riga
+    doc.setFillColor(...RED);
+    doc.roundedRect(ML, y, colW2, SH, 1, 1, 'F');
+    doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(6);
+    doc.text('2  CONDIZIONI GENERALI', ML + 2.5, y + 4.3);
+    doc.roundedRect(midCol, y, colW2, SH, 1, 1, 'F');
+    doc.text('3  STORIA MEDICA', midCol + 2.5, y + 4.3);
+    y += SH + 1.2;
+
+    const yAfterHeaders = y;
+    let yLeft = y, yRight = y;
+
+    // Colonna sinistra: SEZ2
+    y = yLeft;
+    grigliaYN1col([
       ['Ti senti in buona salute oggi?', 'yn_salute'],
       ['Hai dormito almeno 6 ore?', 'yn_sonno'],
       ['Hai mangiato nelle ultime 4 ore?', 'yn_mangiato'],
@@ -686,12 +736,12 @@
       ['Hai assunto alcol nelle ultime 24 ore?', 'yn_alcol'],
       ['Hai assunto sostanze stupefacenti?', 'yn_droghe'],
       ['Hai fatto sforzi fisici intensi oggi?', 'yn_sforzi'],
-    ]);
-    y += 4;
+    ], ML, colW2);
+    yLeft = y;
 
-    // ══ SEZ 3 – STORIA MEDICA ══
-    sezHeader('3', 'STORIA MEDICA');
-    grigliaYN([
+    // Colonna destra: SEZ3
+    y = yAfterHeaders;
+    grigliaYN1col([
       ['Hai mai avuto malattie cardiache?', 'yn_cardiaco'],
       ['Hai mai avuto pressione alta?', 'yn_pressione'],
       ['Hai il diabete?', 'yn_diabete'],
@@ -702,67 +752,76 @@
       ['Hai mai avuto HIV?', 'yn_hiv'],
       ['Hai mai avuto malattie infettive gravi?', 'yn_infettive'],
       ['Hai allergie?', 'yn_allergie'],
-    ]);
-    if (ynState['yn_allergie']==='si') campo('SPECIFICARE ALLERGIE', gv('allergie_spec'));
-    y += 4;
+    ], midCol, colW2);
+    yRight = y;
 
-    // ══ SEZ 4 – FARMACI ══
-    sezHeader('4', 'FARMACI');
-    grigliaYN([
+    y = Math.max(yLeft, yRight) + GAP_S;
+
+    // SEZ 4 e SEZ 5 affiancate
+    doc.setFillColor(...RED);
+    doc.roundedRect(ML, y, colW2, SH, 1, 1, 'F');
+    doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(6);
+    doc.text('4  FARMACI', ML + 2.5, y + 4.3);
+    doc.roundedRect(midCol, y, colW2, SH, 1, 1, 'F');
+    doc.text('5  INTERVENTI E PROCEDURE – ULTIMI 4 MESI', midCol + 2.5, y + 4.3);
+    y += SH + 1.2;
+
+    const yAfterHdr45 = y;
+    let yLeft45 = y, yRight45 = y;
+
+    y = yLeft45;
+    grigliaYN1col([
       ['Assumi farmaci attualmente?', 'yn_farmaci'],
       ['Hai assunto antibiotici negli ultimi 15 giorni?', 'yn_antibiotici'],
       ['Hai fatto vaccini recentemente?', 'yn_vaccini'],
-    ]);
-    if (ynState['yn_farmaci']==='si') {
-      checkY(14);
-      const fd = g('farmaci_desc').value.trim() || '—';
-      doc.setFillColor(...LGRAY);
-      doc.roundedRect(ML, y, CW, 12, 1, 1, 'F');
-      doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
-      doc.text('DESCRIZIONE FARMACI', ML+3, y+3.2);
-      doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
-      const fdLines = doc.splitTextToSize(fd, CW-6);
-      doc.text(fdLines[0], ML+3, y+7.5);
-      y += 14;
-    }
-    y += 4;
+    ], ML, colW2);
+    yLeft45 = y;
 
-    // ══ SEZ 5 – INTERVENTI ══
-    sezHeader('5', 'INTERVENTI E PROCEDURE – ULTIMI 4 MESI');
-    grigliaYN([
+    y = yAfterHdr45;
+    grigliaYN1col([
       ['Tatuaggi?', 'yn_tatuaggi'],
       ['Piercing?', 'yn_piercing'],
       ['Interventi chirurgici?', 'yn_chirurgia'],
       ['Esami invasivi?', 'yn_esami'],
       ['Trasfusioni?', 'yn_trasfusioni'],
       ['Cure dentistiche importanti?', 'yn_dentista'],
-    ]);
-    y += 4;
+    ], midCol, colW2);
+    yRight45 = y;
 
-    // ══ SEZ 6 – STILE DI VITA ══
-    sezHeader('6', 'STILE DI VITA');
+    y = Math.max(yLeft45, yRight45) + GAP_S;
+
+    // SEZ 6 e SEZ 8 affiancate
+    doc.setFillColor(...RED);
+    doc.roundedRect(ML, y, colW2, SH, 1, 1, 'F');
+    doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(6);
+    doc.text('6  STILE DI VITA', ML + 2.5, y + 4.3);
+    doc.roundedRect(midCol, y, colW2, SH, 1, 1, 'F');
+    doc.text('8  CONSENSI OBBLIGATORI', midCol + 2.5, y + 4.3);
+    y += SH + 1.2;
+
+    const yAfterHdr68 = y;
+    let yLeft6 = y, yRight8 = y;
+
+    // Colonna sinistra SEZ 6
+    y = yLeft6;
     riga2('FUMO', freqVal('fg_fumo'), 'CONSUMO DI ALCOL', freqVal('fg_alcol2'));
-    y += 2;
-    grigliaYN([
+    // nota: riga2 usa ML e CW globali; dobbiamo usare metodo custom
+    y -= (CH + GAP_R); // annulla l'avanzamento e rifacciamo a larghezza colonna
+    // Riga fumo/alcol su colW2
+    const halfSub = (colW2 - 2) / 2;
+    const y6r = y;
+    campo('FUMO', freqVal('fg_fumo'), ML, halfSub);
+    y = y6r;
+    campo('CONSUMO DI ALCOL', freqVal('fg_alcol2'), ML + halfSub + 2, halfSub);
+    grigliaYN1col([
       ['Hai avuto nuovi partner negli ultimi mesi?', 'yn_partner'],
       ['Hai viaggiato all\'estero negli ultimi 6 mesi?', 'yn_viaggi'],
-    ]);
-    if (ynState['yn_viaggi']==='si') campo('PAESE VISITATO', gv('viaggi_paese'));
-    y += 4;
+    ], ML, colW2);
+    if (ynState['yn_viaggi']==='si') campo('PAESE VISITATO', gv('viaggi_paese'), ML, colW2);
+    yLeft6 = y;
 
-    // ══ SEZ 7 – DONATRICI (solo femmina) ══
-    if (g('p_sesso').value === 'Femmina') {
-      sezHeader('7', 'PER DONATRICI');
-      grigliaYN([
-        ['Gravidanza attuale?', 'yn_gravatt'],
-        ['Gravidanza negli ultimi 12 mesi?', 'yn_grav12'],
-        ['Allattamento?', 'yn_allatt'],
-      ]);
-      y += 4;
-    }
-
-    // ══ SEZ 8 – CONSENSI ══
-    sezHeader('8', 'CONSENSI OBBLIGATORI');
+    // Colonna destra SEZ 8
+    y = yAfterHdr68;
     const consensi = [
       'Dichiaro che tutte le informazioni fornite sono veritiere e accurate.',
       'Acconsento al trattamento dei miei dati personali ai sensi del GDPR.',
@@ -771,27 +830,28 @@
       'Comprendo e accetto le responsabilità legali da questa dichiarazione.',
     ];
     consensi.forEach((testo, i) => {
-      checkY(9);
       doc.setFillColor(...GREEN);
-      doc.roundedRect(ML, y, 7, 7, 1, 1, 'F');
-      doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(9);
-      doc.text('✓', ML+1.8, y+5.5);
-      doc.setTextColor(...DARK); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-      doc.text((i+1)+'. '+testo, ML+10, y+5);
-      y += 10;
+      doc.roundedRect(midCol, y, 5, RH, 0.8, 0.8, 'F');
+      doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(5.5);
+      doc.text('✓', midCol + 1.2, y + 3.8);
+      doc.setTextColor(...DARK); doc.setFont('helvetica','normal'); doc.setFontSize(5);
+      const lines = doc.splitTextToSize((i+1)+'. '+testo, colW2 - 7);
+      doc.text(lines[0], midCol + 7, y + 3.8);
+      y += RH + GAP_R;
     });
-    y += 4;
+    yRight8 = y;
+
+    y = Math.max(yLeft6, yRight8) + GAP_S;
 
     // ══ SEZ 9 – FIRMA ══
     sezHeader('9', 'FIRMA DEL DONATORE');
-    checkY(46);
-    // Sfondo bianco + bordo per firma
+
+    const firmaH = 22;
     doc.setFillColor(250,251,252);
     doc.setDrawColor(200,210,220);
-    doc.setLineWidth(0.4);
-    doc.roundedRect(ML, y, CW, 40, 2, 2, 'FD');
+    doc.setLineWidth(0.3);
+    doc.roundedRect(ML, y, CW, firmaH, 1.5, 1.5, 'FD');
 
-    // Inserisce la firma dal canvas come immagine
     const canvas = g('canvasDon');
     const tmp = document.createElement('canvas');
     tmp.width = canvas.width; tmp.height = canvas.height;
@@ -799,35 +859,31 @@
     ctx2.fillStyle = '#fafbfc'; ctx2.fillRect(0,0,tmp.width,tmp.height);
     ctx2.drawImage(canvas, 0, 0);
     const firmaDataUrl = tmp.toDataURL('image/png');
-    doc.addImage(firmaDataUrl, 'PNG', ML+2, y+2, CW-4, 36);
+    doc.addImage(firmaDataUrl, 'PNG', ML+1, y+1, CW-2, firmaH-2);
 
-    y += 44;
+    y += firmaH + 2;
 
-    // Data e nome sotto firma
-    doc.setDrawColor(...GRAY); doc.setLineWidth(0.3);
-    doc.line(ML, y, ML+70, y);
-    doc.line(ML+90, y, ML+90+70, y);
-    doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
-    doc.text('Firma del Donatore', ML, y+4);
-    doc.text('Data', ML+90, y+4);
-    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
-    doc.text(gv('p_nome')+' '+gv('p_cognome'), ML, y+9);
-    doc.text(oggi, ML+90, y+9);
-    y += 16;
+    doc.setDrawColor(...GRAY); doc.setLineWidth(0.25);
+    doc.line(ML, y, ML+55, y);
+    doc.line(ML+70, y, ML+70+55, y);
+    doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(5);
+    doc.text('Firma del Donatore', ML, y+3);
+    doc.text('Data', ML+70, y+3);
+    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(6);
+    doc.text(gv('p_nome')+' '+gv('p_cognome'), ML, y+7);
+    doc.text(oggi, ML+70, y+7);
+    y += 10;
 
-    // ── FOOTER ogni pagina ──
-    const totalPages = doc.internal.getNumberOfPages();
-    for (let p=1; p<=totalPages; p++) {
-      doc.setPage(p);
-      doc.setFillColor(...RED);
-      doc.rect(0, 287, W, 10, 'F');
-      doc.setTextColor(...WHITE); doc.setFont('helvetica','normal'); doc.setFontSize(7);
-      doc.text('I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962 — Dati trattati ai sensi del GDPR', ML, 293);
-      doc.text('Pag. '+p+'/'+totalPages+'   Pratica '+pratica, W-MR-30, 293);
-    }
+    // ── FOOTER ──
+    doc.setFillColor(...RED);
+    doc.rect(0, 287, W, 10, 'F');
+    doc.setTextColor(...WHITE); doc.setFont('helvetica','normal'); doc.setFontSize(5.5);
+    doc.text('I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962 — Dati trattati ai sensi del GDPR', ML, 293);
+    doc.text('Pag. 1/1   Pratica '+pratica, W-MR-28, 293);
 
     return doc;
   }
+
 
   /* ═══════════════════════════════════
      RESET
