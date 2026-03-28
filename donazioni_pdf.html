@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Donazione di Sangue – I.R.C.C.S. Ospedale San Raffaele</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --red:        #c0392b; --red-dark: #922b21; --red-light: #fdf0ef;
+      --red-mid:    #e74c3c; --dark: #1a1a2e; --gray: #6b7a8d;
+      --light-gray: #f4f6f9; --border: #dde3ee;
+      --radius: 10px; --shadow: 0 2px 16px rgba(0,0,0,.07);
+      --shadow-lg: 0 8px 36px rgba(0,0,0,.12);
+      --green: #1a8f5a; --green-light: #e6f7f0;
+      --discord: #5865F2; --discord-hov: #4752c4;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--light-gray); color: var(--dark); min-height: 100vh; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 1000; background: rgba(255,255,255,.97); backdrop-filter: blur(12px); border-bottom: 2px solid var(--red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+    .logo img { height: 54px; width: auto; }
+    .logo-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--red); }
+    .logo-text span   { font-size: 11px; color: var(--gray); }
+    .nav-right { display: flex; align-items: center; gap: 14px; }
+    .nav-back { display: flex; align-items: center; gap: 8px; text-decoration: none; font-size: 13px; font-weight: 600; color: var(--red); padding: 8px 16px; border: 1.5px solid var(--red); border-radius: 6px; transition: all .2s; }
+    .nav-back:hover { background: var(--red); color: #fff; }
+    .nav-user { display: none; align-items: center; gap: 10px; background: #f0f2ff; border-radius: 30px; padding: 6px 14px 6px 8px; }
+    .nav-user.on { display: flex; }
+    .nav-user img { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--discord); }
+    .nav-user-name { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .nav-logout { font-size: 11px; color: var(--gray); cursor: pointer; text-decoration: underline; margin-left: 4px; }
+    .nav-logout:hover { color: var(--red); }
+
+    /* HEADER */
+    .page-header { background: linear-gradient(135deg, #922b21 0%, #c0392b 50%, #e74c3c 100%); padding: 60px 5% 48px; text-align: center; position: relative; overflow: hidden; }
+    .page-header::before { content: ''; position: absolute; inset: 0; opacity: .05; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 28px 28px; }
+    .header-icon { width: 68px; height: 68px; background: rgba(255,255,255,.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; border: 2px solid rgba(255,255,255,.3); position: relative; }
+    .header-icon i { font-size: 1.9rem; color: #fff; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,3.5vw,2.8rem); color: #fff; font-weight: 700; margin-bottom: 10px; text-shadow: 0 2px 12px rgba(0,0,0,.2); position: relative; }
+    .page-header p { font-size: 14px; color: rgba(255,255,255,.82); max-width: 500px; margin: 0 auto; line-height: 1.7; position: relative; }
+    .pratica-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3); border-radius: 20px; padding: 5px 16px; margin-top: 16px; font-size: 12px; font-weight: 700; color: #fff; position: relative; }
+
+    /* MAIN */
+    .main-wrap { max-width: 880px; margin: 0 auto; padding: 44px 20px 80px; }
+
+    /* SCHERMATE */
+    #loginScreen, #loadingScreen, #formScreen { display: none; }
+    #loginScreen { flex-direction: column; align-items: center; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); padding: 52px 40px; text-align: center; }
+    .discord-logo-wrap { width: 74px; height: 74px; background: var(--discord); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 0 8px 24px rgba(88,101,242,.35); }
+    .discord-logo-wrap i { font-size: 2rem; color: #fff; }
+    #loginScreen h2 { font-family: 'Playfair Display', serif; font-size: 1.6rem; color: var(--dark); margin-bottom: 10px; }
+    #loginScreen p { font-size: 14px; color: var(--gray); max-width: 360px; line-height: 1.7; margin-bottom: 26px; }
+    .btn-discord { display: inline-flex; align-items: center; gap: 12px; background: var(--discord); color: #fff; padding: 13px 28px; border-radius: 10px; font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 700; text-decoration: none; transition: all .2s; box-shadow: 0 4px 18px rgba(88,101,242,.35); }
+    .btn-discord:hover { background: var(--discord-hov); transform: translateY(-2px); }
+    .login-note { margin-top: 14px; font-size: 12px; color: var(--gray); }
+    #loadingScreen { flex-direction: column; align-items: center; padding: 80px 40px; text-align: center; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); }
+    .spinner { width: 44px; height: 44px; border: 4px solid #fdd; border-top-color: var(--red); border-radius: 50%; animation: spin .8s linear infinite; margin-bottom: 16px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    #loadingScreen p { font-size: 14px; color: var(--gray); }
+
+    /* CARD */
+    .card { background: #fff; border-radius: var(--radius); box-shadow: var(--shadow); margin-bottom: 22px; overflow: hidden; }
+    .card-header { background: linear-gradient(90deg, var(--red) 0%, var(--red-mid) 100%); padding: 14px 26px; display: flex; align-items: center; gap: 10px; }
+    .card-header i { color: rgba(255,255,255,.85); font-size: .95rem; }
+    .card-header h2 { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: #fff; }
+    .sect-num { width: 22px; height: 22px; background: rgba(255,255,255,.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10.5px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .card-body { padding: 24px 28px; }
+
+    /* Discord badge */
+    .discord-badge { display: flex; align-items: center; gap: 12px; background: #f0f2ff; border: 1.5px solid #c5caff; border-radius: 9px; padding: 11px 16px; margin-bottom: 20px; }
+    .discord-badge img { width: 38px; height: 38px; border-radius: 50%; border: 2px solid var(--discord); }
+    .discord-badge-text strong { display: block; font-size: 13.5px; font-weight: 700; color: var(--dark); }
+    .discord-badge-text span { font-size: 11.5px; color: var(--gray); }
+    .discord-badge .fa-circle-check { color: var(--discord); margin-left: auto; }
+
+    /* FORM */
+    .fg { display: grid; gap: 14px; margin-bottom: 14px; }
+    .fg.c2 { grid-template-columns: 1fr 1fr; }
+    .fg.c3 { grid-template-columns: 1fr 1fr 1fr; }
+    .fg.c4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .fg.c1 { grid-template-columns: 1fr; }
+    .fgroup { display: flex; flex-direction: column; gap: 5px; }
+    .lbl { font-size: 12px; font-weight: 600; color: #4a5568; }
+    .lbl .req { color: var(--red); margin-left: 2px; }
+    input[type="text"], input[type="email"], input[type="number"], input[type="date"], select, textarea { border: 1.5px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 13.5px; font-family: 'DM Sans',sans-serif; color: var(--dark); background: #fff; outline: none; width: 100%; transition: border-color .2s, box-shadow .2s; }
+    input:focus, select:focus, textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.08); }
+    select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b7a8d' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; appearance: none; padding-right: 30px; }
+    textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
+
+    /* YN */
+    .yn-grid { display: flex; flex-direction: column; gap: 8px; }
+    .yn-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; gap: 12px; }
+    .yn-label { font-size: 13px; color: var(--dark); flex: 1; }
+    .yn-btns { display: flex; gap: 7px; flex-shrink: 0; }
+    .yn-btn { padding: 5px 16px; border-radius: 6px; border: 1.5px solid var(--border); font-size: 12.5px; font-weight: 700; cursor: pointer; transition: all .15s; color: var(--gray); background: #fff; user-select: none; }
+    .yn-btn.si.sel { background: var(--green); border-color: var(--green); color: #fff; }
+    .yn-btn.no.sel { background: var(--red); border-color: var(--red); color: #fff; }
+    .yn-extra { margin-top: 6px; display: none; padding: 0 2px; }
+    .yn-extra.on { display: block; }
+
+    /* FREQ */
+    .freq-group { display: flex; gap: 7px; flex-wrap: wrap; }
+    .freq-opt { padding: 6px 14px; border: 1.5px solid var(--border); border-radius: 20px; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: all .15s; color: var(--gray); user-select: none; }
+    .freq-opt:hover { border-color: var(--red); color: var(--red); }
+    .freq-opt.sel { background: var(--red); border-color: var(--red); color: #fff; }
+
+    /* STATO DONATORE */
+    .stato-group { display: flex; gap: 10px; }
+    .stato-opt { flex: 1; padding: 11px; border: 2px solid var(--border); border-radius: 9px; text-align: center; cursor: pointer; transition: all .2s; user-select: none; }
+    .stato-opt i { font-size: 1.1rem; margin-bottom: 4px; display: block; color: var(--gray); }
+    .stato-opt span { font-size: 13px; font-weight: 700; color: var(--gray); }
+    .stato-opt.sel { border-color: var(--red); background: var(--red-light); }
+    .stato-opt.sel i, .stato-opt.sel span { color: var(--red); }
+
+    /* SEZIONE FEMMINILE */
+    #sezFemminile { display: none; }
+    #sezFemminile.on { display: block; }
+
+    /* CONSENSI */
+    .consensi-list { display: flex; flex-direction: column; gap: 8px; }
+    .consenso-item { display: flex; align-items: flex-start; gap: 11px; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 8px; cursor: pointer; transition: all .15s; user-select: none; }
+    .consenso-item:hover { border-color: var(--red); background: #fef9f9; }
+    .consenso-item.sel { border-color: var(--green); background: var(--green-light); }
+    .cons-box { width: 17px; height: 17px; border: 2px solid var(--border); border-radius: 4px; flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all .15s; }
+    .consenso-item.sel .cons-box { background: var(--green); border-color: var(--green); }
+    .consenso-item.sel .cons-box::after { content: '✓'; color: #fff; font-size: 10px; font-weight: 700; }
+    .cons-text { font-size: 13px; color: var(--dark); line-height: 1.5; }
+
+    /* FIRMA */
+    .firma-box { display: flex; flex-direction: column; gap: 7px; }
+    .canvas-wrap { border: 2px solid var(--border); border-radius: 8px; overflow: hidden; background: #fafbfc; cursor: crosshair; }
+    canvas { display: block; width: 100%; touch-action: none; }
+    .firma-actions { display: flex; align-items: center; gap: 10px; }
+    .btn-clear { padding: 5px 13px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; color: var(--gray); background: #fff; transition: all .15s; }
+    .btn-clear:hover { border-color: var(--red); color: var(--red); }
+    .data-auto { font-size: 12px; color: var(--gray); }
+
+    /* ERRORE */
+    .err-box { display: none; background: var(--red-light); border: 1.5px solid var(--red-mid); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px; font-size: 13.5px; color: var(--red-dark); align-items: center; gap: 10px; }
+    .err-box.on { display: flex; }
+
+    /* AZIONI */
+    .action-row { display: flex; gap: 12px; }
+    .btn-submit { flex: 1; padding: 14px; background: var(--red); color: #fff; border: none; border-radius: 9px; font-family: 'DM Sans',sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+    .btn-submit:hover { background: var(--red-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(192,57,43,.3); }
+    .btn-submit:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-reset { padding: 14px 24px; background: #fff; color: var(--gray); border: 1.5px solid var(--border); border-radius: 9px; font-family: 'DM Sans',sans-serif; font-size: 14px; font-weight: 600; cursor: pointer; transition: all .2s; display: flex; align-items: center; gap: 8px; }
+    .btn-reset:hover { border-color: var(--gray); color: var(--dark); }
+
+    /* SUCCESSO */
+    #successMsg { display: none; background: var(--green-light); border: 1.5px solid var(--green); border-radius: 12px; padding: 34px 30px; text-align: center; margin-top: 18px; }
+    #successMsg.on { display: block; }
+    #successMsg i.big { font-size: 2.4rem; color: var(--green); margin-bottom: 12px; display: block; }
+    #successMsg h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--dark); margin-bottom: 7px; }
+    #successMsg p { font-size: 14px; color: var(--gray); line-height: 1.65; }
+    .btn-download { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; background: var(--green); color: #fff; padding: 11px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; cursor: pointer; border: none; font-family: 'DM Sans',sans-serif; transition: all .2s; }
+    .btn-download:hover { background: #157a4a; }
+
+    .footer-mini { text-align: center; padding: 26px; font-size: 12px; color: var(--gray); border-top: 1px solid var(--border); }
+
+    @media (max-width: 680px) {
+      .card-body { padding: 18px 16px; }
+      .fg.c2, .fg.c3, .fg.c4 { grid-template-columns: 1fr; }
+      .action-row { flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="logo">
+    <img src="assets/images/logo.png" alt="San Raffaele" />
+    <div class="logo-text">
+      <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+      <span>Gruppo San Donato</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <div class="nav-user" id="navUser">
+      <img id="navAvatar" src="" alt="" />
+      <span class="nav-user-name" id="navUsername"></span>
+      <span class="nav-logout" onclick="logout()">Esci</span>
+    </div>
+    <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Home</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="header-icon"><i class="fa-solid fa-droplet"></i></div>
+  <h1>Donazione di Sangue</h1>
+  <p>Compila il modulo di pre-donazione. Le informazioni sono riservate e tutelate dalla normativa sulla privacy.</p>
+  <div class="pratica-badge"><i class="fa-solid fa-hashtag"></i> Pratica N° <span id="numPratica">—</span></div>
+</div>
+
+<div class="main-wrap">
+
+  <!-- LOGIN -->
+  <div id="loginScreen">
+    <div class="discord-logo-wrap"><i class="fa-brands fa-discord"></i></div>
+    <h2>Accesso richiesto</h2>
+    <p>Per compilare il modulo di donazione è necessario verificare la tua identità tramite Discord.</p>
+    <a id="loginBtn" href="#" class="btn-discord"><i class="fa-brands fa-discord"></i> Accedi con Discord</a>
+    <p class="login-note">Verranno richieste solo le informazioni base del profilo.</p>
+  </div>
+
+  <!-- LOADING -->
+  <div id="loadingScreen">
+    <div class="spinner"></div>
+    <p>Verifica identità in corso…</p>
+  </div>
+
+  <!-- FORM -->
+  <div id="formScreen">
+
+    <div class="err-box" id="errBox">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span id="errTesto"></span>
+    </div>
+
+    <!-- SEZ 1 – DATI PERSONALI -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">1</div><i class="fa-solid fa-user"></i><h2>Dati Personali</h2></div>
+      <div class="card-body">
+        <div class="discord-badge">
+          <img id="bdgAvatar" src="" alt="" />
+          <div class="discord-badge-text"><strong id="bdgUsername"></strong><span id="bdgTag"></span></div>
+          <i class="fa-solid fa-circle-check"></i>
+        </div>
+        <div class="fg c1" style="margin-bottom:16px;">
+          <div class="fgroup">
+            <span class="lbl">Stato donatore</span>
+            <div class="stato-group">
+              <div class="stato-opt sel" id="statoNuovo" onclick="selStato('nuovo')"><i class="fa-solid fa-star"></i><span>Nuovo</span></div>
+              <div class="stato-opt" id="statoAbituale" onclick="selStato('abituale')"><i class="fa-solid fa-rotate"></i><span>Abituale</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="fg c2">
+          <div class="fgroup"><label class="lbl" for="p_nome">Nome <span class="req">*</span></label><input type="text" id="p_nome" placeholder="Nome" /></div>
+          <div class="fgroup"><label class="lbl" for="p_cognome">Cognome <span class="req">*</span></label><input type="text" id="p_cognome" placeholder="Cognome" /></div>
+        </div>
+        <div class="fg c3">
+          <div class="fgroup"><label class="lbl" for="p_nascita">Data di nascita <span class="req">*</span></label><input type="date" id="p_nascita" /></div>
+          <div class="fgroup"><label class="lbl" for="p_sesso">Sesso <span class="req">*</span></label><select id="p_sesso" onchange="checkSesso()"><option value="">— Seleziona —</option><option value="Maschio">Maschio</option><option value="Femmina">Femmina</option><option value="Altro">Altro</option></select></div>
+          <div class="fgroup"><label class="lbl" for="p_sangue">Gruppo sanguigno</label><select id="p_sangue"><option value="Non noto">Non noto</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>0+</option><option>0-</option></select></div>
+        </div>
+        <div class="fg c4">
+          <div class="fgroup"><label class="lbl" for="p_altezza">Altezza (cm) <span class="req">*</span></label><input type="number" id="p_altezza" placeholder="170" min="100" max="250" /></div>
+          <div class="fgroup"><label class="lbl" for="p_peso">Peso (kg) <span class="req">*</span></label><input type="number" id="p_peso" placeholder="70" min="30" max="250" /></div>
+          <div class="fgroup"><label class="lbl" for="p_tel">Telefono <span class="req">*</span></label><input type="text" id="p_tel" placeholder="333 1234567" /></div>
+          <div class="fgroup"><label class="lbl" for="p_email">Email <span class="req">*</span></label><input type="email" id="p_email" placeholder="email@esempio.it" /></div>
+        </div>
+        <div class="fg c1">
+          <div class="fgroup"><label class="lbl" for="p_doc">Documento d'identità <span class="req">*</span></label><input type="text" id="p_doc" placeholder="Es. CI AB1234567" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 2 – CONDIZIONI GENERALI -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">2</div><i class="fa-solid fa-heart-pulse"></i><h2>Condizioni Generali</h2></div>
+      <div class="card-body">
+        <div class="yn-grid">
+          <div class="yn-row" id="yn_salute"><span class="yn-label">Ti senti in buona salute oggi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_salute','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_salute','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_sonno"><span class="yn-label">Hai dormito almeno 6 ore?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_sonno','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_sonno','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_mangiato"><span class="yn-label">Hai mangiato nelle ultime 4 ore?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_mangiato','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_mangiato','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_febbre"><span class="yn-label">Hai febbre?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_febbre','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_febbre','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_influenza"><span class="yn-label">Hai sintomi influenzali?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_influenza','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_influenza','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_tosse"><span class="yn-label">Hai tosse persistente?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_tosse','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_tosse','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_alcol"><span class="yn-label">Hai assunto alcol nelle ultime 24 ore?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_alcol','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_alcol','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_droghe"><span class="yn-label">Hai assunto sostanze stupefacenti?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_droghe','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_droghe','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_sforzi"><span class="yn-label">Hai fatto sforzi fisici intensi oggi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_sforzi','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_sforzi','no',event)">No</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 3 – STORIA MEDICA -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">3</div><i class="fa-solid fa-notes-medical"></i><h2>Storia Medica</h2></div>
+      <div class="card-body">
+        <div class="yn-grid">
+          <div class="yn-row" id="yn_cardiaco"><span class="yn-label">Hai mai avuto malattie cardiache?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_cardiaco','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_cardiaco','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_pressione"><span class="yn-label">Hai mai avuto pressione alta?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_pressione','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_pressione','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_diabete"><span class="yn-label">Hai il diabete?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_diabete','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_diabete','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_conv"><span class="yn-label">Hai mai avuto convulsioni?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_conv','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_conv','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_malsangue"><span class="yn-label">Hai malattie del sangue?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_malsangue','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_malsangue','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_coag"><span class="yn-label">Hai problemi di coagulazione?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_coag','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_coag','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_epatite"><span class="yn-label">Hai mai avuto epatite?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_epatite','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_epatite','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_hiv"><span class="yn-label">Hai mai avuto HIV?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_hiv','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_hiv','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_infettive"><span class="yn-label">Hai mai avuto malattie infettive gravi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_infettive','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_infettive','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_allergie"><span class="yn-label">Hai allergie?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_allergie','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_allergie','no',event)">No</div></div></div>
+          <div class="yn-extra" id="ext_allergie"><input type="text" id="allergie_spec" placeholder="Specifica le allergie…" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 4 – FARMACI -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">4</div><i class="fa-solid fa-pills"></i><h2>Farmaci</h2></div>
+      <div class="card-body">
+        <div class="yn-grid">
+          <div class="yn-row" id="yn_farmaci"><span class="yn-label">Assumi farmaci attualmente?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_farmaci','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_farmaci','no',event)">No</div></div></div>
+          <div class="yn-extra" id="ext_farmaci"><textarea id="farmaci_desc" placeholder="Descrivi i farmaci che assumi…"></textarea></div>
+          <div class="yn-row" id="yn_antibiotici"><span class="yn-label">Hai assunto antibiotici negli ultimi 15 giorni?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_antibiotici','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_antibiotici','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_vaccini"><span class="yn-label">Hai fatto vaccini recentemente?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_vaccini','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_vaccini','no',event)">No</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 5 – INTERVENTI -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">5</div><i class="fa-solid fa-scalpel"></i><h2>Interventi e Procedure – ultimi 4 mesi</h2></div>
+      <div class="card-body">
+        <div class="yn-grid">
+          <div class="yn-row" id="yn_tatuaggi"><span class="yn-label">Tatuaggi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_tatuaggi','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_tatuaggi','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_piercing"><span class="yn-label">Piercing?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_piercing','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_piercing','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_chirurgia"><span class="yn-label">Interventi chirurgici?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_chirurgia','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_chirurgia','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_esami"><span class="yn-label">Esami invasivi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_esami','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_esami','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_trasfusioni"><span class="yn-label">Trasfusioni?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_trasfusioni','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_trasfusioni','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_dentista"><span class="yn-label">Cure dentistiche importanti?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_dentista','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_dentista','no',event)">No</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 6 – STILE DI VITA -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">6</div><i class="fa-solid fa-person-running"></i><h2>Stile di Vita</h2></div>
+      <div class="card-body">
+        <div class="yn-grid">
+          <div class="yn-row"><span class="yn-label">Fumi?</span><div class="freq-group" id="fg_fumo"><div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Mai</div><div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Occasionalmente</div><div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Spesso</div></div></div>
+          <div class="yn-row"><span class="yn-label">Bevi alcol?</span><div class="freq-group" id="fg_alcol2"><div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Mai</div><div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Occasionalmente</div><div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Spesso</div></div></div>
+          <div class="yn-row" id="yn_partner"><span class="yn-label">Hai avuto nuovi partner negli ultimi mesi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_partner','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_partner','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_viaggi"><span class="yn-label">Hai viaggiato all'estero negli ultimi 6 mesi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_viaggi','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_viaggi','no',event)">No</div></div></div>
+          <div class="yn-extra" id="ext_viaggi"><input type="text" id="viaggi_paese" placeholder="Specifica il paese visitato…" /></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 7 – DONATRICI -->
+    <div class="card" id="sezFemminile">
+      <div class="card-header"><div class="sect-num">7</div><i class="fa-solid fa-venus"></i><h2>Per Donatrici</h2></div>
+      <div class="card-body">
+        <div class="yn-grid">
+          <div class="yn-row" id="yn_gravatt"><span class="yn-label">Gravidanza attuale?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_gravatt','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_gravatt','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_grav12"><span class="yn-label">Gravidanza negli ultimi 12 mesi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_grav12','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_grav12','no',event)">No</div></div></div>
+          <div class="yn-row" id="yn_allatt"><span class="yn-label">Allattamento?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_allatt','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_allatt','no',event)">No</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 8 – CONSENSI -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">8</div><i class="fa-solid fa-file-signature"></i><h2>Consensi Obbligatori</h2></div>
+      <div class="card-body">
+        <div class="consensi-list">
+          <div class="consenso-item" id="con1" onclick="togCons(this,event)"><div class="cons-box"></div><span class="cons-text">Dichiaro che tutte le informazioni fornite sono veritiere e accurate.</span></div>
+          <div class="consenso-item" id="con2" onclick="togCons(this,event)"><div class="cons-box"></div><span class="cons-text">Acconsento al trattamento dei miei dati personali ai sensi del GDPR.</span></div>
+          <div class="consenso-item" id="con3" onclick="togCons(this,event)"><div class="cons-box"></div><span class="cons-text">Accetto la valutazione medica preventiva alla donazione.</span></div>
+          <div class="consenso-item" id="con4" onclick="togCons(this,event)"><div class="cons-box"></div><span class="cons-text">Accetto il prelievo di sangue e sono consapevole delle procedure ad esso associate.</span></div>
+          <div class="consenso-item" id="con5" onclick="togCons(this,event)"><div class="cons-box"></div><span class="cons-text">Comprendo e accetto le responsabilità legali derivanti da questa dichiarazione.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SEZ 9 – FIRMA -->
+    <div class="card">
+      <div class="card-header"><div class="sect-num">9</div><i class="fa-solid fa-pen-nib"></i><h2>Firma del Donatore</h2></div>
+      <div class="card-body">
+        <p style="font-size:13px;color:var(--gray);margin-bottom:14px;">Firma nell'area sottostante usando il mouse o il dito sul touchscreen.</p>
+        <div class="firma-box">
+          <div class="canvas-wrap"><canvas id="canvasDon" height="160"></canvas></div>
+          <div class="firma-actions">
+            <button class="btn-clear" onclick="clearCanvas('canvasDon')"><i class="fa-solid fa-eraser"></i> Cancella firma</button>
+            <span class="data-auto"><i class="fa-solid fa-calendar-check" style="margin-right:5px;"></i>Data: <strong id="dataOggi"></strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AZIONI -->
+    <div id="formWrap">
+      <div class="action-row">
+        <button class="btn-reset" onclick="resetForm()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+        <button class="btn-submit" id="submitBtn" onclick="invia()"><i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia</button>
+      </div>
+    </div>
+
+    <div id="successMsg">
+      <i class="fa-solid fa-circle-check big"></i>
+      <h3>Modulo inviato con successo!</h3>
+      <p>Il PDF del modulo di pre-donazione è stato inviato allo staff medico su Discord.<br>Puoi anche scaricarne una copia per i tuoi archivi.</p>
+      <button class="btn-download" id="btnDownload"><i class="fa-solid fa-file-pdf"></i> Scarica copia PDF</button>
+    </div>
+
+  </div>
+</div>
+
+<div class="footer-mini">© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962 — Dati trattati in conformità al GDPR</div>
+
+<script>
+  /* ═══════════════════════════════════
+     CONFIG
+  ═══════════════════════════════════ */
+  const CLIENT_ID = '1484523347243958414';
+  const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/donazioni.html';
+  const WEBHOOK   = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
+
+  /* ═══════════════════════════════════
+     STATO
+  ═══════════════════════════════════ */
+  let user = null, statoDon = 'nuovo', ynState = {}, freqState = {};
+  let pdfBlob = null; // conservato per il download
+
+  /* ═══════════════════════════════════
+     UTILITY
+  ═══════════════════════════════════ */
+  function genPratica() {
+    const d = new Date();
+    return 'SR-' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '-' + Math.floor(1000+Math.random()*9000);
+  }
+  const g  = id => document.getElementById(id);
+  const gv = id => g(id).value.trim();
+  function ynVal(id) { return ynState[id]==='si' ? 'SI' : ynState[id]==='no' ? 'NO' : '—'; }
+  function freqVal(id) { return freqState[id] || '—'; }
+
+  /* ═══════════════════════════════════
+     SCHERMATE
+  ═══════════════════════════════════ */
+  function mostra(s) {
+    g('loginScreen').style.display   = s==='login'   ? 'flex'  : 'none';
+    g('loadingScreen').style.display = s==='loading' ? 'flex'  : 'none';
+    g('formScreen').style.display    = s==='form'    ? 'block' : 'none';
+  }
+
+  /* ═══════════════════════════════════
+     OAUTH2
+  ═══════════════════════════════════ */
+  function oauthURL() {
+    const state = Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
+    sessionStorage.setItem('dstate', state);
+    return 'https://discord.com/oauth2/authorize?'+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:REDIRECT,response_type:'token',scope:'identify',state});
+  }
+  async function leggiCallback() {
+    const fH = new URLSearchParams(location.hash.replace(/^#/,''));
+    const fQ = new URLSearchParams(location.search.replace(/^\?/,''));
+    const token = fH.get('access_token')||fQ.get('access_token');
+    if (!token) return false;
+    history.replaceState(null,'',location.pathname);
+    mostra('loading');
+    try {
+      const res = await fetch('https://discord.com/api/users/@me',{headers:{Authorization:'Bearer '+token}});
+      if (!res.ok) throw new Error(res.status);
+      const u = await res.json();
+      user = { id:u.id, username:u.username,
+        tag:(u.discriminator&&u.discriminator!=='0')?'#'+u.discriminator:'@'+u.username,
+        avatar:u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+                       :`https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id)%6n)}.png` };
+      sessionStorage.setItem('du_don', JSON.stringify(user));
+      mostraForm();
+    } catch(e) { mostra('login'); errore('Impossibile ottenere i dati Discord. Riprova.'); }
+    return true;
+  }
+  function mostraForm() {
+    mostra('form');
+    g('bdgAvatar').src           = user.avatar;
+    g('bdgUsername').textContent = user.username;
+    g('bdgTag').textContent      = user.tag;
+    g('navAvatar').src           = user.avatar;
+    g('navUsername').textContent = user.username;
+    g('navUser').classList.add('on');
+    g('dataOggi').textContent = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+    g('numPratica').textContent = genPratica();
+    initCanvas('canvasDon');
+  }
+  function logout() { sessionStorage.removeItem('du_don'); user=null; mostra('login'); g('navUser').classList.remove('on'); }
+  function errore(msg) {
+    g('errTesto').textContent = msg;
+    g('errBox').classList.add('on');
+    setTimeout(()=>g('errBox').classList.remove('on'),7000);
+    g('errBox').scrollIntoView({behavior:'smooth',block:'center'});
+  }
+
+  /* ═══════════════════════════════════
+     UI HELPERS
+  ═══════════════════════════════════ */
+  function selStato(v) { statoDon=v; g('statoNuovo').classList.toggle('sel',v==='nuovo'); g('statoAbituale').classList.toggle('sel',v==='abituale'); }
+  function selYN(id,val,e) {
+    e.preventDefault(); ynState[id]=val;
+    const row=g(id); row.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('sel'));
+    row.querySelector('.yn-btn.'+val).classList.add('sel');
+    const ext=g('ext_'+id.replace('yn_',''));
+    if(ext) ext.classList.toggle('on',val==='si');
+  }
+  function selFreq(gid,el,e) { e.preventDefault(); freqState[gid]=el.textContent.trim(); document.querySelectorAll('#'+gid+' .freq-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
+  function togCons(el,e) { e.preventDefault(); el.classList.toggle('sel'); }
+  function checkSesso() { g('sezFemminile').classList.toggle('on',g('p_sesso').value==='Femmina'); }
+
+  /* ═══════════════════════════════════
+     SIGNATURE PAD
+  ═══════════════════════════════════ */
+  function initCanvas(id) {
+    const c=g(id), ctx=c.getContext('2d');
+    c.width=c.parentElement.offsetWidth;
+    ctx.strokeStyle='#1a1a2e'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round';
+    let drawing=false, lx=0, ly=0;
+    function pos(e){ const r=c.getBoundingClientRect(),sx=c.width/r.width,sy=c.height/r.height;
+      if(e.touches) return {x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+      return {x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}; }
+    c.addEventListener('mousedown', e=>{drawing=true;const p=pos(e);lx=p.x;ly=p.y;});
+    c.addEventListener('mousemove', e=>{if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;});
+    c.addEventListener('mouseup',   ()=>drawing=false);
+    c.addEventListener('mouseleave',()=>drawing=false);
+    c.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const p=pos(e);lx=p.x;ly=p.y;},{passive:false});
+    c.addEventListener('touchmove', e=>{e.preventDefault();if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;},{passive:false});
+    c.addEventListener('touchend',  ()=>drawing=false);
+  }
+  function clearCanvas(id){ const c=g(id);c.getContext('2d').clearRect(0,0,c.width,c.height); }
+  function isCanvasBlank(id){ return !g(id).getContext('2d').getImageData(0,0,g(id).width,g(id).height).data.some(x=>x!==0); }
+
+  /* ═══════════════════════════════════
+     RESET
+  ═══════════════════════════════════ */
+  function resetForm() {
+    if(!confirm('Sei sicuro di voler azzerare tutti i campi?')) return;
+    document.querySelectorAll('input[type="text"],input[type="email"],input[type="number"],input[type="date"],textarea').forEach(el=>el.value='');
+    document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+    document.querySelectorAll('.yn-btn,.freq-opt,.consenso-item').forEach(b=>b.classList.remove('sel'));
+    document.querySelectorAll('.yn-extra').forEach(b=>b.classList.remove('on'));
+    g('sezFemminile').classList.remove('on');
+    clearCanvas('canvasDon');
+    ynState={}; freqState={};
+    selStato('nuovo');
+    g('numPratica').textContent = genPratica();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  /* ═══════════════════════════════════
+     GENERA PDF con jsPDF
+  ═══════════════════════════════════ */
+  function generaPDF(pratica, oggi) {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+    const W = 210, ML = 14, MR = 14, CW = W - ML - MR;
+    let y = 0;
+
+    // ── Colori ──
+    const RED   = [192, 57, 43];
+    const DARK  = [26, 26, 46];
+    const GRAY  = [107, 122, 141];
+    const LGRAY = [244, 246, 249];
+    const GREEN = [26, 143, 90];
+    const WHITE = [255,255,255];
+
+    function checkY(needed = 10) {
+      if (y + needed > 275) { doc.addPage(); y = 16; }
+    }
+
+    // ── HEADER ──
+    doc.setFillColor(...RED);
+    doc.rect(0, 0, W, 38, 'F');
+    doc.setFillColor(146, 43, 33);
+    doc.rect(0, 0, 8, 38, 'F');
+
+    doc.setTextColor(...WHITE);
+    doc.setFont('helvetica','bold');
+    doc.setFontSize(16);
+    doc.text('I.R.C.C.S. OSPEDALE SAN RAFFAELE', ML + 4, 13);
+    doc.setFontSize(10);
+    doc.setFont('helvetica','normal');
+    doc.text('MODULO DI PRE-DONAZIONE DEL SANGUE', ML + 4, 20);
+
+    doc.setFontSize(8.5);
+    doc.text('Pratica N°: ' + pratica, ML + 4, 27);
+    doc.text('Data: ' + oggi, ML + 4, 32);
+    doc.text('Discord: ' + user.username + ' (' + user.id + ')', W - MR - 80, 27);
+    doc.text('Stato: ' + (statoDon === 'nuovo' ? 'Nuovo donatore' : 'Donatore abituale'), W - MR - 80, 32);
+
+    y = 46;
+
+    // ── Funzione sezione header ──
+    function sezHeader(num, titolo) {
+      checkY(14);
+      doc.setFillColor(...RED);
+      doc.roundedRect(ML, y, CW, 9, 1.5, 1.5, 'F');
+      doc.setTextColor(...WHITE);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      doc.text(num + '  ' + titolo, ML + 4, y + 6);
+      y += 13;
+    }
+
+    // ── Funzione riga campo ──
+    function campo(label, valore, halfLeft = false, startX = ML, width = CW) {
+      checkY(9);
+      doc.setFillColor(...LGRAY);
+      doc.roundedRect(startX, y, width, 8, 1, 1, 'F');
+      doc.setTextColor(...GRAY);
+      doc.setFont('helvetica','normal');
+      doc.setFontSize(7.5);
+      doc.text(label, startX + 3, y + 3.2);
+      doc.setTextColor(...DARK);
+      doc.setFont('helvetica','bold');
+      doc.setFontSize(9);
+      const val = valore || '—';
+      doc.text(val.length > 45 ? val.substring(0,44)+'…' : val, startX + 3, y + 6.8);
+      y += 10;
+    }
+
+    // ── Funzione riga 2 colonne ──
+    function riga2(l1,v1,l2,v2) {
+      const half = (CW - 4) / 2;
+      const y0 = y;
+      campo(l1, v1, false, ML, half);
+      y = y0;
+      campo(l2, v2, false, ML + half + 4, half);
+    }
+    function riga3(l1,v1,l2,v2,l3,v3) {
+      const third = (CW - 8) / 3;
+      const y0 = y;
+      campo(l1,v1,false,ML,third); y=y0;
+      campo(l2,v2,false,ML+third+4,third); y=y0;
+      campo(l3,v3,false,ML+third*2+8,third);
+    }
+
+    // ── Funzione griglia SI/NO ──
+    function grigliaYN(domande) {
+      domande.forEach(([label, id]) => {
+        checkY(9);
+        const val = ynState[id];
+        doc.setFillColor(...LGRAY);
+        doc.roundedRect(ML, y, CW - 28, 8, 1, 1, 'F');
+        doc.setTextColor(...DARK);
+        doc.setFont('helvetica','normal');
+        doc.setFontSize(8.5);
+        doc.text(label, ML + 3, y + 5.5);
+
+        // SI box
+        const siX = ML + CW - 26;
+        if (val === 'si') { doc.setFillColor(...GREEN); } else { doc.setFillColor(220,220,220); }
+        doc.roundedRect(siX, y, 11, 8, 1, 1, 'F');
+        doc.setTextColor(...WHITE);
+        doc.setFont('helvetica','bold');
+        doc.setFontSize(8);
+        doc.text('SI', siX + 2.5, y + 5.5);
+
+        // NO box
+        const noX = siX + 13;
+        if (val === 'no') { doc.setFillColor(...RED); } else { doc.setFillColor(220,220,220); }
+        doc.roundedRect(noX, y, 11, 8, 1, 1, 'F');
+        doc.setTextColor(val === 'no' ? 255 : 80, val === 'no' ? 255 : 80, val === 'no' ? 255 : 80);
+        doc.text('NO', noX + 2, y + 5.5);
+        y += 10;
+      });
+    }
+
+    // ══ SEZ 1 – DATI PERSONALI ══
+    sezHeader('1', 'DATI PERSONALI');
+    riga2('NOME', gv('p_nome'), 'COGNOME', gv('p_cognome'));
+    y += 2;
+    riga3('DATA DI NASCITA', new Date(gv('p_nascita')||'').toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'})||'—',
+           'SESSO', g('p_sesso').value, 'GRUPPO SANGUIGNO', g('p_sangue').value);
+    y += 2;
+    riga2('ALTEZZA (cm)', gv('p_altezza'), 'PESO (kg)', gv('p_peso'));
+    y += 2;
+    riga2('TELEFONO', gv('p_tel'), 'EMAIL', gv('p_email'));
+    y += 2;
+    campo('DOCUMENTO D\'IDENTITA\'', gv('p_doc'));
+    y += 4;
+
+    // ══ SEZ 2 – CONDIZIONI GENERALI ══
+    sezHeader('2', 'CONDIZIONI GENERALI');
+    grigliaYN([
+      ['Ti senti in buona salute oggi?', 'yn_salute'],
+      ['Hai dormito almeno 6 ore?', 'yn_sonno'],
+      ['Hai mangiato nelle ultime 4 ore?', 'yn_mangiato'],
+      ['Hai febbre?', 'yn_febbre'],
+      ['Hai sintomi influenzali?', 'yn_influenza'],
+      ['Hai tosse persistente?', 'yn_tosse'],
+      ['Hai assunto alcol nelle ultime 24 ore?', 'yn_alcol'],
+      ['Hai assunto sostanze stupefacenti?', 'yn_droghe'],
+      ['Hai fatto sforzi fisici intensi oggi?', 'yn_sforzi'],
+    ]);
+    y += 4;
+
+    // ══ SEZ 3 – STORIA MEDICA ══
+    sezHeader('3', 'STORIA MEDICA');
+    grigliaYN([
+      ['Hai mai avuto malattie cardiache?', 'yn_cardiaco'],
+      ['Hai mai avuto pressione alta?', 'yn_pressione'],
+      ['Hai il diabete?', 'yn_diabete'],
+      ['Hai mai avuto convulsioni?', 'yn_conv'],
+      ['Hai malattie del sangue?', 'yn_malsangue'],
+      ['Hai problemi di coagulazione?', 'yn_coag'],
+      ['Hai mai avuto epatite?', 'yn_epatite'],
+      ['Hai mai avuto HIV?', 'yn_hiv'],
+      ['Hai mai avuto malattie infettive gravi?', 'yn_infettive'],
+      ['Hai allergie?', 'yn_allergie'],
+    ]);
+    if (ynState['yn_allergie']==='si') campo('SPECIFICARE ALLERGIE', gv('allergie_spec'));
+    y += 4;
+
+    // ══ SEZ 4 – FARMACI ══
+    sezHeader('4', 'FARMACI');
+    grigliaYN([
+      ['Assumi farmaci attualmente?', 'yn_farmaci'],
+      ['Hai assunto antibiotici negli ultimi 15 giorni?', 'yn_antibiotici'],
+      ['Hai fatto vaccini recentemente?', 'yn_vaccini'],
+    ]);
+    if (ynState['yn_farmaci']==='si') {
+      checkY(14);
+      const fd = g('farmaci_desc').value.trim() || '—';
+      doc.setFillColor(...LGRAY);
+      doc.roundedRect(ML, y, CW, 12, 1, 1, 'F');
+      doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+      doc.text('DESCRIZIONE FARMACI', ML+3, y+3.2);
+      doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+      const fdLines = doc.splitTextToSize(fd, CW-6);
+      doc.text(fdLines[0], ML+3, y+7.5);
+      y += 14;
+    }
+    y += 4;
+
+    // ══ SEZ 5 – INTERVENTI ══
+    sezHeader('5', 'INTERVENTI E PROCEDURE – ULTIMI 4 MESI');
+    grigliaYN([
+      ['Tatuaggi?', 'yn_tatuaggi'],
+      ['Piercing?', 'yn_piercing'],
+      ['Interventi chirurgici?', 'yn_chirurgia'],
+      ['Esami invasivi?', 'yn_esami'],
+      ['Trasfusioni?', 'yn_trasfusioni'],
+      ['Cure dentistiche importanti?', 'yn_dentista'],
+    ]);
+    y += 4;
+
+    // ══ SEZ 6 – STILE DI VITA ══
+    sezHeader('6', 'STILE DI VITA');
+    riga2('FUMO', freqVal('fg_fumo'), 'CONSUMO DI ALCOL', freqVal('fg_alcol2'));
+    y += 2;
+    grigliaYN([
+      ['Hai avuto nuovi partner negli ultimi mesi?', 'yn_partner'],
+      ['Hai viaggiato all\'estero negli ultimi 6 mesi?', 'yn_viaggi'],
+    ]);
+    if (ynState['yn_viaggi']==='si') campo('PAESE VISITATO', gv('viaggi_paese'));
+    y += 4;
+
+    // ══ SEZ 7 – DONATRICI (solo femmina) ══
+    if (g('p_sesso').value === 'Femmina') {
+      sezHeader('7', 'PER DONATRICI');
+      grigliaYN([
+        ['Gravidanza attuale?', 'yn_gravatt'],
+        ['Gravidanza negli ultimi 12 mesi?', 'yn_grav12'],
+        ['Allattamento?', 'yn_allatt'],
+      ]);
+      y += 4;
+    }
+
+    // ══ SEZ 8 – CONSENSI ══
+    sezHeader('8', 'CONSENSI OBBLIGATORI');
+    const consensi = [
+      'Dichiaro che tutte le informazioni fornite sono veritiere e accurate.',
+      'Acconsento al trattamento dei miei dati personali ai sensi del GDPR.',
+      'Accetto la valutazione medica preventiva alla donazione.',
+      'Accetto il prelievo di sangue e sono consapevole delle procedure.',
+      'Comprendo e accetto le responsabilità legali da questa dichiarazione.',
+    ];
+    consensi.forEach((testo, i) => {
+      checkY(9);
+      doc.setFillColor(...GREEN);
+      doc.roundedRect(ML, y, 7, 7, 1, 1, 'F');
+      doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+      doc.text('✓', ML+1.8, y+5.5);
+      doc.setTextColor(...DARK); doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+      doc.text((i+1)+'. '+testo, ML+10, y+5);
+      y += 10;
+    });
+    y += 4;
+
+    // ══ SEZ 9 – FIRMA ══
+    sezHeader('9', 'FIRMA DEL DONATORE');
+    checkY(46);
+    // Sfondo bianco + bordo per firma
+    doc.setFillColor(250,251,252);
+    doc.setDrawColor(200,210,220);
+    doc.setLineWidth(0.4);
+    doc.roundedRect(ML, y, CW, 40, 2, 2, 'FD');
+
+    // Inserisce la firma dal canvas come immagine
+    const canvas = g('canvasDon');
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const ctx2 = tmp.getContext('2d');
+    ctx2.fillStyle = '#fafbfc'; ctx2.fillRect(0,0,tmp.width,tmp.height);
+    ctx2.drawImage(canvas, 0, 0);
+    const firmaDataUrl = tmp.toDataURL('image/png');
+    doc.addImage(firmaDataUrl, 'PNG', ML+2, y+2, CW-4, 36);
+
+    y += 44;
+
+    // Data e nome sotto firma
+    doc.setDrawColor(...GRAY); doc.setLineWidth(0.3);
+    doc.line(ML, y, ML+70, y);
+    doc.line(ML+90, y, ML+90+70, y);
+    doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+    doc.text('Firma del Donatore', ML, y+4);
+    doc.text('Data', ML+90, y+4);
+    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.text(gv('p_nome')+' '+gv('p_cognome'), ML, y+9);
+    doc.text(oggi, ML+90, y+9);
+    y += 16;
+
+    // ── FOOTER ogni pagina ──
+    const totalPages = doc.internal.getNumberOfPages();
+    for (let p=1; p<=totalPages; p++) {
+      doc.setPage(p);
+      doc.setFillColor(...RED);
+      doc.rect(0, 287, W, 10, 'F');
+      doc.setTextColor(...WHITE); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+      doc.text('I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962 — Dati trattati ai sensi del GDPR', ML, 293);
+      doc.text('Pag. '+p+'/'+totalPages+'   Pratica '+pratica, W-MR-30, 293);
+    }
+
+    return doc;
+  }
+
+  /* ═══════════════════════════════════
+     RESET
+  ═══════════════════════════════════ */
+  function resetForm() {
+    if(!confirm('Sei sicuro di voler azzerare tutti i campi?')) return;
+    document.querySelectorAll('input[type="text"],input[type="email"],input[type="number"],input[type="date"],textarea').forEach(el=>el.value='');
+    document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+    document.querySelectorAll('.yn-btn,.freq-opt,.consenso-item').forEach(b=>b.classList.remove('sel'));
+    document.querySelectorAll('.yn-extra').forEach(b=>b.classList.remove('on'));
+    g('sezFemminile').classList.remove('on');
+    clearCanvas('canvasDon');
+    ynState={}; freqState={};
+    selStato('nuovo');
+    g('numPratica').textContent = genPratica();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  /* ═══════════════════════════════════
+     INVIA
+  ═══════════════════════════════════ */
+  async function invia() {
+    // Validazione
+    if (!gv('p_nome')||!gv('p_cognome')||!gv('p_nascita')||!g('p_sesso').value||!gv('p_altezza')||!gv('p_peso')||!gv('p_tel')||!gv('p_email')||!gv('p_doc'))
+      return errore('Compila tutti i campi obbligatori nella Sezione 1.');
+    if (!['con1','con2','con3','con4','con5'].every(id=>g(id).classList.contains('sel')))
+      return errore('Devi accettare tutti i consensi obbligatori (Sezione 8).');
+    if (isCanvasBlank('canvasDon'))
+      return errore('Apponi la tua firma nella Sezione 9 prima di inviare.');
+
+    const btn = g('submitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generazione PDF…';
+
+    const pratica = g('numPratica').textContent;
+    const oggi    = g('dataOggi').textContent;
+
+    try {
+      // 1. Genera PDF
+      const doc = generaPDF(pratica, oggi);
+      const pdfArrayBuffer = doc.output('arraybuffer');
+      pdfBlob = new Blob([pdfArrayBuffer], { type:'application/pdf' });
+
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio al server…';
+
+      // 2. Invia PDF al webhook come allegato
+      const fd = new FormData();
+      fd.append('file', pdfBlob, 'Donazione_'+pratica+'_'+gv('p_cognome')+'_'+gv('p_nome')+'.pdf');
+      fd.append('payload_json', JSON.stringify({
+        username: 'San Raffaele – Donazioni',
+        content: `🩸 **Nuovo modulo di donazione**\n📋 Pratica: **${pratica}**\n👤 Donatore: **${gv('p_nome')} ${gv('p_cognome')}**\n🎮 Discord: **${user.username}** (\`${user.id}\`)\n📅 Data: **${oggi}**\n🔄 Stato: **${statoDon === 'nuovo' ? 'Nuovo donatore' : 'Donatore abituale'}**`
+      }));
+
+      const res = await fetch(WEBHOOK, { method:'POST', body: fd });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+
+      // 3. Mostra successo
+      g('formWrap').style.display = 'none';
+      document.querySelectorAll('#formScreen .card').forEach(c=>c.style.display='none');
+      g('successMsg').classList.add('on');
+      window.scrollTo({top:0,behavior:'smooth'});
+
+    } catch(e) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia';
+      errore('Errore durante l\'invio ('+e.message+'). Riprova.');
+    }
+  }
+
+  /* ═══════════════════════════════════
+     DOWNLOAD COPIA
+  ═══════════════════════════════════ */
+  g('btnDownload').addEventListener('click', () => {
+    if (!pdfBlob) return;
+    const url = URL.createObjectURL(pdfBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Donazione_'+g('numPratica').textContent+'_'+gv('p_cognome')+'_'+gv('p_nome')+'.pdf';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ═══════════════════════════════════
+     INIT
+  ═══════════════════════════════════ */
+  (async function init() {
+    g('loginBtn').href = oauthURL();
+    if (location.hash.includes('access_token')||location.search.includes('access_token')) {
+      await leggiCallback(); return;
+    }
+    try {
+      const saved = sessionStorage.getItem('du_don');
+      if (saved) { user=JSON.parse(saved); mostraForm(); return; }
+    } catch(e) { sessionStorage.removeItem('du_don'); }
+    mostra('login');
+  })();
+</script>
+</body>
+</html>
