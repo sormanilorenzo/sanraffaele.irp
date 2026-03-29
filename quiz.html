@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz di Ingresso – San Raffaele</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue:       #1a4e8f;
+      --blue-dark:  #0d2b5e;
+      --blue-light: #e8f1fb;
+      --dark:       #0d1b2a;
+      --gray:       #6b7a8d;
+      --bg:         #f4f7fc;
+      --white:      #ffffff;
+      --border:     #dde3ee;
+      --green:      #1a8f5a;
+      --green-bg:   #e6f7f0;
+      --red:        #c0392b;
+      --red-bg:     #fdf0ef;
+      --discord:    #5865F2;
+      --radius:     12px;
+      --shadow:     0 4px 20px rgba(26,78,143,.12);
+      --shadow-lg:  0 12px 48px rgba(26,78,143,.20);
+    }
+
+    html, body { height: 100%; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--dark);
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 5%; height: 64px;
+    }
+    .logo { display: flex; align-items: center; gap: 11px; text-decoration: none; }
+    .logo img { height: 48px; width: auto; }
+    .logo-text strong { display: block; font-size: 12.5px; font-weight: 700; color: var(--blue); }
+    .logo-text span   { font-size: 11px; color: var(--gray); }
+    .nav-right { display: flex; align-items: center; gap: 12px; }
+    .nav-user { display: none; align-items: center; gap: 9px; background: #f0f2ff; border-radius: 30px; padding: 5px 14px 5px 7px; }
+    .nav-user.show { display: flex; }
+    .nav-user img { width: 28px; height: 28px; border-radius: 50%; border: 2px solid var(--discord); }
+    .nav-user span { font-size: 13px; font-weight: 700; color: var(--dark); }
+    .nav-back { text-decoration: none; font-size: 13px; font-weight: 600; color: var(--blue); padding: 7px 15px; border: 1.5px solid var(--blue); border-radius: 6px; transition: all .2s; }
+    .nav-back:hover { background: var(--blue); color: #fff; }
+
+    /* ── HEADER ── */
+    .page-header {
+      background: linear-gradient(130deg, var(--blue-dark) 0%, var(--blue) 60%, #2567b0 100%);
+      padding: 56px 5% 44px; text-align: center; position: relative; overflow: hidden;
+    }
+    .page-header::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at 20% 50%, rgba(255,255,255,.04) 0%, transparent 60%),
+                  radial-gradient(circle at 80% 20%, rgba(255,255,255,.03) 0%, transparent 50%);
+    }
+    .header-icon {
+      width: 64px; height: 64px; background: rgba(255,255,255,.15);
+      border-radius: 50%; border: 2px solid rgba(255,255,255,.3);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px; position: relative;
+    }
+    .header-icon i { font-size: 1.8rem; color: #fff; }
+    .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.9rem,3.5vw,2.8rem); color: #fff; margin-bottom: 10px; }
+    .page-header p  { font-size: 14.5px; color: rgba(255,255,255,.8); max-width: 480px; margin: 0 auto; line-height: 1.7; }
+
+    /* ── WRAP ── */
+    .wrap { max-width: 780px; margin: 0 auto; padding: 40px 20px 80px; }
+
+    /* ════════════════════════════
+       SCHERMATA 1 – LOGIN
+    ════════════════════════════ */
+    #screen-login {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); padding: 52px 40px;
+      text-align: center;
+    }
+    .discord-circle {
+      width: 76px; height: 76px; background: var(--discord);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 22px; box-shadow: 0 8px 28px rgba(88,101,242,.38);
+    }
+    .discord-circle i { font-size: 2.1rem; color: #fff; }
+    #screen-login h2 { font-family: 'Playfair Display', serif; font-size: 1.65rem; color: var(--dark); margin-bottom: 10px; }
+    #screen-login p  { font-size: 14px; color: var(--gray); max-width: 360px; margin: 0 auto 28px; line-height: 1.7; }
+    .btn-discord {
+      display: inline-flex; align-items: center; gap: 11px;
+      background: var(--discord); color: #fff; text-decoration: none;
+      padding: 13px 30px; border-radius: 10px;
+      font-size: 15px; font-weight: 700;
+      box-shadow: 0 4px 18px rgba(88,101,242,.38);
+      transition: all .2s;
+    }
+    .btn-discord:hover { background: #4752c4; transform: translateY(-2px); }
+    .login-note { margin-top: 14px; font-size: 12px; color: var(--gray); }
+
+    /* ════════════════════════════
+       SCHERMATA 2 – INFO
+    ════════════════════════════ */
+    #screen-info { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-lg); overflow: hidden; }
+    .screen-header {
+      background: linear-gradient(90deg, var(--blue) 0%, #2567b0 100%);
+      padding: 18px 28px; display: flex; align-items: center; gap: 12px;
+    }
+    .screen-header i  { color: rgba(255,255,255,.85); }
+    .screen-header h2 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #fff; }
+    .screen-body { padding: 30px 32px; }
+
+    .discord-badge {
+      display: flex; align-items: center; gap: 12px;
+      background: #f0f2ff; border: 1.5px solid #c5caff;
+      border-radius: 9px; padding: 11px 16px; margin-bottom: 24px;
+    }
+    .discord-badge img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid var(--discord); }
+    .discord-badge-text strong { display: block; font-size: 14px; font-weight: 700; color: var(--dark); }
+    .discord-badge-text span   { font-size: 12px; color: var(--gray); }
+    .discord-badge .fa-circle-check { color: var(--discord); margin-left: auto; font-size: 1.1rem; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .form-grid.one { grid-template-columns: 1fr; }
+    .fgroup { display: flex; flex-direction: column; gap: 5px; }
+    .fgroup label { font-size: 12.5px; font-weight: 600; color: #4a5568; }
+    .fgroup label .req { color: var(--red); }
+    .fgroup input, .fgroup select {
+      border: 1.5px solid var(--border); border-radius: 8px;
+      padding: 10px 13px; font-size: 14px; font-family: 'DM Sans', sans-serif;
+      color: var(--dark); background: var(--white); outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .fgroup input:focus, .fgroup select:focus {
+      border-color: var(--blue); box-shadow: 0 0 0 3px rgba(26,78,143,.08);
+    }
+    .fgroup select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b7a8d' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
+
+    .info-notice {
+      background: var(--blue-light); border-left: 3px solid var(--blue);
+      border-radius: 8px; padding: 12px 16px; margin-bottom: 22px;
+      font-size: 13px; color: var(--blue); display: flex; gap: 10px;
+    }
+    .info-notice i { flex-shrink: 0; margin-top: 1px; }
+
+    /* ════════════════════════════
+       SCHERMATA 3 – QUIZ
+    ════════════════════════════ */
+    #screen-quiz { display: flex; flex-direction: column; gap: 18px; }
+
+    /* Timer */
+    .timer-bar {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow); padding: 14px 22px;
+      display: flex; align-items: center; justify-content: space-between; gap: 16px;
+    }
+    .timer-left { display: flex; align-items: center; gap: 10px; }
+    .timer-icon { width: 38px; height: 38px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+    .timer-icon i { color: var(--blue); font-size: .95rem; }
+    .timer-label { font-size: 12px; color: var(--gray); font-weight: 600; text-transform: uppercase; letter-spacing: .5px; }
+    .timer-val { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--dark); line-height: 1; }
+    .timer-val.urgent { color: var(--red); animation: pulse .8s ease-in-out infinite alternate; }
+    @keyframes pulse { from { opacity: 1; } to { opacity: .5; } }
+    .timer-progress-wrap { flex: 1; }
+    .timer-prog-bg { height: 8px; background: var(--blue-light); border-radius: 4px; overflow: hidden; }
+    .timer-prog-fill { height: 100%; background: linear-gradient(90deg, var(--blue), #2567b0); border-radius: 4px; transition: width .5s linear, background .5s; }
+    .timer-prog-fill.urgent { background: linear-gradient(90deg, var(--red), #e74c3c); }
+    .timer-qcount { font-size: 13px; font-weight: 700; color: var(--blue); white-space: nowrap; }
+
+    /* Domanda */
+    .question-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); overflow: hidden; }
+    .question-header { background: linear-gradient(90deg, var(--blue), #2567b0); padding: 16px 24px; display: flex; align-items: center; gap: 12px; }
+    .q-badge { width: 28px; height: 28px; background: rgba(255,255,255,.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; color: #fff; flex-shrink: 0; }
+    .question-header p { font-size: 14.5px; font-weight: 600; color: #fff; line-height: 1.45; }
+    .question-body { padding: 20px 24px; }
+    .options { display: flex; flex-direction: column; gap: 9px; }
+    .opt {
+      display: flex; align-items: center; gap: 13px;
+      padding: 12px 16px; border: 1.5px solid var(--border); border-radius: 9px;
+      cursor: pointer; user-select: none; transition: all .15s;
+      font-size: 14px; font-weight: 500; color: var(--dark);
+    }
+    .opt:hover:not(.locked) { border-color: var(--blue); background: var(--blue-light); }
+    .opt.chosen:not(.locked) { border-color: var(--blue); background: var(--blue-light); font-weight: 700; }
+    .opt.correct  { border-color: var(--green) !important; background: var(--green-bg) !important; color: var(--green) !important; font-weight: 700; }
+    .opt.wrong    { border-color: var(--red)   !important; background: var(--red-bg)   !important; color: var(--red)   !important; font-weight: 700; }
+    .opt-letter {
+      width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11.5px; font-weight: 700; color: var(--gray); flex-shrink: 0; transition: all .15s;
+    }
+    .opt.chosen:not(.locked) .opt-letter { border-color: var(--blue); background: var(--blue); color: #fff; }
+    .opt.correct .opt-letter { border-color: var(--green); background: var(--green); color: #fff; }
+    .opt.wrong   .opt-letter { border-color: var(--red);   background: var(--red);   color: #fff; }
+
+    /* Feedback */
+    .feedback {
+      margin-top: 12px; padding: 11px 15px; border-radius: 8px;
+      font-size: 13.5px; font-weight: 600; display: none;
+      align-items: center; gap: 9px;
+    }
+    .feedback.show { display: flex; }
+    .feedback.ok  { background: var(--green-bg); border: 1.5px solid var(--green); color: var(--green); }
+    .feedback.err { background: var(--red-bg);   border: 1.5px solid var(--red);   color: var(--red); }
+
+    /* Nav quiz */
+    .quiz-nav { display: flex; justify-content: flex-end; }
+    .btn-next {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 26px; background: var(--blue); color: #fff;
+      border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; font-weight: 700; cursor: pointer; transition: all .2s;
+    }
+    .btn-next:hover:not(:disabled) { background: var(--blue-dark); transform: translateY(-1px); }
+    .btn-next:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+
+    /* ════════════════════════════
+       SCHERMATA 4 – RISULTATO
+    ════════════════════════════ */
+    #screen-result {
+      background: var(--white); border-radius: var(--radius);
+      box-shadow: var(--shadow-lg); overflow: hidden;
+    }
+    .result-top { padding: 36px 32px 28px; text-align: center; }
+    .score-ring {
+      width: 110px; height: 110px; border-radius: 50%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      margin: 0 auto 18px; border: 4px solid var(--blue);
+    }
+    .score-ring.pass { border-color: var(--green); }
+    .score-ring.fail { border-color: var(--red); }
+    .score-n { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; line-height: 1; }
+    .score-ring.pass .score-n { color: var(--green); }
+    .score-ring.fail .score-n { color: var(--red); }
+    .score-sub { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray); }
+    #result-title { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: var(--dark); margin-bottom: 8px; }
+    #result-desc  { font-size: 14px; color: var(--gray); line-height: 1.7; max-width: 460px; margin: 0 auto; }
+    .stat-row { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; padding: 0 32px 28px; }
+    .stat-box { background: var(--bg); border-radius: 9px; padding: 14px; text-align: center; }
+    .stat-box .sn { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; }
+    .stat-box .sl { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; }
+    .stat-box.c .sn { color: var(--green); }
+    .stat-box.w .sn { color: var(--red); }
+    .stat-box.t .sn { color: var(--blue); }
+    .result-footer { padding: 0 32px 32px; display: flex; flex-direction: column; gap: 14px; }
+    .btn-send {
+      width: 100%; padding: 14px; background: var(--blue); color: #fff;
+      border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+    }
+    .btn-send:hover:not(:disabled) { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,78,143,.28); }
+    .btn-send:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+    .success-box {
+      background: var(--green-bg); border: 1.5px solid var(--green);
+      border-radius: 10px; padding: 20px 22px; text-align: center; display: none;
+    }
+    .success-box.show { display: block; }
+    .success-box i   { font-size: 1.9rem; color: var(--green); margin-bottom: 8px; display: block; }
+    .success-box h3  { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--dark); margin-bottom: 5px; }
+    .success-box p   { font-size: 13.5px; color: var(--gray); }
+    .btn-dl {
+      display: inline-flex; align-items: center; gap: 8px; margin-top: 12px;
+      background: var(--green); color: #fff; border: none; border-radius: 8px;
+      padding: 9px 22px; font-size: 13.5px; font-weight: 700; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: background .2s;
+    }
+    .btn-dl:hover { background: #157a4a; }
+    .err-strip {
+      background: var(--red-bg); border: 1.5px solid var(--red);
+      border-radius: 8px; padding: 11px 14px; font-size: 13.5px;
+      color: var(--red); display: none; align-items: center; gap: 9px;
+    }
+    .err-strip.show { display: flex; }
+
+    /* ── BOTTONI GENERICI ── */
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center; gap: 9px;
+      width: 100%; padding: 13px; background: var(--blue); color: #fff;
+      border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
+      font-size: 14.5px; font-weight: 700; cursor: pointer; transition: all .2s;
+    }
+    .btn-primary:hover { background: var(--blue-dark); transform: translateY(-1px); }
+
+    footer { text-align: center; padding: 24px; font-size: 12px; color: var(--gray); border-top: 1px solid var(--border); }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .stat-row  { grid-template-columns: 1fr; }
+      .screen-body { padding: 22px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="logo">
+    <img src="assets/images/logo.png" alt="San Raffaele" />
+    <div class="logo-text">
+      <strong>I.R.C.C.S. Ospedale San Raffaele</strong>
+      <span>Gruppo San Donato</span>
+    </div>
+  </a>
+  <div class="nav-right">
+    <div class="nav-user" id="navUser">
+      <img id="navAv" src="" alt="" />
+      <span id="navName"></span>
+    </div>
+    <a href="index.html" class="nav-back"><i class="fa-solid fa-arrow-left"></i> Home</a>
+  </div>
+</nav>
+
+<!-- HEADER -->
+<div class="page-header">
+  <div class="header-icon"><i class="fa-solid fa-clipboard-question"></i></div>
+  <h1>Quiz di Ingresso</h1>
+  <p>30 domande su competenze di soccorso. Hai 20 minuti. Le domande non risposte saranno considerate errate.</p>
+</div>
+
+<div class="wrap" id="mainWrap">
+
+  <!-- ①  LOGIN -->
+  <div id="screen-login">
+    <div class="discord-circle"><i class="fa-brands fa-discord"></i></div>
+    <h2>Accedi per iniziare</h2>
+    <p>Per accedere al quiz devi verificare la tua identità tramite il tuo account Discord del server.</p>
+    <a id="loginBtn" href="#" class="btn-discord">
+      <i class="fa-brands fa-discord"></i> Accedi con Discord
+    </a>
+    <p class="login-note">Saranno usate solo le informazioni base del tuo profilo.</p>
+  </div>
+
+  <!-- ②  INFO -->
+  <div id="screen-info" style="display:none;">
+    <div class="screen-header">
+      <i class="fa-solid fa-user"></i>
+      <h2>Dati del Candidato</h2>
+    </div>
+    <div class="screen-body">
+      <div class="discord-badge">
+        <img id="infoAv" src="" alt="" />
+        <div class="discord-badge-text">
+          <strong id="infoName"></strong>
+          <span id="infoTag"></span>
+        </div>
+        <i class="fa-solid fa-circle-check"></i>
+      </div>
+
+      <div class="info-notice">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Compila i tuoi dati prima di iniziare. Una volta avviato il quiz avrai <strong>20 minuti</strong> per completarlo.</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="fgroup">
+          <label>Nome <span class="req">*</span></label>
+          <input type="text" id="inNome" placeholder="Il tuo nome IC" />
+        </div>
+        <div class="fgroup">
+          <label>Cognome <span class="req">*</span></label>
+          <input type="text" id="inCognome" placeholder="Il tuo cognome IC" />
+        </div>
+      </div>
+      <div class="form-grid">
+        <div class="fgroup">
+          <label>Ruolo richiesto <span class="req">*</span></label>
+          <select id="inRuolo">
+            <option value="">— Seleziona —</option>
+            <option>Soccorritore</option>
+            <option>Infermiere</option>
+            <option>Medico</option>
+          </select>
+        </div>
+        <div class="fgroup">
+          <label>Data di nascita IC</label>
+          <input type="date" id="inNascita" />
+        </div>
+      </div>
+
+      <div id="infoErr" class="err-strip" style="margin-bottom:16px;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="infoErrTxt"></span>
+      </div>
+
+      <button class="btn-primary" onclick="avviaQuiz()">
+        <i class="fa-solid fa-play"></i> Inizia il Quiz
+      </button>
+    </div>
+  </div>
+
+  <!-- ③  QUIZ -->
+  <div id="screen-quiz" style="display:none;">
+
+    <!-- Timer -->
+    <div class="timer-bar">
+      <div class="timer-left">
+        <div class="timer-icon"><i class="fa-solid fa-clock"></i></div>
+        <div>
+          <div class="timer-label">Tempo rimasto</div>
+          <div class="timer-val" id="timerVal">20:00</div>
+        </div>
+      </div>
+      <div class="timer-progress-wrap">
+        <div class="timer-prog-bg">
+          <div class="timer-prog-fill" id="timerFill" style="width:100%"></div>
+        </div>
+      </div>
+      <div class="timer-qcount"><span id="qCur">1</span>/30</div>
+    </div>
+
+    <!-- Domanda -->
+    <div class="question-card">
+      <div class="question-header">
+        <div class="q-badge" id="qBadge">1</div>
+        <p id="qText">—</p>
+      </div>
+      <div class="question-body">
+        <div class="options" id="optList"></div>
+        <div class="feedback" id="feedback">
+          <i id="fbIcon"></i><span id="fbText"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigazione -->
+    <div class="quiz-nav">
+      <button class="btn-next" id="btnNext" onclick="nextQ()" disabled>
+        Avanti <i class="fa-solid fa-arrow-right"></i>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- ④  RISULTATO -->
+  <div id="screen-result" style="display:none;">
+    <div class="result-top">
+      <div class="score-ring" id="scoreRing">
+        <span class="score-n" id="scoreN">—</span>
+        <span class="score-sub">/ 30</span>
+      </div>
+      <h2 id="result-title">Risultato</h2>
+      <p id="result-desc"></p>
+    </div>
+    <div class="stat-row">
+      <div class="stat-box c"><div class="sn" id="stC">0</div><div class="sl">Corrette</div></div>
+      <div class="stat-box w"><div class="sn" id="stW">0</div><div class="sl">Errate</div></div>
+      <div class="stat-box t"><div class="sn">30</div><div class="sl">Totali</div></div>
+    </div>
+    <div class="result-footer">
+      <div class="err-strip" id="resErr">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="resErrTxt"></span>
+      </div>
+      <button class="btn-send" id="btnSend" onclick="inviaRisultati()">
+        <i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia allo Staff
+      </button>
+      <div class="success-box" id="successBox">
+        <i class="fa-solid fa-circle-check"></i>
+        <h3>PDF inviato con successo!</h3>
+        <p>I tuoi risultati sono stati inviati allo staff del San Raffaele. Sarai contattato su Discord.</p>
+        <button class="btn-dl" id="btnDl"><i class="fa-solid fa-file-pdf"></i> Scarica copia PDF</button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<footer>© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962</footer>
+
+<!-- jsPDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   CONFIG
+══════════════════════════════════════════ */
+const CLIENT_ID = '1484523347243958414';
+const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/quiz.html';
+const WEBHOOK   = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
+const TIMER_SEC = 20 * 60; // 20 minuti
+
+/* ══════════════════════════════════════════
+   BANCA DOMANDE
+   opts[0] = risposta corretta (verrà mescolata)
+══════════════════════════════════════════ */
+const FACILI = [
+  {q:"Qual è l'obiettivo della valutazione primaria?", opts:["Identificare minacce immediate alla vita","Valutare anamnesi","Compilare scheda paziente","Misurare temperatura"]},
+  {q:"Cosa indica la A nello schema ABCDE?", opts:["Airway – controllo vie aeree","Attività cardiaca","Analgesia","Assistenza"]},
+  {q:"Quando una scena si considera sicura?", opts:["Quando non ci sono pericoli per soccorritori e pazienti","Quando il paziente è cosciente","Quando arrivano le forze dell'ordine","Quando l'ambulanza è parcheggiata"]},
+  {q:"Qual è la prima protezione del soccorritore?", opts:["DPI – Dispositivi di Protezione Individuale","Barella","Ossigeno","Telefono"]},
+  {q:"Frequenza corretta delle compressioni toraciche nell'adulto?", opts:["100–120 al minuto","60–80","140–160","40–60"]},
+  {q:"Profondità corretta delle compressioni toraciche nell'adulto?", opts:["5–6 cm","2 cm","8 cm","10 cm"]},
+  {q:"Rapporto compressioni/ventilazioni nell'adulto (BLS)?", opts:["30:2","15:2","10:2","20:5"]},
+  {q:"Quando si utilizza il DAE?", opts:["Paziente incosciente e non respirante","Sempre in ogni emergenza","Trauma cranico","Dolore toracico isolato"]},
+  {q:"Prima azione in caso di emorragia esterna?", opts:["Compressione diretta sulla ferita","Sollevare il paziente","Lavare subito con acqua","Immobilizzare l'arto"]},
+  {q:"Quando è indicata la posizione laterale di sicurezza?", opts:["Paziente incosciente che respira","In caso di arresto cardiaco","Trauma maggiore","Paziente cosciente e vigile"]},
+  {q:"Cosa indica la C in ABCDE?", opts:["Circolazione","Coscienza","Cranio","Controllo glicemia"]},
+  {q:"Segno tipico di shock ipovolemico?", opts:["Pelle fredda, pallida e sudata","Pelle calda e arrossata","Iperattività e agitazione","Rossore al viso"]},
+  {q:"Come si valuta rapidamente il livello di coscienza?", opts:["Scala AVPU","ECG","Pressione arteriosa","Saturimetria"]},
+  {q:"In AVPU, se il paziente risponde alla voce è classificato come?", opts:["V – Voice","P – Pain","U – Unresponsive","A – Alert"]},
+  {q:"Saturazione periferica di ossigeno normale nell'adulto?", opts:["95–100%","80–85%","70–75%","60–65%"]},
+  {q:"Polso normale nell'adulto?", opts:["60–100 bpm","20–40 bpm","120–160 bpm","10–30 bpm"]},
+  {q:"Cosa fare se il paziente adulto non risponde?", opts:["Valutare il respiro","Metterlo in posizione seduta","Dargli acqua","Spostarlo immediatamente"]},
+  {q:"Cosa indica il respiro agonico (gasping)?", opts:["Possibile arresto cardiaco imminente","Respirazione normale ma superficiale","Crisi d'ansia","Stato febbrile"]},
+  {q:"Tempo massimo per la valutazione del respiro in BLS?", opts:["10 secondi","30 secondi","1 minuto","5 secondi"]},
+  {q:"Cosa indica la D in ABCDE?", opts:["Disability – stato neurologico","Dolore","Defibrillazione","Diagnosi"]},
+  {q:"Cosa controlla la E in ABCDE?", opts:["Esposizione del paziente","ECG","Emozioni","Equilibrio"]},
+  {q:"Cosa prevenire durante l'esposizione del paziente?", opts:["Ipotermia","Ipertensione","Iperglicemia","Tachicardia"]},
+  {q:"Tempo di refill capillare normale?", opts:["Meno di 2 secondi","5 secondi","10 secondi","4 secondi"]},
+  {q:"Come si presenta l'emorragia venosa?", opts:["Sangue scuro a flusso continuo","Sangue rosso vivo pulsante","Assenza di sangue esterno","Solo emorragia interna"]},
+  {q:"Funzione del collare cervicale?", opts:["Limitare i movimenti cervicali","Curare il dolore","Migliorare il respiro","Fermare un'emorragia"]},
+  {q:"Cosa fare prima di applicare il collare cervicale?", opts:["Stabilizzazione manuale della testa","Misurare la pressione","Immobilizzare le gambe","Somministrare ossigeno"]},
+  {q:"In caso di sospetto trauma spinale cosa fare?", opts:["Immobilizzare in posizione trovata","Far sedere il paziente","Far camminare il paziente","Rimuovere il collare"]},
+  {q:"Quando esporre il paziente?", opts:["Quando necessario per la valutazione completa","Mai in nessun caso","Sempre e completamente","Solo in ospedale"]},
+  {q:"Prima priorità assoluta in un soccorso?", opts:["Sicurezza della scena","Velocità di intervento","Trasporto immediato","Documentazione"]},
+  {q:"Ostruzione grave vie aeree nell'adulto cosciente: cosa fare?", opts:["5 pacche dorsali e 5 compressioni addominali","Somministrare acqua","Iniziare RCP immediata","Posizione laterale di sicurezza"]},
+];
+
+const MEDIE = [
+  {q:"Obiettivo principale della valutazione secondaria?", opts:["Identificare lesioni non immediatamente pericolose","Iniziare il trasporto del paziente","Formulare la diagnosi medica","Somministrare la terapia"]},
+  {q:"SAMPLE è uno schema per?", opts:["Raccolta dell'anamnesi","Scala di valutazione del trauma","Tipo di immobilizzazione","Monitoraggio del respiro"]},
+  {q:"Cosa rappresenta la S in SAMPLE?", opts:["Sintomi lamentati dal paziente","Saturazione","Sangue","Sicurezza della scena"]},
+  {q:"Cosa rappresenta la A in SAMPLE?", opts:["Allergie","Airway","Attività fisica","Assistenza precedente"]},
+  {q:"Cosa rappresenta la M in SAMPLE?", opts:["Malattie pregresse e medicazioni","Movimento del paziente","Massa corporea","Memoria"]},
+  {q:"Cosa rappresenta la L in SAMPLE?", opts:["Last meal – ultimo pasto","Lesione riportata","Lato colpito","Livello di coscienza"]},
+  {q:"Cosa rappresenta la E in SAMPLE?", opts:["Evento – cosa è successo","ECG","Esposizione al freddo","Emergenza attivata"]},
+  {q:"Segno tipico di trauma cranico?", opts:["Perdita di coscienza","Dolore al ginocchio","Tosse persistente","Nausea isolata"]},
+  {q:"Pupille di dimensione diversa (anisocoria) indicano?", opts:["Possibile trauma o lesione cranica","Stato febbrile","Diabete","Stress emotivo"]},
+  {q:"GCS pari a 15 indica?", opts:["Paziente completamente vigile","Stato di coma","Paziente incosciente","Trauma grave recente"]},
+  {q:"Valore minimo del GCS?", opts:["3","0","5","10"]},
+  {q:"Quando immobilizzare la colonna vertebrale?", opts:["Dinamica significativa o presenza di dolore","Solo dolore lieve isolato","In tutti i pazienti sempre","Solo nei pazienti anziani"]},
+  {q:"La tavola spinale serve per?", opts:["Immobilizzare l'asse testa-collo-tronco","Trasporto rapido in ogni caso","Comfort del paziente","Solo in contesti sportivi"]},
+  {q:"Il materassino a depressione (vacuum) è usato per?", opts:["Immobilizzazione adattativa del paziente","Ventilazione artificiale","Ossigenazione","Medicazione delle ferite"]},
+  {q:"Il KED (Kendrick Extrication Device) serve per?", opts:["Estricazione del paziente in posizione seduta","Immobilizzare le gambe","Fermare un'emorragia","Eseguire RCP in spazio ristretto"]},
+  {q:"Segno sospetto di emorragia interna?", opts:["Addome rigido e dolente","Pelle calda e asciutta","Senso di fame improvviso","Prurito diffuso"]},
+  {q:"Segni di shock compensato?", opts:["Tachicardia e pelle fredda","Bradicardia e pelle calda","Ipertensione marcata","Respirazione lenta e profonda"]},
+  {q:"Frequenza respiratoria elevata indica?", opts:["Possibile distress respiratorio","Stato di rilassamento","Sonno profondo","Parametro nella norma"]},
+  {q:"Cosa indica la cianosi?", opts:["Colorazione blu di labbra e mucose","Arrossamento della cute","Sudorazione profusa","Pallore cutaneo"]},
+  {q:"Quando sospettare un ictus (stroke)?", opts:["Deficit neurologico improvviso","Febbre elevata","Trauma all'arto","Vomito isolato"]},
+  {q:"In FAST, cosa indica la F?", opts:["Face – asimmetria del viso","Febbre alta","Forza muscolare","Frequenza cardiaca"]},
+  {q:"In FAST, cosa indica la A?", opts:["Arm – debolezza improvvisa al braccio","Airway ostruita","Attività cardiaca","Ansia del paziente"]},
+  {q:"In FAST, cosa indica la S?", opts:["Speech – difficoltà nella parola","Safety della scena","Shock ipovolemico","Saturazione critica"]},
+  {q:"In FAST, cosa indica la T?", opts:["Time – registrare l'ora di insorgenza","Temperatura corporea","Trauma subito","Terapia farmacologica"]},
+  {q:"Durante una convulsione attiva cosa fare?", opts:["Proteggere il paziente dai traumi","Bloccare gli arti convulsivi","Inserire oggetti tra i denti","Alzare il paziente"]},
+  {q:"Dopo una convulsione cosa valutare prima?", opts:["Pervietà delle vie aeree e respiro","Far alzare e camminare il paziente","Somministrare acqua subito","Farlo sedere"]},
+  {q:"Segno principale di trauma toracico?", opts:["Dolore acuto alla respirazione","Cefalea intensa","Dolore al piede","Nausea isolata"]},
+  {q:"Segni classici di frattura ossea?", opts:["Dolore, deformità e impotenza funzionale","Solo dolore localizzato","Febbre e brividi","Tosse e dispnea"]},
+  {q:"Come si immobilizza correttamente un arto fratturato?", opts:["Stecca che blocca l'articolazione sopra e sotto la frattura","Solo sulla zona di massimo dolore","Solo con bendaggio compressivo","Solo con applicazione di ghiaccio"]},
+  {q:"Cosa indica la P in SAMPLE?", opts:["Patologie pregresse e farmaci assunti","Pressione arteriosa","Polso radiale","Postura del paziente"]},
+];
+
+const DIFFICILI = [
+  {q:"Cosa indica la 'compression fraction' nella RCP?", opts:["Percentuale del tempo totale dedicato alle compressioni","Livello di pressione arteriosa durante RCP","Valore di saturazione durante RCP","Tempo totale di trasporto"]},
+  {q:"Le interruzioni delle compressioni durante RCP devono essere?", opts:["Minime e brevissime","Frequenti per recuperare le forze","Lunghe per rivalutare il paziente","Opzionali a discrezione del soccorritore"]},
+  {q:"Quando è necessario rivalutare l'ABCDE?", opts:["Dopo ogni intervento terapeutico","Solo all'arrivo in ospedale","Non è necessario rivalutare","Solo alla fine del servizio"]},
+  {q:"Esempio di trauma ad alta energia?", opts:["Caduta da altezza >3 m o veicolo ad alta velocità","Caduta da sedia","Taglio superficiale al dito","Urto lieve contro un mobile"]},
+  {q:"Segni di trauma maggiore?", opts:["Alterazione della coscienza e parametri vitali instabili","Dolore localizzato isolato","Ferita superficiale piccola","Semplice contusione"]},
+  {q:"Paziente agitato dopo un trauma: prima cosa da considerare?", opts:["Possibile ipossia o shock in corso","Solo crisi d'ansia situazionale","Sempre causa psichiatrica","Risposta normale al trauma"]},
+  {q:"Perché il meccanismo lesivo è importante da valutare?", opts:["Aiuta a sospettare lesioni interne non evidenti","Non ha alcuna utilità pratica","Solo per fini statistici","Utile solo in ambiente ospedaliero"]},
+  {q:"La triade letale del trauma (o triade della morte) è?", opts:["Ipotermia, acidosi metabolica e coagulopatia","Febbre, tachicardia e dispnea","Ipertensione, diabete e obesità","Dolore, ansia e ipotensione"]},
+  {q:"Perché è importante prevenire l'ipotermia nel paziente traumatizzato?", opts:["L'ipotermia peggiora la coagulazione del sangue","Per il confort del paziente","È solo un protocollo estetico","Riduce la percezione del dolore"]},
+  {q:"La manovra di log roll serve per?", opts:["Ruotare il paziente in asse preservando la colonna","Far sedere il paziente dal decubito","Alzare il paziente da terra rapidamente","Eseguire la RCP in spazio confinato"]},
+  {q:"Numero ideale di soccorritori per un log roll corretto?", opts:["Almeno 3","1 soccorritore è sufficiente","2 soccorritori","6 o più soccorritori"]},
+  {q:"Chi comanda e coordina il log roll?", opts:["Il soccorritore che stabilizza e mantiene la testa","Chi tiene i piedi del paziente","L'autista dell'ambulanza","Chi compila la documentazione"]},
+  {q:"Priorità nella gestione del paziente politraumatizzato?", opts:["Seguire rigorosamente l'ABCDE","Trattare prima le fratture evidenti","Raccogliere prima l'anamnesi completa","Gestire prima il dolore"]},
+  {q:"Rumori respiratori anomali all'auscultazione indicano?", opts:["Problema alle vie aeree o ai polmoni","Sono sempre nella norma","Crisi d'ansia del paziente","Stato febbrile in corso"]},
+  {q:"Lo stridore (stridor) indica?", opts:["Ostruzione parziale delle alte vie aeree","Problema cardiaco primitivo","Trauma isolato all'arto","Diabete scompensato"]},
+  {q:"Il gorgoglio nelle vie aeree superiori indica?", opts:["Presenza di liquidi nelle vie aeree (sangue, vomito, secrezioni)","Respiro normale in un paziente ansioso","Risposta normale allo stress","Stato febbrile"]},
+  {q:"I sibili (wheezing) all'auscultazione indicano?", opts:["Broncospasmo delle vie aeree inferiori","Trauma osseo","Emorragia interna","Ictus cerebrale"]},
+  {q:"Tachipnea nell'adulto è definita come?", opts:["Frequenza respiratoria >20 atti/minuto","Frequenza respiratoria >10 atti/minuto","Frequenza respiratoria >5 atti/minuto","Frequenza respiratoria >15 atti/minuto"]},
+  {q:"Bradipnea nell'adulto è definita come?", opts:["Frequenza respiratoria <12 atti/minuto","Frequenza respiratoria <20 atti/minuto","Frequenza respiratoria <18 atti/minuto","Frequenza respiratoria <25 atti/minuto"]},
+  {q:"Lo shock distributivo è caratterizzato da?", opts:["Vasodilatazione massiva con calo delle resistenze periferiche","Emorragia acuta massiva","Trauma osseo maggiore","Frattura esposta"]},
+  {q:"Segni di scarsa perfusione periferica?", opts:["Confusione mentale e refill capillare lento (>2 sec)","Senso di fame intensa","Sonnolenza post-prandiale","Arrossamento delle estremità"]},
+  {q:"Stato mentale alterato dopo trauma suggerisce?", opts:["Possibile ipoperfusione cerebrale o ipossia","Sempre e solo reazione da stress","Necessità di dormire","Semplice stanchezza"]},
+  {q:"Nel triage START, qual è la prima valutazione da effettuare?", opts:["Presenza e qualità della respirazione","Pressione arteriosa","Percezione del dolore","Età del paziente"]},
+  {q:"Nel triage START, se il paziente non respira cosa fare prima?", opts:["Aprire e liberare le vie aeree","Dichiararlo deceduto immediatamente","Trasportarlo subito senza fare nulla","Metterlo in PLS"]},
+  {q:"Nel triage START, se respira dopo apertura vie aeree, il codice è?", opts:["Rosso – priorità massima","Verde – non urgente","Nero – deceduto","Bianco – non pertinente"]},
+  {q:"Nel triage START, frequenza respiratoria >30 atti/min assegna il codice?", opts:["Rosso","Verde","Giallo","Bianco"]},
+  {q:"Nel triage START, paziente che non obbedisce a ordini semplici assegna?", opts:["Rosso","Verde","Giallo","Nero"]},
+  {q:"Nel triage START, paziente che cammina autonomamente assegna il codice?", opts:["Verde","Rosso","Nero","Giallo"]},
+  {q:"Con quale frequenza rivalutare un paziente instabile?", opts:["Rivalutazione continua ogni 5 minuti o meno","Mai durante il trasporto","Solo all'arrivo al pronto soccorso","Solo il medico può rivalutare"]},
+  {q:"Caratteristiche di una comunicazione efficace durante il soccorso?", opts:["Chiara, breve, strutturata e confermata dal ricevente","Il più lunga e dettagliata possibile","Completamente improvvisata","Opzionale e non necessaria in urgenza"]},
+];
+
+/* ══════════════════════════════════════════
+   STATO
+══════════════════════════════════════════ */
+let user       = null;
+let candidato  = {};
+let questions  = [];
+let current    = 0;
+let answered   = false;
+let answers    = [];      // { q, shuffled, chosen, correctIdx, correct }
+let timerID    = null;
+let secsLeft   = TIMER_SEC;
+let pdfBlob    = null;
+let quizDone   = false;
+
+/* ══════════════════════════════════════════
+   UTILITY
+══════════════════════════════════════════ */
+function $(id) { return document.getElementById(id); }
+
+function show(id) { $(id).style.display = ''; }
+function hide(id) { $(id).style.display = 'none'; }
+
+function showScreen(name) {
+  ['screen-login','screen-info','screen-quiz','screen-result'].forEach(s => hide(s));
+  show('screen-' + name);
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
+
+function pick(pool, n) { return shuffle(pool).slice(0, n); }
+
+function buildQuiz() {
+  return shuffle([...pick(FACILI,10), ...pick(MEDIE,10), ...pick(DIFFICILI,10)]);
+}
+
+function fmtTime(s) {
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return String(m).padStart(2,'0') + ':' + String(sec).padStart(2,'0');
+}
+
+/* ══════════════════════════════════════════
+   OAUTH2
+══════════════════════════════════════════ */
+function oauthURL() {
+  const state = Math.random().toString(36).slice(2) + Date.now().toString(36);
+  sessionStorage.setItem('qstate', state);
+  return 'https://discord.com/oauth2/authorize?' + new URLSearchParams({
+    client_id: CLIENT_ID, redirect_uri: REDIRECT,
+    response_type: 'token', scope: 'identify', state,
+  });
+}
+
+async function handleCallback() {
+  const hP = new URLSearchParams(location.hash.replace(/^#/,''));
+  const qP = new URLSearchParams(location.search.replace(/^\?/,''));
+  const token = hP.get('access_token') || qP.get('access_token');
+  if (!token) return false;
+  history.replaceState(null,'', location.pathname);
+
+  try {
+    const res = await fetch('https://discord.com/api/users/@me', {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    if (!res.ok) throw new Error(res.status);
+    const u = await res.json();
+    user = {
+      id:       u.id,
+      username: u.username,
+      tag:      (u.discriminator && u.discriminator !== '0') ? '#' + u.discriminator : '@' + u.username,
+      avatar:   u.avatar
+        ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+        : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id) % 6n)}.png`,
+    };
+    sessionStorage.setItem('quser', JSON.stringify(user));
+    mostraInfo();
+  } catch(e) {
+    showScreen('login');
+  }
+  return true;
+}
+
+function mostraInfo() {
+  $('navAv').src    = user.avatar;
+  $('navName').textContent = user.username;
+  $('navUser').classList.add('show');
+  $('infoAv').src   = user.avatar;
+  $('infoName').textContent = user.username;
+  $('infoTag').textContent  = user.tag;
+  showScreen('info');
+}
+
+function logout() {
+  sessionStorage.removeItem('quser');
+  user = null;
+  $('navUser').classList.remove('show');
+  showScreen('login');
+}
+
+/* ══════════════════════════════════════════
+   AVVIO QUIZ
+══════════════════════════════════════════ */
+function avviaQuiz() {
+  const nome    = $('inNome').value.trim();
+  const cognome = $('inCognome').value.trim();
+  const ruolo   = $('inRuolo').value;
+
+  if (!nome || !cognome || !ruolo) {
+    $('infoErrTxt').textContent = 'Compila nome, cognome e ruolo richiesto prima di iniziare.';
+    $('infoErr').classList.add('show'); $('infoErr').style.display = 'flex';
+    setTimeout(() => { $('infoErr').style.display = 'none'; }, 5000);
+    return;
+  }
+
+  candidato = {
+    nome, cognome, ruolo,
+    nascita: $('inNascita').value || '—',
+  };
+
+  questions = buildQuiz();
+  answers   = new Array(30).fill(null);
+  current   = 0;
+  quizDone  = false;
+  secsLeft  = TIMER_SEC;
+
+  showScreen('quiz');
+  renderQ();
+  startTimer();
+}
+
+/* ══════════════════════════════════════════
+   TIMER
+══════════════════════════════════════════ */
+function startTimer() {
+  if (timerID) clearInterval(timerID);
+  updateTimerUI();
+  timerID = setInterval(() => {
+    secsLeft--;
+    updateTimerUI();
+    if (secsLeft <= 0) {
+      clearInterval(timerID);
+      timerID = null;
+      fineQuiz(true);
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const pct = (secsLeft / TIMER_SEC) * 100;
+  const urgent = secsLeft <= 120; // ultimi 2 minuti
+  $('timerVal').textContent = fmtTime(secsLeft);
+  $('timerVal').className   = 'timer-val' + (urgent ? ' urgent' : '');
+  $('timerFill').style.width = pct + '%';
+  $('timerFill').className  = 'timer-prog-fill' + (urgent ? ' urgent' : '');
+}
+
+/* ══════════════════════════════════════════
+   RENDER DOMANDA
+══════════════════════════════════════════ */
+function renderQ() {
+  answered = false;
+  const qd = questions[current];
+  const correctText = qd.opts[0];
+  const shuffled    = shuffle(qd.opts);
+  const correctIdx  = shuffled.indexOf(correctText);
+
+  qd._shuffled    = shuffled;
+  qd._correctIdx  = correctIdx;
+
+  const n = current + 1;
+  $('qBadge').textContent = n;
+  $('qCur').textContent   = n;
+  $('qText').textContent  = qd.q;
+  $('btnNext').disabled   = true;
+  $('btnNext').innerHTML  = n < 30
+    ? 'Avanti <i class="fa-solid fa-arrow-right"></i>'
+    : 'Vedi risultati <i class="fa-solid fa-flag-checkered"></i>';
+
+  // Reset feedback
+  const fb = $('feedback');
+  fb.className = 'feedback';
+  fb.style.display = 'none';
+
+  // Opzioni
+  const list = $('optList');
+  list.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  shuffled.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className   = 'opt';
+    div.dataset.idx = i;
+    div.innerHTML   = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
+    div.onclick = () => selectOpt(i, correctIdx, shuffled);
+    list.appendChild(div);
+  });
+}
+
+/* ══════════════════════════════════════════
+   SELEZIONE RISPOSTA
+══════════════════════════════════════════ */
+function selectOpt(idx, correctIdx, shuffled) {
+  if (answered) return;
+  answered = true;
+
+  const opts = $('optList').querySelectorAll('.opt');
+  opts.forEach(o => o.classList.add('locked'));
+  opts[correctIdx].classList.add('correct');
+
+  const isRight = idx === correctIdx;
+  if (!isRight) opts[idx].classList.add('wrong');
+
+  // Salva
+  answers[current] = {
+    q:          questions[current].q,
+    shuffled:   shuffled,
+    chosen:     idx,
+    correctIdx: correctIdx,
+    correct:    isRight,
+    skipped:    false,
+  };
+
+  // Feedback
+  const fb = $('feedback');
+  if (isRight) {
+    fb.className = 'feedback ok show';
+    $('fbIcon').className = 'fa-solid fa-circle-check';
+    $('fbText').textContent = 'Risposta corretta!';
+  } else {
+    fb.className = 'feedback err show';
+    $('fbIcon').className = 'fa-solid fa-circle-xmark';
+    $('fbText').textContent = 'Sbagliato. Corretta: "' + shuffled[correctIdx] + '"';
+  }
+  fb.style.display = 'flex';
+
+  $('btnNext').disabled = false;
+}
+
+/* ══════════════════════════════════════════
+   AVANTI
+══════════════════════════════════════════ */
+function nextQ() {
+  if (!answered) return;
+  current++;
+  if (current >= 30) {
+    fineQuiz(false);
+  } else {
+    renderQ();
+  }
+}
+
+/* ══════════════════════════════════════════
+   FINE QUIZ
+══════════════════════════════════════════ */
+function fineQuiz(timedOut) {
+  if (quizDone) return;
+  quizDone = true;
+
+  if (timerID) { clearInterval(timerID); timerID = null; }
+
+  // Segna le domande non risposte come errate
+  for (let i = 0; i < 30; i++) {
+    if (!answers[i]) {
+      const qd  = questions[i];
+      const correctText = qd.opts[0];
+      const shuffled    = qd._shuffled || shuffle(qd.opts);
+      if (!qd._shuffled) {
+        qd._shuffled   = shuffled;
+        qd._correctIdx = shuffled.indexOf(correctText);
+      }
+      answers[i] = {
+        q:          qd.q,
+        shuffled:   qd._shuffled,
+        chosen:     -1,           // -1 = non risposta
+        correctIdx: qd._correctIdx,
+        correct:    false,
+        skipped:    true,
+      };
+    }
+  }
+
+  mostraRisultato(timedOut);
+}
+
+/* ══════════════════════════════════════════
+   RISULTATO
+══════════════════════════════════════════ */
+function mostraRisultato(timedOut) {
+  const corr  = answers.filter(a => a.correct).length;
+  const wrong = 30 - corr;
+  const pct   = Math.round(corr / 30 * 100);
+  const pass  = pct >= 60;
+
+  $('scoreN').textContent  = corr;
+  $('scoreRing').className = 'score-ring ' + (pass ? 'pass' : 'fail');
+  $('result-title').textContent = pass ? '🎉 Quiz Superato!' : '❌ Quiz Non Superato';
+  $('result-desc').textContent  = timedOut
+    ? `Il tempo è scaduto. Hai risposto correttamente a ${corr}/30 domande (${pct}%). Le domande senza risposta sono state conteggiate come errate.`
+    : (pass
+        ? `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Ottimo risultato!`
+        : `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Non hai raggiunto la soglia minima del 60%.`);
+  $('stC').textContent = corr;
+  $('stW').textContent = wrong;
+
+  showScreen('result');
+}
+
+/* ══════════════════════════════════════════
+   GENERA PDF
+══════════════════════════════════════════ */
+function generaPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
+  const W=210, ML=14, CW=182;
+  let y = 0;
+
+  const BLUE  = [26,78,143];
+  const DARK  = [13,27,42];
+  const GRAY  = [107,122,141];
+  const LGRAY = [244,247,252];
+  const GREEN = [26,143,90];
+  const RED   = [192,57,43];
+  const WHITE = [255,255,255];
+
+  const oggi = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const corr = answers.filter(a=>a.correct).length;
+  const pct  = Math.round(corr/30*100);
+  const pass = pct >= 60;
+
+  function checkY(n=12) {
+    if (y + n > 278) { doc.addPage(); y = 16; }
+  }
+
+  // ── HEADER ──
+  doc.setFillColor(...BLUE);
+  doc.rect(0,0,W,36,'F');
+  doc.setFillColor(13,43,94);
+  doc.rect(0,0,7,36,'F');
+  doc.setTextColor(...WHITE);
+  doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  doc.text('I.R.C.C.S. OSPEDALE SAN RAFFAELE', ML+4,13);
+  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
+  doc.text('RISULTATI QUIZ DI INGRESSO — PERSONALE SANITARIO', ML+4,20);
+  doc.setFontSize(8);
+  doc.text('Discord: '+user.username+' ('+user.id+')', ML+4,27);
+  doc.text('Data: '+oggi, ML+4,32);
+
+  y = 44;
+
+  // ── DATI CANDIDATO ──
+  doc.setFillColor(...LGRAY);
+  doc.roundedRect(ML,y,CW,20,2,2,'F');
+  doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.text('CANDIDATO', ML+4, y+4.5);
+  doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.text(candidato.nome+' '+candidato.cognome, ML+4, y+10.5);
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
+  doc.text('Ruolo richiesto: '+candidato.ruolo+'   |   Nato/a il: '+candidato.nascita, ML+4, y+16);
+  y += 26;
+
+  // ── BANNER ESITO ──
+  checkY(14);
+  doc.setFillColor(pass ? ...GREEN : ...RED);
+  doc.roundedRect(ML,y,CW,13,2,2,'F');
+  doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
+  doc.text((pass?'✓  SUPERATO':'✗  NON SUPERATO')+'   —   '+corr+'/30 corrette  ('+pct+'%)', ML+5, y+9);
+  y += 20;
+
+  // ── DOMANDE ──
+  const letters = ['A','B','C','D'];
+  answers.forEach((ans, i) => {
+    const linesNeeded = 12 + ans.shuffled.length * 9 + 6;
+    checkY(linesNeeded);
+
+    // Header domanda
+    const isOk = ans.correct;
+    doc.setFillColor(isOk ? 220,240,230 : 253,240,239);
+    doc.roundedRect(ML, y, CW, 10, 1.5, 1.5, 'F');
+    doc.setFillColor(isOk ? ...GREEN : ...RED);
+    doc.roundedRect(ML,y,6,10,1,1,'F');
+    doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text(isOk ? '✓' : '✗', ML+1.2, y+7);
+    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    const qtxt = (i+1)+'. '+ans.q;
+    const qlines = doc.splitTextToSize(qtxt, CW-12);
+    doc.text(qlines[0].substring(0,90), ML+9, y+6.8);
+    y += 12;
+
+    // Opzioni
+    ans.shuffled.forEach((opt, oi) => {
+      checkY(8.5);
+      const isCorrect = oi === ans.correctIdx;
+      const isChosen  = oi === ans.chosen;
+      const isSkipped = ans.skipped && isCorrect;
+
+      let bg, tc;
+      if (isCorrect) { bg=GREEN; tc=WHITE; }
+      else if (isChosen && !isCorrect) { bg=RED; tc=WHITE; }
+      else { bg=[235,240,248]; tc=DARK; }
+
+      doc.setFillColor(...bg);
+      doc.roundedRect(ML+3,y,CW-3,7.5,1,1,'F');
+
+      // Lettera
+      doc.setFillColor(isCorrect||(isChosen&&!isCorrect) ? WHITE : BLUE);
+      doc.circle(ML+8.5,y+3.75,2.8,'F');
+      doc.setTextColor(isCorrect ? ...GREEN : isChosen ? ...RED : ...WHITE);
+      doc.setFont('helvetica','bold'); doc.setFontSize(7);
+      doc.text(letters[oi], ML+7.2, y+5.3);
+
+      doc.setTextColor(...tc);
+      doc.setFont('helvetica', isCorrect||(isChosen&&!isCorrect) ? 'bold' : 'normal');
+      doc.setFontSize(8);
+      doc.text(opt.substring(0,82), ML+13.5, y+5.3);
+
+      // Tag
+      doc.setFontSize(7); doc.setFont('helvetica','bold');
+      if (isCorrect && !ans.skipped)    doc.text('[CORRETTA]', W-24, y+5.3);
+      if (isChosen && !isCorrect)       doc.text('[TUA RISPOSTA]', W-30, y+5.3);
+      if (ans.skipped && isCorrect)     doc.text('[NON RISPOSTA – ERRATA]', W-42, y+5.3);
+
+      y += 9;
+    });
+    y += 5;
+  });
+
+  // ── FOOTER ogni pagina ──
+  const tot = doc.internal.getNumberOfPages();
+  for (let p=1;p<=tot;p++) {
+    doc.setPage(p);
+    doc.setFillColor(...BLUE);
+    doc.rect(0,287,W,10,'F');
+    doc.setTextColor(...WHITE); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.text('I.R.C.C.S. Ospedale San Raffaele — Quiz di Ingresso — '+oggi, ML, 293);
+    doc.text('Pag.'+p+'/'+tot, 194, 293);
+  }
+
+  return doc;
+}
+
+/* ══════════════════════════════════════════
+   INVIA RISULTATI
+══════════════════════════════════════════ */
+async function inviaRisultati() {
+  const btn = $('btnSend');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generazione PDF…';
+
+  const corr = answers.filter(a=>a.correct).length;
+  const pct  = Math.round(corr/30*100);
+  const pass = pct >= 60;
+  const oggi = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  try {
+    const doc = generaPDF();
+    pdfBlob = new Blob([doc.output('arraybuffer')], {type:'application/pdf'});
+
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio al server…';
+
+    const fd = new FormData();
+    fd.append('file', pdfBlob, 'Quiz_'+candidato.cognome+'_'+candidato.nome+'_'+oggi.replace(/\//g,'-')+'.pdf');
+    fd.append('payload_json', JSON.stringify({
+      username: 'San Raffaele – Quiz',
+      content:
+        (pass ? '✅' : '❌') +
+        ` **Quiz di Ingresso**\n` +
+        `👤 **${candidato.nome} ${candidato.cognome}** — Ruolo: **${candidato.ruolo}**\n` +
+        `🎮 Discord: **${user.username}** (\`${user.id}\`)\n` +
+        `📊 Punteggio: **${corr}/30 (${pct}%)** — Esito: **${pass?'SUPERATO':'NON SUPERATO'}**\n` +
+        `📅 Data: **${oggi}**`
+    }));
+
+    const res = await fetch(WEBHOOK, {method:'POST', body:fd});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+
+    btn.style.display = 'none';
+    $('successBox').classList.add('show');
+    $('successBox').style.display = 'block';
+
+  } catch(e) {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia allo Staff';
+    $('resErrTxt').textContent = 'Errore durante l\'invio (' + e.message + '). Riprova.';
+    $('resErr').style.display = 'flex';
+    setTimeout(() => { $('resErr').style.display = 'none'; }, 7000);
+  }
+}
+
+$('btnDl').addEventListener('click', () => {
+  if (!pdfBlob) return;
+  const url = URL.createObjectURL(pdfBlob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'Quiz_'+candidato.cognome+'_'+candidato.nome+'.pdf';
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+/* ══════════════════════════════════════════
+   INIT
+══════════════════════════════════════════ */
+$('loginBtn').href = oauthURL();
+
+(async function init() {
+  // Callback OAuth2?
+  if (location.hash.includes('access_token') || location.search.includes('access_token')) {
+    await handleCallback();
+    return;
+  }
+
+  // Sessione salvata?
+  try {
+    const saved = sessionStorage.getItem('quser');
+    if (saved) {
+      user = JSON.parse(saved);
+      if (user && user.id) { mostraInfo(); return; }
+    }
+  } catch(e) { sessionStorage.removeItem('quser'); }
+
+  // Default: mostra login
+  showScreen('login');
+})();
+</script>
+</body>
+</html>
