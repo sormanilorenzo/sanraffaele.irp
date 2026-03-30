@@ -930,11 +930,11 @@ function generaPDF() {
   }
 
   // ── HEADER ──
-  doc.setFillColor(...BLUE);
+  doc.setFillColorX(BLUE);
   doc.rect(0,0,W,36,'F');
   doc.setFillColor(13,43,94);
   doc.rect(0,0,7,36,'F');
-  doc.setTextColor(...WHITE);
+  doc.setTextColor(255,255,255);
   doc.setFont('helvetica','bold'); doc.setFontSize(15);
   doc.text('I.R.C.C.S. OSPEDALE SAN RAFFAELE', ML+4,13);
   doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
@@ -946,11 +946,11 @@ function generaPDF() {
   y = 44;
 
   // ── DATI CANDIDATO ──
-  doc.setFillColor(...LGRAY);
+  doc.setFillColorX(LGRAY);
   doc.roundedRect(ML,y,CW,20,2,2,'F');
-  doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
+  doc.setTextColor(107,122,141); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
   doc.text('CANDIDATO', ML+4, y+4.5);
-  doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(10);
+  doc.setTextColor(13,27,42); doc.setFont('helvetica','bold'); doc.setFontSize(10);
   doc.text(candidato.nome+' '+candidato.cognome, ML+4, y+10.5);
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
   doc.text('Ruolo richiesto: '+candidato.ruolo+'   |   Nato/a il: '+candidato.nascita, ML+4, y+16);
@@ -958,9 +958,9 @@ function generaPDF() {
 
   // ── BANNER ESITO ──
   checkY(14);
-  doc.setFillColor(pass ? ...GREEN : ...RED);
+  if (pass) doc.setFillColor(26,143,90); else doc.setFillColor(192,57,43);
   doc.roundedRect(ML,y,CW,13,2,2,'F');
-  doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
+  doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
   doc.text((pass?'✓  SUPERATO':'✗  NON SUPERATO')+'   —   '+corr+'/30 corrette  ('+pct+'%)', ML+5, y+9);
   y += 20;
 
@@ -972,13 +972,13 @@ function generaPDF() {
 
     // Header domanda
     const isOk = ans.correct;
-    doc.setFillColor(isOk ? 220,240,230 : 253,240,239);
+    if (isOk) doc.setFillColor(220,240,230); else doc.setFillColor(253,240,239);
     doc.roundedRect(ML, y, CW, 10, 1.5, 1.5, 'F');
-    doc.setFillColor(isOk ? ...GREEN : ...RED);
+    if (isOk) doc.setFillColor(26,143,90); else doc.setFillColor(192,57,43);
     doc.roundedRect(ML,y,6,10,1,1,'F');
-    doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','bold'); doc.setFontSize(9);
     doc.text(isOk ? '✓' : '✗', ML+1.2, y+7);
-    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
+    doc.setTextColor(13,27,42); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
     const qtxt = (i+1)+'. '+ans.q;
     const qlines = doc.splitTextToSize(qtxt, CW-12);
     doc.text(qlines[0].substring(0,90), ML+9, y+6.8);
@@ -996,17 +996,19 @@ function generaPDF() {
       else if (isChosen && !isCorrect) { bg=RED; tc=WHITE; }
       else { bg=[235,240,248]; tc=DARK; }
 
-      doc.setFillColor(...bg);
+      doc.setFillColor(bg[0],bg[1],bg[2]);
       doc.roundedRect(ML+3,y,CW-3,7.5,1,1,'F');
 
       // Lettera
-      doc.setFillColor(isCorrect||(isChosen&&!isCorrect) ? WHITE : BLUE);
+      doc.setFillColor(isCorrect||(isChosen&&!isCorrect) ? 255 : 26, isCorrect||(isChosen&&!isCorrect) ? 255 : 78, isCorrect||(isChosen&&!isCorrect) ? 255 : 143);
       doc.circle(ML+8.5,y+3.75,2.8,'F');
-      doc.setTextColor(isCorrect ? ...GREEN : isChosen ? ...RED : ...WHITE);
+      if (isCorrect) doc.setTextColor(26,143,90);
+      else if (isChosen) doc.setTextColor(192,57,43);
+      else doc.setTextColor(255,255,255);
       doc.setFont('helvetica','bold'); doc.setFontSize(7);
       doc.text(letters[oi], ML+7.2, y+5.3);
 
-      doc.setTextColor(...tc);
+      doc.setTextColor(tc[0],tc[1],tc[2]);
       doc.setFont('helvetica', isCorrect||(isChosen&&!isCorrect) ? 'bold' : 'normal');
       doc.setFontSize(8);
       doc.text(opt.substring(0,82), ML+13.5, y+5.3);
@@ -1026,9 +1028,9 @@ function generaPDF() {
   const tot = doc.internal.getNumberOfPages();
   for (let p=1;p<=tot;p++) {
     doc.setPage(p);
-    doc.setFillColor(...BLUE);
+    doc.setFillColorX(BLUE);
     doc.rect(0,287,W,10,'F');
-    doc.setTextColor(...WHITE); doc.setFont('helvetica','normal'); doc.setFontSize(7);
+    doc.setTextColor(255,255,255); doc.setFont('helvetica','normal'); doc.setFontSize(7);
     doc.text('I.R.C.C.S. Ospedale San Raffaele — Quiz di Ingresso — '+oggi, ML, 293);
     doc.text('Pag.'+p+'/'+tot, 194, 293);
   }
