@@ -6,12 +6,14 @@
   <title>Donazione di Sangue – I.R.C.C.S. Ospedale San Raffaele</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <!-- html2canvas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
       --red:        #c0392b; --red-dark: #922b21; --red-light: #fdf0ef;
       --red-mid:    #e74c3c; --dark: #1a1a2e; --gray: #6b7a8d;
-      --light-gray: #f4f6f9; --border: #dde3ee; --white: #fff;
+      --light-gray: #f4f6f9; --border: #dde3ee;
       --radius: 10px; --shadow: 0 2px 16px rgba(0,0,0,.07);
       --shadow-lg: 0 8px 36px rgba(0,0,0,.12);
       --green: #1a8f5a; --green-light: #e6f7f0;
@@ -21,12 +23,7 @@
     body { font-family: 'DM Sans', sans-serif; background: var(--light-gray); color: var(--dark); min-height: 100vh; }
 
     /* NAV */
-    nav {
-      position: sticky; top: 0; z-index: 1000;
-      background: rgba(255,255,255,.97); backdrop-filter: blur(12px);
-      border-bottom: 2px solid var(--red);
-      padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 68px;
-    }
+    nav { position: sticky; top: 0; z-index: 1000; background: rgba(255,255,255,.97); backdrop-filter: blur(12px); border-bottom: 2px solid var(--red); padding: 0 5%; display: flex; align-items: center; justify-content: space-between; height: 68px; }
     .logo { display: flex; align-items: center; gap: 12px; text-decoration: none; }
     .logo img { height: 54px; width: auto; }
     .logo-text strong { display: block; font-size: 13px; font-weight: 700; color: var(--red); }
@@ -42,15 +39,8 @@
     .nav-logout:hover { color: var(--red); }
 
     /* HEADER */
-    .page-header {
-      background: linear-gradient(135deg, #922b21 0%, #c0392b 50%, #e74c3c 100%);
-      padding: 60px 5% 48px; text-align: center; position: relative; overflow: hidden;
-    }
-    .page-header::before {
-      content: ''; position: absolute; inset: 0; opacity: .05;
-      background-image: radial-gradient(circle, #fff 1px, transparent 1px);
-      background-size: 28px 28px;
-    }
+    .page-header { background: linear-gradient(135deg, #922b21 0%, #c0392b 50%, #e74c3c 100%); padding: 60px 5% 48px; text-align: center; position: relative; overflow: hidden; }
+    .page-header::before { content: ''; position: absolute; inset: 0; opacity: .05; background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 28px 28px; }
     .header-icon { width: 68px; height: 68px; background: rgba(255,255,255,.15); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; border: 2px solid rgba(255,255,255,.3); position: relative; }
     .header-icon i { font-size: 1.9rem; color: #fff; }
     .page-header h1 { font-family: 'Playfair Display', serif; font-size: clamp(1.8rem,3.5vw,2.8rem); color: #fff; font-weight: 700; margin-bottom: 10px; text-shadow: 0 2px 12px rgba(0,0,0,.2); position: relative; }
@@ -99,16 +89,12 @@
     .fgroup { display: flex; flex-direction: column; gap: 5px; }
     .lbl { font-size: 12px; font-weight: 600; color: #4a5568; }
     .lbl .req { color: var(--red); margin-left: 2px; }
-    input[type="text"], input[type="email"], input[type="number"], input[type="date"], select, textarea {
-      border: 1.5px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 13.5px;
-      font-family: 'DM Sans',sans-serif; color: var(--dark); background: #fff; outline: none; width: 100%;
-      transition: border-color .2s, box-shadow .2s;
-    }
+    input[type="text"], input[type="email"], input[type="number"], input[type="date"], select, textarea { border: 1.5px solid var(--border); border-radius: 7px; padding: 9px 12px; font-size: 13.5px; font-family: 'DM Sans',sans-serif; color: var(--dark); background: #fff; outline: none; width: 100%; transition: border-color .2s, box-shadow .2s; }
     input:focus, select:focus, textarea:focus { border-color: var(--red); box-shadow: 0 0 0 3px rgba(192,57,43,.08); }
     select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath fill='%236b7a8d' d='M0 0l5 6 5-6z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; appearance: none; padding-right: 30px; }
     textarea { resize: vertical; min-height: 82px; line-height: 1.6; }
 
-    /* YN ROWS */
+    /* YN */
     .yn-grid { display: flex; flex-direction: column; gap: 8px; }
     .yn-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 8px; gap: 12px; }
     .yn-label { font-size: 13px; color: var(--dark); flex: 1; }
@@ -174,8 +160,77 @@
     #successMsg i.big { font-size: 2.4rem; color: var(--green); margin-bottom: 12px; display: block; }
     #successMsg h3 { font-family: 'Playfair Display', serif; font-size: 1.35rem; color: var(--dark); margin-bottom: 7px; }
     #successMsg p { font-size: 14px; color: var(--gray); line-height: 1.65; }
+    .btn-download { display: inline-flex; align-items: center; gap: 8px; margin-top: 18px; background: var(--green); color: #fff; padding: 11px 24px; border-radius: 8px; font-weight: 700; font-size: 14px; text-decoration: none; cursor: pointer; border: none; font-family: 'DM Sans',sans-serif; transition: all .2s; }
+    .btn-download:hover { background: #157a4a; }
 
     .footer-mini { text-align: center; padding: 26px; font-size: 12px; color: var(--gray); border-top: 1px solid var(--border); }
+
+    /* ── Documento stampabile (off-screen) ── */
+    #printDoc {
+      position: fixed; left: -9999px; top: 0;
+      width: 900px; background: #fff;
+      font-family: 'DM Sans', sans-serif;
+      color: #1a1a2e; padding: 0;
+    }
+    .pd-header {
+      background: linear-gradient(90deg,#922b21 0%,#c0392b 50%,#e74c3c 100%);
+      padding: 28px 34px 22px;
+      display: flex; justify-content: space-between; align-items: flex-start;
+    }
+    .pd-header-left h1 { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 3px; }
+    .pd-header-left p  { font-size: 12px; color: rgba(255,255,255,.8); }
+    .pd-header-right   { text-align: right; }
+    .pd-header-right span { display: block; font-size: 11px; color: rgba(255,255,255,.85); margin-bottom: 2px; }
+    .pd-header-right strong { color: #fff; }
+    .pd-body { padding: 26px 34px; }
+    .pd-sez { margin-bottom: 18px; }
+    .pd-sez-title {
+      background: linear-gradient(90deg,#c0392b,#e74c3c);
+      color: #fff; font-size: 11px; font-weight: 700;
+      padding: 6px 12px; border-radius: 5px; margin-bottom: 8px;
+      letter-spacing: .4px;
+    }
+    .pd-row { display: flex; gap: 8px; margin-bottom: 6px; }
+    .pd-field {
+      flex: 1; background: #f4f6f9; border-radius: 5px;
+      padding: 6px 10px;
+    }
+    .pd-field .lbl { font-size: 9.5px; color: #6b7a8d; font-weight: 600; display: block; margin-bottom: 2px; }
+    .pd-field .val { font-size: 12px; font-weight: 700; color: #1a1a2e; word-break: break-word; }
+    .pd-yn-grid { display: flex; flex-direction: column; gap: 4px; }
+    .pd-yn-row {
+      display: flex; align-items: center; justify-content: space-between;
+      background: #f4f6f9; border-radius: 5px; padding: 5px 10px;
+    }
+    .pd-yn-label { font-size: 11.5px; color: #1a1a2e; flex: 1; }
+    .pd-yn-badges { display: flex; gap: 5px; }
+    .pd-badge { padding: 2px 10px; border-radius: 4px; font-size: 10.5px; font-weight: 700; color: #fff; }
+    .pd-badge.si-on { background: #1a8f5a; }
+    .pd-badge.no-on { background: #c0392b; }
+    .pd-badge.off   { background: #d0d7e3; color: #888; }
+    .pd-consensi { display: flex; flex-direction: column; gap: 4px; }
+    .pd-cons-item {
+      display: flex; align-items: center; gap: 9px;
+      background: #e6f7f0; border-radius: 5px; padding: 6px 10px;
+    }
+    .pd-check { width: 16px; height: 16px; background: #1a8f5a; border-radius: 3px;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+    .pd-cons-text { font-size: 11px; color: #1a1a2e; }
+    .pd-firma-box {
+      border: 1.5px solid #dde3ee; border-radius: 6px;
+      background: #fafbfc; padding: 10px;
+      min-height: 110px; display: flex; align-items: center; justify-content: center;
+    }
+    .pd-firma-box img { max-height: 100px; }
+    .pd-sign-row { display: flex; gap: 40px; margin-top: 14px; padding-top: 10px; border-top: 1px solid #dde3ee; }
+    .pd-sign-col .line { border-bottom: 1px solid #bbb; margin-bottom: 4px; height: 28px; display: flex; align-items: flex-end; padding-bottom: 3px; font-size: 11.5px; font-weight: 700; color: #1a1a2e; }
+    .pd-sign-col .sublbl { font-size: 9px; color: #6b7a8d; }
+    .pd-footer {
+      background: #c0392b; padding: 8px 34px;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .pd-footer span { font-size: 9px; color: rgba(255,255,255,.85); }
 
     @media (max-width: 680px) {
       .card-body { padding: 18px 16px; }
@@ -238,17 +293,13 @@
 
     <!-- SEZ 1 – DATI PERSONALI -->
     <div class="card">
-      <div class="card-header">
-        <div class="sect-num">1</div><i class="fa-solid fa-user"></i>
-        <h2>Dati Personali</h2>
-      </div>
+      <div class="card-header"><div class="sect-num">1</div><i class="fa-solid fa-user"></i><h2>Dati Personali</h2></div>
       <div class="card-body">
         <div class="discord-badge">
           <img id="bdgAvatar" src="" alt="" />
           <div class="discord-badge-text"><strong id="bdgUsername"></strong><span id="bdgTag"></span></div>
           <i class="fa-solid fa-circle-check"></i>
         </div>
-
         <div class="fg c1" style="margin-bottom:16px;">
           <div class="fgroup">
             <span class="lbl">Stato donatore</span>
@@ -258,30 +309,14 @@
             </div>
           </div>
         </div>
-
         <div class="fg c2">
           <div class="fgroup"><label class="lbl" for="p_nome">Nome <span class="req">*</span></label><input type="text" id="p_nome" placeholder="Nome" /></div>
           <div class="fgroup"><label class="lbl" for="p_cognome">Cognome <span class="req">*</span></label><input type="text" id="p_cognome" placeholder="Cognome" /></div>
         </div>
         <div class="fg c3">
           <div class="fgroup"><label class="lbl" for="p_nascita">Data di nascita <span class="req">*</span></label><input type="date" id="p_nascita" /></div>
-          <div class="fgroup">
-            <label class="lbl" for="p_sesso">Sesso <span class="req">*</span></label>
-            <select id="p_sesso" onchange="checkSesso()">
-              <option value="">— Seleziona —</option>
-              <option value="Maschio">Maschio</option>
-              <option value="Femmina">Femmina</option>
-              <option value="Altro">Altro</option>
-            </select>
-          </div>
-          <div class="fgroup">
-            <label class="lbl" for="p_sangue">Gruppo sanguigno</label>
-            <select id="p_sangue">
-              <option value="Non noto">Non noto</option>
-              <option>A+</option><option>A-</option><option>B+</option><option>B-</option>
-              <option>AB+</option><option>AB-</option><option>0+</option><option>0-</option>
-            </select>
-          </div>
+          <div class="fgroup"><label class="lbl" for="p_sesso">Sesso <span class="req">*</span></label><select id="p_sesso" onchange="checkSesso()"><option value="">— Seleziona —</option><option value="Maschio">Maschio</option><option value="Femmina">Femmina</option><option value="Altro">Altro</option></select></div>
+          <div class="fgroup"><label class="lbl" for="p_sangue">Gruppo sanguigno</label><select id="p_sangue"><option value="Non noto">Non noto</option><option>A+</option><option>A-</option><option>B+</option><option>B-</option><option>AB+</option><option>AB-</option><option>0+</option><option>0-</option></select></div>
         </div>
         <div class="fg c4">
           <div class="fgroup"><label class="lbl" for="p_altezza">Altezza (cm) <span class="req">*</span></label><input type="number" id="p_altezza" placeholder="170" min="100" max="250" /></div>
@@ -366,22 +401,8 @@
       <div class="card-header"><div class="sect-num">6</div><i class="fa-solid fa-person-running"></i><h2>Stile di Vita</h2></div>
       <div class="card-body">
         <div class="yn-grid">
-          <div class="yn-row">
-            <span class="yn-label">Fumi?</span>
-            <div class="freq-group" id="fg_fumo">
-              <div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Mai</div>
-              <div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Occasionalmente</div>
-              <div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Spesso</div>
-            </div>
-          </div>
-          <div class="yn-row">
-            <span class="yn-label">Bevi alcol?</span>
-            <div class="freq-group" id="fg_alcol2">
-              <div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Mai</div>
-              <div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Occasionalmente</div>
-              <div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Spesso</div>
-            </div>
-          </div>
+          <div class="yn-row"><span class="yn-label">Fumi?</span><div class="freq-group" id="fg_fumo"><div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Mai</div><div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Occasionalmente</div><div class="freq-opt" onclick="selFreq('fg_fumo',this,event)">Spesso</div></div></div>
+          <div class="yn-row"><span class="yn-label">Bevi alcol?</span><div class="freq-group" id="fg_alcol2"><div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Mai</div><div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Occasionalmente</div><div class="freq-opt" onclick="selFreq('fg_alcol2',this,event)">Spesso</div></div></div>
           <div class="yn-row" id="yn_partner"><span class="yn-label">Hai avuto nuovi partner negli ultimi mesi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_partner','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_partner','no',event)">No</div></div></div>
           <div class="yn-row" id="yn_viaggi"><span class="yn-label">Hai viaggiato all'estero negli ultimi 6 mesi?</span><div class="yn-btns"><div class="yn-btn si" onclick="selYN('yn_viaggi','si',event)">Sì</div><div class="yn-btn no" onclick="selYN('yn_viaggi','no',event)">No</div></div></div>
           <div class="yn-extra" id="ext_viaggi"><input type="text" id="viaggi_paese" placeholder="Specifica il paese visitato…" /></div>
@@ -415,7 +436,7 @@
       </div>
     </div>
 
-    <!-- SEZ 9 – FIRMA DONATORE -->
+    <!-- SEZ 9 – FIRMA -->
     <div class="card">
       <div class="card-header"><div class="sect-num">9</div><i class="fa-solid fa-pen-nib"></i><h2>Firma del Donatore</h2></div>
       <div class="card-body">
@@ -434,67 +455,72 @@
     <div id="formWrap">
       <div class="action-row">
         <button class="btn-reset" onclick="resetForm()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
-        <button class="btn-submit" id="submitBtn" onclick="invia()"><i class="fa-solid fa-paper-plane"></i> Invia Modulo di Donazione</button>
+        <button class="btn-submit" id="submitBtn" onclick="invia()"><i class="fa-solid fa-image"></i> Genera immagine e Invia</button>
       </div>
     </div>
 
     <div id="successMsg">
       <i class="fa-solid fa-circle-check big"></i>
       <h3>Modulo inviato con successo!</h3>
-      <p>Il modulo di pre-donazione è stato ricevuto dallo staff medico.<br>Sarai contattato per confermare l'appuntamento. Grazie per la tua generosità!</p>
+      <p>L'immagine del modulo di pre-donazione è stata inviata allo staff medico su Discord.<br>Puoi anche scaricarne una copia per i tuoi archivi.</p>
+      <button class="btn-download" id="btnDownload"><i class="fa-solid fa-image"></i> Scarica copia PNG</button>
     </div>
 
-  </div><!-- /formScreen -->
+  </div>
 </div>
 
 <div class="footer-mini">© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962 — Dati trattati in conformità al GDPR</div>
 
+<!-- Documento off-screen per rendering PNG -->
+<div id="printDoc"></div>
+
 <script>
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      CONFIG
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   const CLIENT_ID = '1484523347243958414';
   const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/donazioni.html';
   const WEBHOOK   = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      STATO
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   let user = null, statoDon = 'nuovo', ynState = {}, freqState = {};
+  let pngBlob = null; // conservato per il download
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      UTILITY
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function genPratica() {
     const d = new Date();
     return 'SR-' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '-' + Math.floor(1000+Math.random()*9000);
   }
-  function ynVal(id) { return ynState[id]==='si' ? 'Sì' : ynState[id]==='no' ? 'No' : '—'; }
+  const g  = id => document.getElementById(id);
+  const gv = id => g(id).value.trim();
+  function ynVal(id) { return ynState[id]==='si' ? 'SI' : ynState[id]==='no' ? 'NO' : '—'; }
   function freqVal(id) { return freqState[id] || '—'; }
-  const v = id => document.getElementById(id).value.trim();
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      SCHERMATE
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function mostra(s) {
-    document.getElementById('loginScreen').style.display   = s==='login'   ? 'flex'  : 'none';
-    document.getElementById('loadingScreen').style.display = s==='loading' ? 'flex'  : 'none';
-    document.getElementById('formScreen').style.display    = s==='form'    ? 'block' : 'none';
+    g('loginScreen').style.display   = s==='login'   ? 'flex'  : 'none';
+    g('loadingScreen').style.display = s==='loading' ? 'flex'  : 'none';
+    g('formScreen').style.display    = s==='form'    ? 'block' : 'none';
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      OAUTH2
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function oauthURL() {
     const state = Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
     sessionStorage.setItem('dstate', state);
-    return 'https://discord.com/oauth2/authorize?'+new URLSearchParams({ client_id:CLIENT_ID, redirect_uri:REDIRECT, response_type:'token', scope:'identify', state });
+    return 'https://discord.com/oauth2/authorize?'+new URLSearchParams({client_id:CLIENT_ID,redirect_uri:REDIRECT,response_type:'token',scope:'identify',state});
   }
-
   async function leggiCallback() {
     const fH = new URLSearchParams(location.hash.replace(/^#/,''));
     const fQ = new URLSearchParams(location.search.replace(/^\?/,''));
-    const token = fH.get('access_token') || fQ.get('access_token');
+    const token = fH.get('access_token')||fQ.get('access_token');
     if (!token) return false;
     history.replaceState(null,'',location.pathname);
     mostra('loading');
@@ -502,279 +528,334 @@
       const res = await fetch('https://discord.com/api/users/@me',{headers:{Authorization:'Bearer '+token}});
       if (!res.ok) throw new Error(res.status);
       const u = await res.json();
-      user = {
-        id: u.id, username: u.username,
-        tag: (u.discriminator && u.discriminator!=='0') ? '#'+u.discriminator : '@'+u.username,
-        avatar: u.avatar ? `https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
-                         : `https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id)%6n)}.png`,
-      };
+      user = { id:u.id, username:u.username,
+        tag:(u.discriminator&&u.discriminator!=='0')?'#'+u.discriminator:'@'+u.username,
+        avatar:u.avatar?`https://cdn.discordapp.com/avatars/${u.id}/${u.avatar}.png?size=64`
+                       :`https://cdn.discordapp.com/embed/avatars/${Number(BigInt(u.id)%6n)}.png` };
       sessionStorage.setItem('du_don', JSON.stringify(user));
       mostraForm();
     } catch(e) { mostra('login'); errore('Impossibile ottenere i dati Discord. Riprova.'); }
     return true;
   }
-
   function mostraForm() {
     mostra('form');
-    document.getElementById('bdgAvatar').src           = user.avatar;
-    document.getElementById('bdgUsername').textContent = user.username;
-    document.getElementById('bdgTag').textContent      = user.tag;
-    document.getElementById('navAvatar').src           = user.avatar;
-    document.getElementById('navUsername').textContent = user.username;
-    document.getElementById('navUser').classList.add('on');
-    document.getElementById('dataOggi').textContent = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-    document.getElementById('numPratica').textContent = genPratica();
+    g('bdgAvatar').src           = user.avatar;
+    g('bdgUsername').textContent = user.username;
+    g('bdgTag').textContent      = user.tag;
+    g('navAvatar').src           = user.avatar;
+    g('navUsername').textContent = user.username;
+    g('navUser').classList.add('on');
+    g('dataOggi').textContent = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+    g('numPratica').textContent = genPratica();
     initCanvas('canvasDon');
   }
-
-  function logout() {
-    sessionStorage.removeItem('du_don'); user = null; mostra('login');
-    document.getElementById('navUser').classList.remove('on');
-  }
-
+  function logout() { sessionStorage.removeItem('du_don'); user=null; mostra('login'); g('navUser').classList.remove('on'); }
   function errore(msg) {
-    const b = document.getElementById('errBox');
-    document.getElementById('errTesto').textContent = msg;
-    b.classList.add('on');
-    setTimeout(()=>b.classList.remove('on'), 7000);
-    b.scrollIntoView({behavior:'smooth',block:'center'});
+    g('errTesto').textContent = msg;
+    g('errBox').classList.add('on');
+    setTimeout(()=>g('errBox').classList.remove('on'),7000);
+    g('errBox').scrollIntoView({behavior:'smooth',block:'center'});
   }
 
-  /* ═══════════════════════════════════════
-     UI
-  ═══════════════════════════════════════ */
-  function selStato(v2) {
-    statoDon = v2;
-    document.getElementById('statoNuovo').classList.toggle('sel', v2==='nuovo');
-    document.getElementById('statoAbituale').classList.toggle('sel', v2==='abituale');
-  }
-
-  function selYN(id, val, e) {
-    e.preventDefault();
-    ynState[id] = val;
-    const row = document.getElementById(id);
-    row.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('sel'));
+  /* ═══════════════════════════════════
+     UI HELPERS
+  ═══════════════════════════════════ */
+  function selStato(v) { statoDon=v; g('statoNuovo').classList.toggle('sel',v==='nuovo'); g('statoAbituale').classList.toggle('sel',v==='abituale'); }
+  function selYN(id,val,e) {
+    e.preventDefault(); ynState[id]=val;
+    const row=g(id); row.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('sel'));
     row.querySelector('.yn-btn.'+val).classList.add('sel');
-    const extId = id.replace('yn_','');
-    const ext = document.getElementById('ext_'+extId);
-    if (ext) ext.classList.toggle('on', val==='si');
+    const ext=g('ext_'+id.replace('yn_',''));
+    if(ext) ext.classList.toggle('on',val==='si');
   }
+  function selFreq(gid,el,e) { e.preventDefault(); freqState[gid]=el.textContent.trim(); document.querySelectorAll('#'+gid+' .freq-opt').forEach(o=>o.classList.remove('sel')); el.classList.add('sel'); }
+  function togCons(el,e) { e.preventDefault(); el.classList.toggle('sel'); }
+  function checkSesso() { g('sezFemminile').classList.toggle('on',g('p_sesso').value==='Femmina'); }
 
-  function selFreq(gid, el, e) {
-    e.preventDefault();
-    freqState[gid] = el.textContent.trim();
-    document.querySelectorAll('#'+gid+' .freq-opt').forEach(o=>o.classList.remove('sel'));
-    el.classList.add('sel');
-  }
-
-  function togCons(el, e) { e.preventDefault(); el.classList.toggle('sel'); }
-
-  function checkSesso() {
-    document.getElementById('sezFemminile').classList.toggle('on', document.getElementById('p_sesso').value==='Femmina');
-  }
-
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      SIGNATURE PAD
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function initCanvas(id) {
-    const canvas = document.getElementById(id);
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.parentElement.offsetWidth;
-    ctx.strokeStyle = '#1a1a2e'; ctx.lineWidth = 2.2; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    let drawing = false, lx = 0, ly = 0;
-    function pos(e) {
-      const r = canvas.getBoundingClientRect(), sx = canvas.width/r.width, sy = canvas.height/r.height;
-      if (e.touches) return {x:(e.touches[0].clientX-r.left)*sx, y:(e.touches[0].clientY-r.top)*sy};
-      return {x:(e.clientX-r.left)*sx, y:(e.clientY-r.top)*sy};
-    }
-    canvas.addEventListener('mousedown',  e=>{drawing=true; const p=pos(e); lx=p.x; ly=p.y;});
-    canvas.addEventListener('mousemove',  e=>{if(!drawing)return; const p=pos(e); ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y); ctx.stroke(); lx=p.x; ly=p.y;});
-    canvas.addEventListener('mouseup',    ()=>drawing=false);
-    canvas.addEventListener('mouseleave', ()=>drawing=false);
-    canvas.addEventListener('touchstart', e=>{e.preventDefault(); drawing=true; const p=pos(e); lx=p.x; ly=p.y;},{passive:false});
-    canvas.addEventListener('touchmove',  e=>{e.preventDefault(); if(!drawing)return; const p=pos(e); ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(p.x,p.y); ctx.stroke(); lx=p.x; ly=p.y;},{passive:false});
-    canvas.addEventListener('touchend',   ()=>drawing=false);
+    const c=g(id), ctx=c.getContext('2d');
+    c.width=c.parentElement.offsetWidth;
+    ctx.strokeStyle='#1a1a2e'; ctx.lineWidth=2.2; ctx.lineCap='round'; ctx.lineJoin='round';
+    let drawing=false, lx=0, ly=0;
+    function pos(e){ const r=c.getBoundingClientRect(),sx=c.width/r.width,sy=c.height/r.height;
+      if(e.touches) return {x:(e.touches[0].clientX-r.left)*sx,y:(e.touches[0].clientY-r.top)*sy};
+      return {x:(e.clientX-r.left)*sx,y:(e.clientY-r.top)*sy}; }
+    c.addEventListener('mousedown', e=>{drawing=true;const p=pos(e);lx=p.x;ly=p.y;});
+    c.addEventListener('mousemove', e=>{if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;});
+    c.addEventListener('mouseup',   ()=>drawing=false);
+    c.addEventListener('mouseleave',()=>drawing=false);
+    c.addEventListener('touchstart',e=>{e.preventDefault();drawing=true;const p=pos(e);lx=p.x;ly=p.y;},{passive:false});
+    c.addEventListener('touchmove', e=>{e.preventDefault();if(!drawing)return;const p=pos(e);ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(p.x,p.y);ctx.stroke();lx=p.x;ly=p.y;},{passive:false});
+    c.addEventListener('touchend',  ()=>drawing=false);
   }
+  function clearCanvas(id){ const c=g(id);c.getContext('2d').clearRect(0,0,c.width,c.height); }
+  function isCanvasBlank(id){ return !g(id).getContext('2d').getImageData(0,0,g(id).width,g(id).height).data.some(x=>x!==0); }
 
-  function clearCanvas(id) { const c=document.getElementById(id); c.getContext('2d').clearRect(0,0,c.width,c.height); }
-
-  function isCanvasBlank(id) {
-    return !document.getElementById(id).getContext('2d').getImageData(0,0,
-      document.getElementById(id).width, document.getElementById(id).height).data.some(x=>x!==0);
-  }
-
-  /* ═══════════════════════════════════════
-     FIRMA → BLOB PNG
-  ═══════════════════════════════════════ */
-  function canvasToBlob(id) {
-    return new Promise(resolve => {
-      const c = document.getElementById(id);
-      // Disegna sfondo bianco + firma su canvas temporaneo
-      const tmp = document.createElement('canvas');
-      tmp.width = c.width; tmp.height = c.height;
-      const ctx = tmp.getContext('2d');
-      ctx.fillStyle = '#ffffff';
-      ctx.fillRect(0,0,tmp.width,tmp.height);
-      ctx.drawImage(c,0,0);
-      tmp.toBlob(blob => resolve(blob), 'image/png');
-    });
-  }
-
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
      RESET
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   function resetForm() {
-    if (!confirm('Sei sicuro di voler azzerare tutti i campi?')) return;
+    if(!confirm('Sei sicuro di voler azzerare tutti i campi?')) return;
     document.querySelectorAll('input[type="text"],input[type="email"],input[type="number"],input[type="date"],textarea').forEach(el=>el.value='');
     document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
-    document.querySelectorAll('.yn-btn').forEach(b=>b.classList.remove('sel'));
-    document.querySelectorAll('.freq-opt').forEach(b=>b.classList.remove('sel'));
-    document.querySelectorAll('.consenso-item').forEach(b=>b.classList.remove('sel'));
+    document.querySelectorAll('.yn-btn,.freq-opt,.consenso-item').forEach(b=>b.classList.remove('sel'));
     document.querySelectorAll('.yn-extra').forEach(b=>b.classList.remove('on'));
-    document.getElementById('sezFemminile').classList.remove('on');
+    g('sezFemminile').classList.remove('on');
     clearCanvas('canvasDon');
     ynState={}; freqState={};
     selStato('nuovo');
-    document.getElementById('numPratica').textContent = genPratica();
+    g('numPratica').textContent = genPratica();
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
-  /* ═══════════════════════════════════════
-     INVIO
-     Strategy: 2 embed max 25 campi ciascuno
-     + 1 messaggio separato con la firma PNG
-  ═══════════════════════════════════════ */
+  /* ═══════════════════════════════════
+     GENERA DOCUMENTO HTML (per png)
+  ═══════════════════════════════════ */
+  function field(lbl, val) {
+    return `<div class="pd-field"><span class="lbl">${lbl}</span><span class="val">${val||'—'}</span></div>`;
+  }
+  function ynRow(label, id) {
+    const v = ynState[id];
+    return `<div class="pd-yn-row">
+      <span class="pd-yn-label">${label}</span>
+      <div class="pd-yn-badges">
+        <span class="pd-badge ${v==='si'?'si-on':'off'}">SI</span>
+        <span class="pd-badge ${v==='no'?'no-on':'off'}">NO</span>
+      </div>
+    </div>`;
+  }
+  function sez(num, titolo, contenuto) {
+    return `<div class="pd-sez">
+      <div class="pd-sez-title">${num} — ${titolo}</div>
+      ${contenuto}
+    </div>`;
+  }
+  function fmtData(val) {
+    if (!val) return '—';
+    const d = new Date(val);
+    return isNaN(d) ? val : d.toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  }
+
+  function generaDocHTML(pratica, oggi) {
+    // Firma dal canvas
+    const canvas = g('canvasDon');
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const ctx2 = tmp.getContext('2d');
+    ctx2.fillStyle = '#fafbfc'; ctx2.fillRect(0,0,tmp.width,tmp.height);
+    ctx2.drawImage(canvas, 0, 0);
+    const firmaDataUrl = tmp.toDataURL('image/png');
+
+    const isFemmina = g('p_sesso').value === 'Femmina';
+    const hasFarmaci = ynState['yn_farmaci']==='si';
+    const hasAllergie = ynState['yn_allergie']==='si';
+    const hasViagg = ynState['yn_viaggi']==='si';
+
+    const html = `
+    <div class="pd-header">
+      <div class="pd-header-left">
+        <h1>I.R.C.C.S. OSPEDALE SAN RAFFAELE</h1>
+        <p>MODULO DI PRE-DONAZIONE DEL SANGUE</p>
+      </div>
+      <div class="pd-header-right">
+        <span>Pratica N°: <strong>${pratica}</strong></span>
+        <span>Data: <strong>${oggi}</strong></span>
+        <span>Discord: <strong>${user.username} (${user.id})</strong></span>
+        <span>Stato: <strong>${statoDon==='nuovo'?'Nuovo donatore':'Donatore abituale'}</strong></span>
+      </div>
+    </div>
+    <div class="pd-body">
+      ${sez('1','DATI PERSONALI',`
+        <div class="pd-row">${field('NOME',gv('p_nome'))}${field('COGNOME',gv('p_cognome'))}</div>
+        <div class="pd-row">${field('DATA DI NASCITA',fmtData(gv('p_nascita')))}${field('SESSO',g('p_sesso').value||'—')}${field('GRUPPO SANGUIGNO',g('p_sangue').value||'—')}</div>
+        <div class="pd-row">${field('ALTEZZA (cm)',gv('p_altezza'))}${field('PESO (kg)',gv('p_peso'))}${field('TELEFONO',gv('p_tel'))}${field('EMAIL',gv('p_email'))}</div>
+        <div class="pd-row">${field("DOCUMENTO D'IDENTITÀ",gv('p_doc'))}</div>
+      `)}
+      ${sez('2','CONDIZIONI GENERALI',`<div class="pd-yn-grid">
+        ${ynRow('Ti senti in buona salute oggi?','yn_salute')}
+        ${ynRow('Hai dormito almeno 6 ore?','yn_sonno')}
+        ${ynRow('Hai mangiato nelle ultime 4 ore?','yn_mangiato')}
+        ${ynRow('Hai febbre?','yn_febbre')}
+        ${ynRow('Hai sintomi influenzali?','yn_influenza')}
+        ${ynRow('Hai tosse persistente?','yn_tosse')}
+        ${ynRow('Hai assunto alcol nelle ultime 24 ore?','yn_alcol')}
+        ${ynRow('Hai assunto sostanze stupefacenti?','yn_droghe')}
+        ${ynRow('Hai fatto sforzi fisici intensi oggi?','yn_sforzi')}
+      </div>`)}
+      ${sez('3','STORIA MEDICA',`<div class="pd-yn-grid">
+        ${ynRow('Hai mai avuto malattie cardiache?','yn_cardiaco')}
+        ${ynRow('Hai mai avuto pressione alta?','yn_pressione')}
+        ${ynRow('Hai il diabete?','yn_diabete')}
+        ${ynRow('Hai mai avuto convulsioni?','yn_conv')}
+        ${ynRow('Hai malattie del sangue?','yn_malsangue')}
+        ${ynRow('Hai problemi di coagulazione?','yn_coag')}
+        ${ynRow('Hai mai avuto epatite?','yn_epatite')}
+        ${ynRow('Hai mai avuto HIV?','yn_hiv')}
+        ${ynRow('Hai mai avuto malattie infettive gravi?','yn_infettive')}
+        ${ynRow('Hai allergie?','yn_allergie')}
+      </div>${hasAllergie?`<div class="pd-row" style="margin-top:6px;">${field('SPECIFICARE ALLERGIE',gv('allergie_spec'))}</div>`:''}`)}
+      ${sez('4','FARMACI',`<div class="pd-yn-grid">
+        ${ynRow('Assumi farmaci attualmente?','yn_farmaci')}
+        ${ynRow('Hai assunto antibiotici negli ultimi 15 giorni?','yn_antibiotici')}
+        ${ynRow('Hai fatto vaccini recentemente?','yn_vaccini')}
+      </div>${hasFarmaci?`<div class="pd-row" style="margin-top:6px;">${field('DESCRIZIONE FARMACI',g('farmaci_desc').value.trim())}</div>`:''}`)}
+      ${sez('5','INTERVENTI E PROCEDURE – ULTIMI 4 MESI',`<div class="pd-yn-grid">
+        ${ynRow('Tatuaggi?','yn_tatuaggi')}
+        ${ynRow('Piercing?','yn_piercing')}
+        ${ynRow('Interventi chirurgici?','yn_chirurgia')}
+        ${ynRow('Esami invasivi?','yn_esami')}
+        ${ynRow('Trasfusioni?','yn_trasfusioni')}
+        ${ynRow('Cure dentistiche importanti?','yn_dentista')}
+      </div>`)}
+      ${sez('6','STILE DI VITA',`
+        <div class="pd-row">${field('FUMO',freqState['fg_fumo']||'—')}${field('CONSUMO DI ALCOL',freqState['fg_alcol2']||'—')}</div>
+        <div class="pd-yn-grid">
+          ${ynRow('Hai avuto nuovi partner negli ultimi mesi?','yn_partner')}
+          ${ynRow('Hai viaggiato all\'estero negli ultimi 6 mesi?','yn_viaggi')}
+        </div>
+        ${hasViagg?`<div class="pd-row" style="margin-top:6px;">${field('PAESE VISITATO',gv('viaggi_paese'))}</div>`:''}
+      `)}
+      ${isFemmina?sez('7','PER DONATRICI',`<div class="pd-yn-grid">
+        ${ynRow('Gravidanza attuale?','yn_gravatt')}
+        ${ynRow('Gravidanza negli ultimi 12 mesi?','yn_grav12')}
+        ${ynRow('Allattamento?','yn_allatt')}
+      </div>`):''}
+      ${sez('8','CONSENSI OBBLIGATORI',`<div class="pd-consensi">
+        <div class="pd-cons-item"><div class="pd-check">✓</div><span class="pd-cons-text">Dichiaro che tutte le informazioni fornite sono veritiere e accurate.</span></div>
+        <div class="pd-cons-item"><div class="pd-check">✓</div><span class="pd-cons-text">Acconsento al trattamento dei miei dati personali ai sensi del GDPR.</span></div>
+        <div class="pd-cons-item"><div class="pd-check">✓</div><span class="pd-cons-text">Accetto la valutazione medica preventiva alla donazione.</span></div>
+        <div class="pd-cons-item"><div class="pd-check">✓</div><span class="pd-cons-text">Accetto il prelievo di sangue e sono consapevole delle procedure ad esso associate.</span></div>
+        <div class="pd-cons-item"><div class="pd-check">✓</div><span class="pd-cons-text">Comprendo e accetto le responsabilità legali derivanti da questa dichiarazione.</span></div>
+      </div>`)}
+      ${sez('9','FIRMA DEL DONATORE',`
+        <div class="pd-firma-box"><img src="${firmaDataUrl}" /></div>
+        <div class="pd-sign-row">
+          <div class="pd-sign-col">
+            <div class="line">${gv('p_nome')} ${gv('p_cognome')}</div>
+            <div class="sublbl">Firma del Donatore</div>
+          </div>
+          <div class="pd-sign-col">
+            <div class="line">${oggi}</div>
+            <div class="sublbl">Data</div>
+          </div>
+        </div>
+      `)}
+    </div>
+    <div class="pd-footer">
+      <span>I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962 — Dati trattati ai sensi del GDPR</span>
+      <span>Pratica ${pratica}</span>
+    </div>`;
+
+    const el = g('printDoc');
+    el.innerHTML = html;
+    return el;
+  }
+  /* ═══════════════════════════════════
+     RESET
+  ═══════════════════════════════════ */
+  function resetForm() {
+    if(!confirm('Sei sicuro di voler azzerare tutti i campi?')) return;
+    document.querySelectorAll('input[type="text"],input[type="email"],input[type="number"],input[type="date"],textarea').forEach(el=>el.value='');
+    document.querySelectorAll('select').forEach(el=>el.selectedIndex=0);
+    document.querySelectorAll('.yn-btn,.freq-opt,.consenso-item').forEach(b=>b.classList.remove('sel'));
+    document.querySelectorAll('.yn-extra').forEach(b=>b.classList.remove('on'));
+    g('sezFemminile').classList.remove('on');
+    clearCanvas('canvasDon');
+    ynState={}; freqState={};
+    selStato('nuovo');
+    g('numPratica').textContent = genPratica();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  /* ═══════════════════════════════════
+     INVIA (PNG via html2canvas)
+  ═══════════════════════════════════ */
   async function invia() {
-    // Validazione base
-    if (!v('p_nome')||!v('p_cognome')||!v('p_nascita')||!document.getElementById('p_sesso').value||!v('p_altezza')||!v('p_peso')||!v('p_tel')||!v('p_email')||!v('p_doc'))
+    // Validazione
+    if (!gv('p_nome')||!gv('p_cognome')||!gv('p_nascita')||!g('p_sesso').value||!gv('p_altezza')||!gv('p_peso')||!gv('p_tel')||!gv('p_email')||!gv('p_doc'))
       return errore('Compila tutti i campi obbligatori nella Sezione 1.');
-    if (!['con1','con2','con3','con4','con5'].every(id=>document.getElementById(id).classList.contains('sel')))
+    if (!['con1','con2','con3','con4','con5'].every(id=>g(id).classList.contains('sel')))
       return errore('Devi accettare tutti i consensi obbligatori (Sezione 8).');
     if (isCanvasBlank('canvasDon'))
       return errore('Apponi la tua firma nella Sezione 9 prima di inviare.');
 
-    const btn = document.getElementById('submitBtn');
+    const btn = g('submitBtn');
     btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio in corso…';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generazione immagine…';
 
-    const pratica = document.getElementById('numPratica').textContent;
-    const dataN = new Date(v('p_nascita')).toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-    const oggi  = document.getElementById('dataOggi').textContent;
-    const isFemm = document.getElementById('p_sesso').value === 'Femmina';
-
-    // ── EMBED 1: Dati personali + Condizioni + Storia medica (max 25) ──
-    const embed1 = {
-      title: '🩸 Modulo Donazione — ' + pratica,
-      color: 0xc0392b,
-      thumbnail: { url: user.avatar },
-      fields: [
-        { name: '🎮 Discord',       value: user.username+' (`'+user.id+'`)', inline: true },
-        { name: '🔄 Stato',         value: statoDon==='nuovo'?'Nuovo donatore':'Donatore abituale', inline: true },
-        { name: '📅 Data modulo',   value: oggi, inline: true },
-        { name: '👤 Nominativo',    value: v('p_nome')+' '+v('p_cognome'), inline: true },
-        { name: '📅 Nascita',       value: dataN, inline: true },
-        { name: '⚧ Sesso',         value: document.getElementById('p_sesso').value, inline: true },
-        { name: '🩸 Gruppo',        value: document.getElementById('p_sangue').value, inline: true },
-        { name: '📏 Alt. / Peso',   value: v('p_altezza')+' cm / '+v('p_peso')+' kg', inline: true },
-        { name: '📞 Tel.',          value: v('p_tel'), inline: true },
-        { name: '📧 Email',         value: v('p_email'), inline: true },
-        { name: '🪪 Documento',     value: v('p_doc'), inline: false },
-        // Condizioni generali
-        { name: '━━ 💓 CONDIZIONI GENERALI', value:
-          `Buona salute: **${ynVal('yn_salute')}** · Dormito ≥6h: **${ynVal('yn_sonno')}** · Mangiato ≤4h: **${ynVal('yn_mangiato')}**\n`+
-          `Febbre: **${ynVal('yn_febbre')}** · Sintomi inf.: **${ynVal('yn_influenza')}** · Tosse: **${ynVal('yn_tosse')}**\n`+
-          `Alcol 24h: **${ynVal('yn_alcol')}** · Stupefacenti: **${ynVal('yn_droghe')}** · Sforzi fisici: **${ynVal('yn_sforzi')}**`,
-          inline: false },
-        // Storia medica
-        { name: '━━ 📋 STORIA MEDICA', value:
-          `Cardiopatie: **${ynVal('yn_cardiaco')}** · P.alta: **${ynVal('yn_pressione')}** · Diabete: **${ynVal('yn_diabete')}**\n`+
-          `Convulsioni: **${ynVal('yn_conv')}** · Mal.sangue: **${ynVal('yn_malsangue')}** · Coagulazione: **${ynVal('yn_coag')}**\n`+
-          `Epatite: **${ynVal('yn_epatite')}** · HIV: **${ynVal('yn_hiv')}** · Mal.infettive: **${ynVal('yn_infettive')}**\n`+
-          `Allergie: **${ynVal('yn_allergie')}**`+(ynState['yn_allergie']==='si' ? ' — '+(v('allergie_spec')||'n.s.') : ''),
-          inline: false },
-      ],
-      footer: { text: 'I.R.C.C.S. Ospedale San Raffaele — Pratica '+pratica },
-      timestamp: new Date().toISOString(),
-    };
-
-    // ── EMBED 2: Farmaci + Interventi + Stile vita + Donatrici (max 25) ──
-    const embed2 = {
-      title: '🩸 Modulo Donazione — '+pratica+' (continua)',
-      color: 0xc0392b,
-      fields: [
-        { name: '━━ 💊 FARMACI', value:
-          `Farmaci attuali: **${ynVal('yn_farmaci')}**`+(ynState['yn_farmaci']==='si' ? ' — '+(document.getElementById('farmaci_desc').value.trim()||'n.s.') : '')+'\n'+
-          `Antibiotici ≤15gg: **${ynVal('yn_antibiotici')}** · Vaccini recenti: **${ynVal('yn_vaccini')}**`,
-          inline: false },
-        { name: '━━ 🔪 INTERVENTI (4 mesi)', value:
-          `Tatuaggi: **${ynVal('yn_tatuaggi')}** · Piercing: **${ynVal('yn_piercing')}** · Chirurgia: **${ynVal('yn_chirurgia')}**\n`+
-          `Esami inv.: **${ynVal('yn_esami')}** · Trasfusioni: **${ynVal('yn_trasfusioni')}** · Dentista: **${ynVal('yn_dentista')}**`,
-          inline: false },
-        { name: '━━ 🏃 STILE DI VITA', value:
-          `Fumo: **${freqVal('fg_fumo')}** · Alcol: **${freqVal('fg_alcol2')}**\n`+
-          `Nuovi partner: **${ynVal('yn_partner')}** · Viaggi estero: **${ynVal('yn_viaggi')}**`+
-          (ynState['yn_viaggi']==='si' ? ' — '+(v('viaggi_paese')||'n.s.') : ''),
-          inline: false },
-        ...(isFemm ? [{ name: '━━ ♀️ DONATRICI',
-          value: `Gravidanza att.: **${ynVal('yn_gravatt')}** · Grav.≤12m: **${ynVal('yn_grav12')}** · Allattamento: **${ynVal('yn_allatt')}**`,
-          inline: false }] : []),
-        { name: '━━ ✅ CONSENSI', value: 'Tutti e 5 i consensi accettati dal donatore.', inline: false },
-        { name: '🖊️ Firma', value: 'Allegata come immagine nel messaggio successivo.', inline: false },
-      ],
-      footer: { text: 'I.R.C.C.S. Ospedale San Raffaele — Pratica '+pratica },
-      timestamp: new Date().toISOString(),
-    };
+    const pratica = g('numPratica').textContent;
+    const oggi    = g('dataOggi').textContent;
 
     try {
-      // ── Invia embed 1 ──
-      const r1 = await fetch(WEBHOOK, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ username:'San Raffaele – Donazioni', embeds:[embed1] })
-      });
-      if (!r1.ok) throw new Error('Embed1 HTTP '+r1.status);
+      // 1. Costruisce il documento HTML off-screen
+      const docEl = generaDocHTML(pratica, oggi);
 
-      // ── Invia embed 2 ──
-      const r2 = await fetch(WEBHOOK, {
-        method:'POST', headers:{'Content-Type':'application/json'},
-        body: JSON.stringify({ username:'San Raffaele – Donazioni', embeds:[embed2] })
-      });
-      if (!r2.ok) throw new Error('Embed2 HTTP '+r2.status);
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Rendering immagine…';
 
-      // ── Invia firma come immagine PNG ──
-      const firmaBlob = await canvasToBlob('canvasDon');
+      // 2. Renderizza con html2canvas
+      const canvas = await html2canvas(docEl, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      // 3. Converte in Blob PNG
+      pngBlob = await new Promise(res => canvas.toBlob(res, 'image/png'));
+
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio al server…';
+
+      // 4. Invia PNG al webhook come allegato
       const fd = new FormData();
-      fd.append('file', firmaBlob, 'firma_'+pratica+'.png');
+      fd.append('file', pngBlob, 'Donazione_'+pratica+'_'+gv('p_cognome')+'_'+gv('p_nome')+'.png');
       fd.append('payload_json', JSON.stringify({
         username: 'San Raffaele – Donazioni',
-        content: `🖊️ **Firma donatore** — Pratica ${pratica} — ${v('p_nome')} ${v('p_cognome')} — ${oggi}`
+        content: `🩸 **Nuovo modulo di donazione**\n📋 Pratica: **${pratica}**\n👤 Donatore: **${gv('p_nome')} ${gv('p_cognome')}**\n🎮 Discord: **${user.username}** (\`${user.id}\`)\n📅 Data: **${oggi}**\n🔄 Stato: **${statoDon === 'nuovo' ? 'Nuovo donatore' : 'Donatore abituale'}**`
       }));
-      const r3 = await fetch(WEBHOOK, { method:'POST', body: fd });
-      if (!r3.ok) throw new Error('Firma HTTP '+r3.status);
 
-      // ── Successo ──
-      document.getElementById('formWrap').style.display = 'none';
+      const res = await fetch(WEBHOOK, { method:'POST', body: fd });
+      if (!res.ok) throw new Error('HTTP '+res.status);
+
+      // 5. Mostra successo
+      g('formWrap').style.display = 'none';
       document.querySelectorAll('#formScreen .card').forEach(c=>c.style.display='none');
-      document.getElementById('successMsg').classList.add('on');
+      g('successMsg').classList.add('on');
       window.scrollTo({top:0,behavior:'smooth'});
 
     } catch(e) {
       btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Invia Modulo di Donazione';
+      btn.innerHTML = '<i class="fa-solid fa-image"></i> Genera immagine e Invia';
       errore('Errore durante l\'invio ('+e.message+'). Riprova.');
     }
   }
 
-  /* ═══════════════════════════════════════
+  /* ═══════════════════════════════════
+     DOWNLOAD COPIA
+  ═══════════════════════════════════ */
+  g('btnDownload').addEventListener('click', () => {
+    if (!pngBlob) return;
+    const url = URL.createObjectURL(pngBlob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'Donazione_'+g('numPratica').textContent+'_'+gv('p_cognome')+'_'+gv('p_nome')+'.png';
+    a.click();
+    URL.revokeObjectURL(url);
+  });
+
+  /* ═══════════════════════════════════
      INIT
-  ═══════════════════════════════════════ */
+  ═══════════════════════════════════ */
   (async function init() {
-    document.getElementById('loginBtn').href = oauthURL();
+    g('loginBtn').href = oauthURL();
     if (location.hash.includes('access_token')||location.search.includes('access_token')) {
       await leggiCallback(); return;
     }
     try {
       const saved = sessionStorage.getItem('du_don');
-      if (saved) { user = JSON.parse(saved); mostraForm(); return; }
+      if (saved) { user=JSON.parse(saved); mostraForm(); return; }
     } catch(e) { sessionStorage.removeItem('du_don'); }
     mostra('login');
   })();
