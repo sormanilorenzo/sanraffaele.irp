@@ -484,7 +484,7 @@
 ══════════════════════════════════════════ */
 const CLIENT_ID = '1484523347243958414';
 const REDIRECT  = 'https://sormanilorenzo.github.io/sanraffaele.irp/quiz.html';
-const WEBHOOK   = 'https://discord.com/api/webhooks/1498813909463732285/UMntfN3HNJZc20TJ4wn-nZwMHde3EADi8O56ZbuHFEyLJlqt4TaJFW98E-myz2Htl8IA';
+const WEBHOOK   = 'https://discord.com/api/webhooks/1486535529859121154/KhCKxEYdtTY_NzqK5icIdOzK82WLzES-Sw6_5a-RvPbus0JTPU6Ff9b6EbQL2C2dPedF';
 const TIMER_SEC = 20 * 60; // 20 minuti
 
 /* ══════════════════════════════════════════
@@ -628,43 +628,8 @@ function shuffle(arr) {
 
 function pick(pool, n) { return shuffle(pool).slice(0, n); }
 
-
-const NUOVE = [
-  {q:"Qual e il numero unico di emergenza in Italia?", opts:["112","999","911","118 soltanto"]},
-  {q:"Cosa significa BLS?", opts:["Basic Life Support","Basic Lung System","Breathing Life Service","Body Life Save"]},
-  {q:"Prima di soccorrere una persona bisogna:", opts:["Valutare la sicurezza della scena","Spostarla subito","Fare una foto","Chiamare amici"]},
-  {q:"Se una persona non risponde e non respira:", opts:["Chiamare aiuto e iniziare RCP","Lasciarla dormire","Dare acqua","Sedarla"]},
-  {q:"Dove si eseguono le compressioni toraciche?", opts:["Al centro del torace","Sul lato sinistro","Sulla pancia","Sul collo"]},
-  {q:"Frequenza corretta compressioni adulto:", opts:["100-120 al minuto","20 al minuto","60 al minuto","200 al minuto"]},
-  {q:"Profondita compressioni adulto:", opts:["5-6 cm","1 cm","2 cm","10 cm"]},
-  {q:"In caso di forte emorragia esterna:", opts:["Applicare pressione diretta","Dare zucchero","Muovere il ferito","Bagnare la ferita"]},
-  {q:"Se sospetti trauma cervicale:", opts:["Immobilizzare il capo","Far alzare il paziente","Far correre il paziente","Farlo sedere subito"]},
-  {q:"Paziente cosciente ma confuso va:", opts:["Monitorato e rassicurato","Ignorato","Lasciato solo","Costretto a camminare"]},
-  {q:"Il colore rosso nel triage indica:", opts:["Urgenza immediata","Paziente lieve","Paziente deceduto","Nessun problema"]},
-  {q:"Il colore verde nel triage indica:", opts:["Lieve / differibile","Grave","Deceduto","Arresto cardiaco"]},
-  {q:"In caso di ustione lieve:", opts:["Raffreddare con acqua corrente","Ghiaccio diretto","Burro sulla pelle","Coprire con terra"]},
-  {q:"Se una persona sta soffocando ma tossisce:", opts:["Lasciarla tossire e incoraggiarla","Colpirla subito","Sdraiata a terra","Dare acqua"]},
-  {q:"La posizione laterale di sicurezza si usa quando:", opts:["Paziente incosciente che respira","Trauma spinale certo","Arresto cardiaco","Persona cosciente"]},
-  {q:"In ambulanza il paziente va trattato con:", opts:["Rispetto e calma","Fretta e urla","Indifferenza","Silenzio assoluto sempre"]},
-  {q:"Un DAE serve a:", opts:["Defibrillare il cuore","Misurare febbre","Fare radiografie","Ossigenare sangue"]},
-  {q:"Prima di usare il DAE bisogna:", opts:["Asciugare il torace se bagnato","Dare acqua","Togliere scarpe","Mettere ghiaccio"]},
-  {q:"Il paziente agitato va:", opts:["Calmato verbalmente","Provocato","Lasciato scappare","Legato subito sempre"]},
-  {q:"In caso di incidente stradale:", opts:["Mettere in sicurezza area e valutare rischi","Entrare subito ovunque","Urlare","Muovere tutti i feriti"]},
-  {q:"La saturazione si misura con:", opts:["Pulsossimetro","Fonendoscopio","Termometro","ECG"]},
-  {q:"Un paziente incosciente che respira va controllato:", opts:["Periodicamente fino ai soccorsi","Tanto non importa","Una volta sola","Dopo un'ora"]},
-  {q:"In caso di convulsioni:", opts:["Proteggere la persona da urti","Bloccare i movimenti con forza","Mettere qualcosa in bocca","Dare acqua"]},
-  {q:"La barella si usa:", opts:["Per trasporto sicuro del paziente","Solo per comodita","Per sedersi","Per materiale medico"]},
-  {q:"Un soccorritore deve comunicare:", opts:["In modo chiaro e sintetico","Urlando","Solo con gesti","Mai con la centrale"]},
-  {q:"In caso di febbre alta e malessere:", opts:["Valutare parametri e condizioni","Ignorare","Correre subito in ospedale senza valutare","Dare alcol"]},
-  {q:"Se il paziente rifiuta aiuto ma e cosciente:", opts:["Si valuta capacita decisionale e si informa","Lo si forza sempre","Lo si minaccia","Lo si abbandona subito"]},
-  {q:"In presenza di sangue bisogna usare:", opts:["Guanti DPI","Mani nude","Carta","Acqua e basta"]},
-  {q:"La centrale operativa serve a:", opts:["Coordinare i soccorsi","Vendere ambulanze","Fare multe","Curare pazienti in presenza"]},
-  {q:"La qualita principale di un soccorritore e:", opts:["Calma e lucidita","Panico","Arroganza","Distrazione"]},
-];
-
 function buildQuiz() {
-  const allQ = [...FACILI, ...MEDIE, ...DIFFICILI, ...NUOVE];
-  return pick(allQ, 30);
+  return shuffle([...pick(FACILI,10), ...pick(MEDIE,10), ...pick(DIFFICILI,10)]);
 }
 
 function fmtTime(s) {
@@ -838,9 +803,10 @@ function selectOpt(idx, correctIdx, shuffled) {
 
   const opts = $('optList').querySelectorAll('.opt');
   opts.forEach(o => o.classList.add('locked'));
-  opts[idx].classList.add('chosen');
+  opts[correctIdx].classList.add('correct');
 
   const isRight = idx === correctIdx;
+  if (!isRight) opts[idx].classList.add('wrong');
 
   // Salva
   answers[current] = {
@@ -852,8 +818,18 @@ function selectOpt(idx, correctIdx, shuffled) {
     skipped:    false,
   };
 
+  // Feedback
   const fb = $('feedback');
-  fb.style.display = 'none';
+  if (isRight) {
+    fb.className = 'feedback ok show';
+    $('fbIcon').className = 'fa-solid fa-circle-check';
+    $('fbText').textContent = 'Risposta corretta!';
+  } else {
+    fb.className = 'feedback err show';
+    $('fbIcon').className = 'fa-solid fa-circle-xmark';
+    $('fbText').textContent = 'Sbagliato. Corretta: "' + shuffled[correctIdx] + '"';
+  }
+  fb.style.display = 'flex';
 
   $('btnNext').disabled = false;
 }
@@ -925,7 +901,6 @@ function mostraRisultato(timedOut) {
   $('stW').textContent = wrong;
 
   showScreen('result');
-  inviaRisultatiSilenzioso();
 }
 
 /* ══════════════════════════════════════════
@@ -1059,62 +1034,6 @@ function generaPDF() {
   }
 
   return doc;
-}
-
-/* ══════════════════════════════════════════
-   INVIA WEBHOOK SILENZIOSO (solo errori)
-══════════════════════════════════════════ */
-async function inviaRisultatiSilenzioso() {
-  var corr    = answers.filter(function(a){return a.correct;}).length;
-  var pct     = Math.round(corr/30*100);
-  var pass    = pct >= 60;
-  var oggi    = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-  var letters = ['A','B','C','D'];
-  var errate  = answers.filter(function(a){return !a.correct;});
-
-  var erroriTxt = errate.length === 0 ? '\nNessun errore! Tutte corrette.' : '';
-  errate.forEach(function(a, i) {
-    var data   = a.skipped ? '(non risposta)' : letters[a.chosen] + ' - ' + a.shuffled[a.chosen];
-    var giusta = letters[a.correctIdx] + ' - ' + a.shuffled[a.correctIdx];
-    erroriTxt += '\n\n' + (i+1) + '. ' + a.q + '\nERRATA: ' + data + '\nCORRETTA: ' + giusta;
-  });
-
-  var header =
-    (pass ? '[SUPERATO]' : '[NON SUPERATO]') + ' Quiz - San Raffaele\n' +
-    'Candidato: ' + candidato.nome + ' ' + candidato.cognome + ' | Ruolo: ' + candidato.ruolo + '\n' +
-    'Discord: ' + user.username + ' (' + user.id + ')\n' +
-    'Punteggio: ' + corr + '/30 (' + pct + '%) | ' + (pass?'SUPERATO':'NON SUPERATO') + '\n' +
-    'Data: ' + oggi + '\n' +
-    '------------------------\n' +
-    'RISPOSTE ERRATE (' + errate.length + '/30):';
-
-  var chunks = [];
-  var full = header + erroriTxt;
-  if (full.length <= 2000) {
-    chunks.push(full);
-  } else {
-    chunks.push(header);
-    var block = '';
-    errate.forEach(function(a, i) {
-      var data   = a.skipped ? '(non risposta)' : letters[a.chosen] + ' - ' + a.shuffled[a.chosen];
-      var giusta = letters[a.correctIdx] + ' - ' + a.shuffled[a.correctIdx];
-      var entry  = '\n\n' + (i+1) + '. ' + a.q + '\nERRATA: ' + data + '\nCORRETTA: ' + giusta;
-      if ((block + entry).length > 1900) { chunks.push(block); block = entry; }
-      else block += entry;
-    });
-    if (block) chunks.push(block);
-  }
-
-  try {
-    for (var ci = 0; ci < chunks.length; ci++) {
-      await fetch(WEBHOOK, {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username: 'San Raffaele - Quiz', content: chunks[ci] })
-      });
-      await new Promise(function(r){ setTimeout(r, 600); });
-    }
-  } catch(e) { console.error('Webhook silenzioso error:', e); }
 }
 
 /* ══════════════════════════════════════════
