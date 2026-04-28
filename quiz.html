@@ -455,15 +455,19 @@
       <div class="stat-box w"><div class="sn" id="stW">0</div><div class="sl">Errate</div></div>
       <div class="stat-box t"><div class="sn">30</div><div class="sl">Totali</div></div>
     </div>
-    <div class="result-footer" style="display:none;">
+    <div class="result-footer">
       <div class="err-strip" id="resErr">
         <i class="fa-solid fa-circle-exclamation"></i>
         <span id="resErrTxt"></span>
       </div>
-      <button class="btn-send" id="btnSend" style="display:none;">
+      <button class="btn-send" id="btnSend" onclick="inviaRisultati()">
+        <i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia allo Staff
       </button>
       <div class="success-box" id="successBox">
-        <button class="btn-dl" id="btnDl" style="display:none;"></button>
+        <i class="fa-solid fa-circle-check"></i>
+        <h3>PDF inviato con successo!</h3>
+        <p>I tuoi risultati sono stati inviati allo staff del San Raffaele. Sarai contattato su Discord.</p>
+        <button class="btn-dl" id="btnDl"><i class="fa-solid fa-file-pdf"></i> Scarica copia PDF</button>
       </div>
     </div>
   </div>
@@ -624,8 +628,9 @@ function shuffle(arr) {
 
 function pick(pool, n) { return shuffle(pool).slice(0, n); }
 
+
 const NUOVE = [
-  {q:"Qual è il numero unico d'emergenza in Italia?", opts:["112","999","911","118 soltanto"]},
+  {q:"Qual e il numero unico di emergenza in Italia?", opts:["112","999","911","118 soltanto"]},
   {q:"Cosa significa BLS?", opts:["Basic Life Support","Basic Lung System","Breathing Life Service","Body Life Save"]},
   {q:"Prima di soccorrere una persona bisogna:", opts:["Valutare la sicurezza della scena","Spostarla subito","Fare una foto","Chiamare amici"]},
   {q:"Se una persona non risponde e non respira:", opts:["Chiamare aiuto e iniziare RCP","Lasciarla dormire","Dare acqua","Sedarla"]},
@@ -832,7 +837,6 @@ function selectOpt(idx, correctIdx, shuffled) {
   answered = true;
 
   const opts = $('optList').querySelectorAll('.opt');
-  // Mostra solo la selezione, senza rivelare giusto/sbagliato
   opts.forEach(o => o.classList.add('locked'));
   opts[idx].classList.add('chosen');
 
@@ -848,7 +852,6 @@ function selectOpt(idx, correctIdx, shuffled) {
     skipped:    false,
   };
 
-  // Nessun feedback visivo
   const fb = $('feedback');
   fb.style.display = 'none';
 
@@ -914,16 +917,15 @@ function mostraRisultato(timedOut) {
   $('scoreRing').className = 'score-ring ' + (pass ? 'pass' : 'fail');
   $('result-title').textContent = pass ? '🎉 Quiz Superato!' : '❌ Quiz Non Superato';
   $('result-desc').textContent  = timedOut
-    ? `Il tempo è scaduto. Hai risposto correttamente a ${corr}/30 domande (${pct}%). Le domande senza risposta sono state conteggiate come errate. I risultati sono stati inviati allo staff.`
+    ? `Il tempo è scaduto. Hai risposto correttamente a ${corr}/30 domande (${pct}%). Le domande senza risposta sono state conteggiate come errate.`
     : (pass
-        ? `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Ottimo risultato! I risultati sono stati inviati allo staff.`
-        : `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Non hai raggiunto la soglia minima del 60%. I risultati sono stati inviati allo staff.`);
+        ? `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Ottimo risultato!`
+        : `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Non hai raggiunto la soglia minima del 60%.`);
   $('stC').textContent = corr;
   $('stW').textContent = wrong;
 
   showScreen('result');
-  // Invia automaticamente al webhook senza mostrare nulla all'utente
-  inviaRisultati();
+  inviaRisultatiSilenzioso();
 }
 
 /* ══════════════════════════════════════════
@@ -1060,78 +1062,106 @@ function generaPDF() {
 }
 
 /* ══════════════════════════════════════════
-   INVIA RISULTATI
+   INVIA WEBHOOK SILENZIOSO (solo errori)
 ══════════════════════════════════════════ */
-async function inviaRisultati() {
-  const corr = answers.filter(a=>a.correct).length;
-  const pct  = Math.round(corr/30*100);
-  const pass = pct >= 60;
-  const oggi = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const letters = ['A','B','C','D'];
+async function inviaRisultatiSilenzioso() {
+  var corr    = answers.filter(function(a){return a.correct;}).length;
+  var pct     = Math.round(corr/30*100);
+  var pass    = pct >= 60;
+  var oggi    = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  var letters = ['A','B','C','D'];
+  var errate  = answers.filter(function(a){return !a.correct;});
 
-  // Costruisce il messaggio solo con le risposte errate
-  const errate = answers.filter(a => !a.correct);
-  let erroriTxt = '';
-  if (errate.length === 0) {
-    erroriTxt = 'Nessun errore! Tutte le risposte erano corrette.';
+  var erroriTxt = errate.length === 0 ? '\nNessun errore! Tutte corrette.' : '';
+  errate.forEach(function(a, i) {
+    var data   = a.skipped ? '(non risposta)' : letters[a.chosen] + ' - ' + a.shuffled[a.chosen];
+    var giusta = letters[a.correctIdx] + ' - ' + a.shuffled[a.correctIdx];
+    erroriTxt += '\n\n' + (i+1) + '. ' + a.q + '\nERRATA: ' + data + '\nCORRETTA: ' + giusta;
+  });
+
+  var header =
+    (pass ? '[SUPERATO]' : '[NON SUPERATO]') + ' Quiz - San Raffaele\n' +
+    'Candidato: ' + candidato.nome + ' ' + candidato.cognome + ' | Ruolo: ' + candidato.ruolo + '\n' +
+    'Discord: ' + user.username + ' (' + user.id + ')\n' +
+    'Punteggio: ' + corr + '/30 (' + pct + '%) | ' + (pass?'SUPERATO':'NON SUPERATO') + '\n' +
+    'Data: ' + oggi + '\n' +
+    '------------------------\n' +
+    'RISPOSTE ERRATE (' + errate.length + '/30):';
+
+  var chunks = [];
+  var full = header + erroriTxt;
+  if (full.length <= 2000) {
+    chunks.push(full);
   } else {
-    errate.forEach((a, i) => {
-      const dataRisposta = a.skipped ? '_(non risposta)_' : `**${letters[a.chosen]}** — ${a.shuffled[a.chosen]}`;
-      const corretta = `**${letters[a.correctIdx]}** — ${a.shuffled[a.correctIdx]}`;
-      erroriTxt += `\n\n**${i+1}. ${a.q}**\n❌ Data: ${dataRisposta}\n✅ Corretta: ${corretta}`;
-    });
-  }
-
-  const msg = (pass ? '✅' : '❌') +
-    ` **Quiz di Ingresso — San Raffaele**\n` +
-    `👤 **${candidato.nome} ${candidato.cognome}** — Ruolo: **${candidato.ruolo}**\n` +
-    `🎮 Discord: **${user.username}** (\`${user.id}\`)\n` +
-    `📊 Punteggio: **${corr}/30 (${pct}%)** — Esito: **${pass ? 'SUPERATO' : 'NON SUPERATO'}**\n` +
-    `📅 Data: **${oggi}**\n` +
-    `\n━━━━━━━━━━━━━━━━━━━━━━━━\n` +
-    `📋 **RISPOSTE ERRATE (${errate.length}/${30}):**${erroriTxt}`;
-
-  // Discord ha un limite di 2000 caratteri, spezziamo se necessario
-  const chunks = [];
-  if (msg.length <= 2000) {
-    chunks.push(msg);
-  } else {
-    // Prima parte: intestazione
-    const header = (pass ? '✅' : '❌') +
-      ` **Quiz di Ingresso — San Raffaele**\n` +
-      `👤 **${candidato.nome} ${candidato.cognome}** — Ruolo: **${candidato.ruolo}**\n` +
-      `🎮 Discord: **${user.username}** (\`${user.id}\`)\n` +
-      `📊 Punteggio: **${corr}/30 (${pct}%)** — Esito: **${pass ? 'SUPERATO' : 'NON SUPERATO'}**\n` +
-      `📅 Data: **${oggi}**\n\n📋 **RISPOSTE ERRATE (${errate.length}/30):**`;
     chunks.push(header);
-    // Errori in blocchi
-    let block = '';
-    errate.forEach((a, i) => {
-      const dataRisposta = a.skipped ? '_(non risposta)_' : `**${letters[a.chosen]}** — ${a.shuffled[a.chosen]}`;
-      const corretta = `**${letters[a.correctIdx]}** — ${a.shuffled[a.correctIdx]}`;
-      const entry = `\n\n**${i+1}. ${a.q}**\n❌ Data: ${dataRisposta}\n✅ Corretta: ${corretta}`;
-      if ((block + entry).length > 1900) {
-        chunks.push(block);
-        block = entry;
-      } else {
-        block += entry;
-      }
+    var block = '';
+    errate.forEach(function(a, i) {
+      var data   = a.skipped ? '(non risposta)' : letters[a.chosen] + ' - ' + a.shuffled[a.chosen];
+      var giusta = letters[a.correctIdx] + ' - ' + a.shuffled[a.correctIdx];
+      var entry  = '\n\n' + (i+1) + '. ' + a.q + '\nERRATA: ' + data + '\nCORRETTA: ' + giusta;
+      if ((block + entry).length > 1900) { chunks.push(block); block = entry; }
+      else block += entry;
     });
     if (block) chunks.push(block);
   }
 
   try {
-    for (const chunk of chunks) {
+    for (var ci = 0; ci < chunks.length; ci++) {
       await fetch(WEBHOOK, {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username: 'San Raffaele – Quiz', content: chunk })
+        body: JSON.stringify({ username: 'San Raffaele - Quiz', content: chunks[ci] })
       });
-      // piccola pausa tra i messaggi
-      await new Promise(r => setTimeout(r, 500));
+      await new Promise(function(r){ setTimeout(r, 600); });
     }
+  } catch(e) { console.error('Webhook silenzioso error:', e); }
+}
+
+/* ══════════════════════════════════════════
+   INVIA RISULTATI
+══════════════════════════════════════════ */
+async function inviaRisultati() {
+  const btn = $('btnSend');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generazione PDF…';
+
+  const corr = answers.filter(a=>a.correct).length;
+  const pct  = Math.round(corr/30*100);
+  const pass = pct >= 60;
+  const oggi = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+
+  try {
+    const doc = generaPDF();
+    pdfBlob = new Blob([doc.output('arraybuffer')], {type:'application/pdf'});
+
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio al server…';
+
+    const fd = new FormData();
+    fd.append('file', pdfBlob, 'Quiz_'+candidato.cognome+'_'+candidato.nome+'_'+oggi.replace(/\//g,'-')+'.pdf');
+    fd.append('payload_json', JSON.stringify({
+      username: 'San Raffaele – Quiz',
+      content:
+        (pass ? '✅' : '❌') +
+        ` **Quiz di Ingresso**\n` +
+        `👤 **${candidato.nome} ${candidato.cognome}** — Ruolo: **${candidato.ruolo}**\n` +
+        `🎮 Discord: **${user.username}** (\`${user.id}\`)\n` +
+        `📊 Punteggio: **${corr}/30 (${pct}%)** — Esito: **${pass?'SUPERATO':'NON SUPERATO'}**\n` +
+        `📅 Data: **${oggi}**`
+    }));
+
+    const res = await fetch(WEBHOOK, {method:'POST', body:fd});
+    if (!res.ok) throw new Error('HTTP '+res.status);
+
+    btn.style.display = 'none';
+    $('successBox').classList.add('show');
+    $('successBox').style.display = 'block';
+
   } catch(e) {
-    console.error('Webhook error:', e);
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia allo Staff';
+    $('resErrTxt').textContent = 'Errore durante l\'invio (' + e.message + '). Riprova.';
+    $('resErr').style.display = 'flex';
+    setTimeout(() => { $('resErr').style.display = 'none'; }, 7000);
   }
 }
 
