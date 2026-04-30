@@ -542,11 +542,18 @@ let user       = null;
 let candidato  = {};
 let questions  = [];
 let current    = 0;
-let answered   = false;
+let answered   = false;   // ha selezionato almeno una risposta
+let canChange  = true;    // può ancora cambiare (diventa false dopo il cambio)
 let answers    = [];
 let timerID    = null;
 let secsLeft   = TIMER_SEC;
 let quizDone   = false;
+
+/* ── ANTI-CHEAT LOG ── */
+const cheatLog = [];   // { ts, type, detail }
+function logCheat(type, detail) {
+  cheatLog.push({ ts: new Date().toISOString(), type, detail });
+}
 
 /* ══════════════════════════════════════════
    UTILITY
@@ -693,7 +700,8 @@ function updateTimerUI() {
    RENDER DOMANDA
 ══════════════════════════════════════════ */
 function renderQ() {
-  answered = false;
+  answered  = false;
+  canChange = true;
   const qd = questions[current];
   const correctText = qd.opts[0];
   const shuffled    = shuffle(qd.opts);
@@ -727,30 +735,77 @@ function renderQ() {
 /* ══════════════════════════════════════════
    SELEZIONE RISPOSTA
    — nessun feedback visivo giusto/sbagliato —
+   — cambio risposta consentito una sola volta —
+   — avanzamento automatico tranne all'ultima —
 ══════════════════════════════════════════ */
 function selectOpt(idx, correctIdx, shuffled) {
-  if (answered) return;
-  answered = true;
-
   const opts = $('optList').querySelectorAll('.opt');
-  // Blocca tutte le opzioni
-  opts.forEach(o => o.classList.add('locked'));
-  // Evidenzia solo la risposta selezionata, senza indicare se è giusta o sbagliata
-  opts[idx].classList.add('chosen');
+  const isLast = (current === 29);
 
-  const isRight = idx === correctIdx;
+  if (!answered) {
+    // Prima selezione
+    answered = true;
 
-  // Salva la risposta internamente
-  answers[current] = {
-    q:          questions[current].q,
-    shuffled:   shuffled,
-    chosen:     idx,
-    correctIdx: correctIdx,
-    correct:    isRight,
-    skipped:    false,
-  };
+    opts[idx].classList.add('chosen');
 
-  $('btnNext').disabled = false;
+    const isRight = idx === correctIdx;
+    answers[current] = {
+      q:          questions[current].q,
+      shuffled:   shuffled,
+      chosen:     idx,
+      correctIdx: correctIdx,
+      correct:    isRight,
+      skipped:    false,
+    };
+
+    $('btnNext').disabled = false;
+
+    // Avanza automaticamente dopo 600ms, tranne all'ultima domanda
+    if (!isLast) {
+      setTimeout(() => {
+        // Controlla che non abbiano già cambiato idea nel frattempo
+        if (answered && !canChange) {
+          nextQ();
+        } else if (answered && canChange) {
+          // L'utente non ha cambiato: blocca e avanza
+          canChange = false;
+          opts.forEach(o => o.classList.add('locked'));
+          nextQ();
+        }
+      }, 600);
+    } else {
+      // Ultima domanda: blocca subito, il pulsante lo deve cliccare
+      opts.forEach(o => o.classList.add('locked'));
+      canChange = false;
+    }
+
+  } else if (canChange && idx !== answers[current].chosen) {
+    // Secondo click su opzione diversa: cambio consentito una volta
+    canChange = false;
+
+    // Rimuove chosen dalla vecchia scelta
+    opts.forEach(o => o.classList.remove('chosen'));
+    opts[idx].classList.add('chosen');
+
+    // Blocca definitivamente tutte le opzioni
+    opts.forEach(o => o.classList.add('locked'));
+
+    const isRight = idx === correctIdx;
+    answers[current] = {
+      q:          questions[current].q,
+      shuffled:   shuffled,
+      chosen:     idx,
+      correctIdx: correctIdx,
+      correct:    isRight,
+      skipped:    false,
+    };
+
+    // Avanza automaticamente dopo il cambio, tranne all'ultima
+    if (!isLast) {
+      setTimeout(() => nextQ(), 600);
+    }
+  }
+  // Se canChange è false e hanno già risposto: ignora il click
 }
 
 /* ══════════════════════════════════════════
@@ -798,6 +853,50 @@ function fineQuiz(timedOut) {
 
   // Invia automaticamente e mostra schermata di attesa
   inviaRisultatiAuto(timedOut);
+}
+
+/* ══════════════════════════════════════════
+   BUILD CHEAT LOG FIELDS PER WEBHOOK
+══════════════════════════════════════════ */
+function buildCheatFields() {
+  if (cheatLog.length === 0) {
+    return [{ name: '🛡️ Comportamenti sospetti', value: 'Nessuno rilevato', inline: false }];
+  }
+
+  // Conta per tipo
+  const counts = {};
+  cheatLog.forEach(e => { counts[e.type] = (counts[e.type] || 0) + 1; });
+
+  const labels = {
+    F12:               '🔍 F12',
+    CTRL_U:            '🔍 Ctrl+U',
+    CTRL_S:            '💾 Ctrl+S',
+    CTRL_P:            '🖨️ Ctrl+P',
+    DEVTOOLS_SHORTCUT: '🔧 DevTools shortcut',
+    TASTO_DESTRO:      '🖱️ Tasto destro',
+    PAGINA_NASCOSTA:   '👁️ Cambio scheda/minimizza',
+    FOCUS_PERSO:       '🪟 Fuori dalla finestra',
+    RIDIMENSIONAMENTO: '📐 Ridimensionamento finestra',
+  };
+
+  let summary = '';
+  Object.entries(counts).forEach(([type, n]) => {
+    summary += `${labels[type] || type}: **${n}x**\n`;
+  });
+
+  // Log dettagliato (max 900 char)
+  let detail = '';
+  cheatLog.forEach((e, i) => {
+    const line = `${i+1}. [${e.ts.slice(11,19)}] ${e.type} — ${e.detail}\n`;
+    if ((detail + line).length < 900) detail += line;
+  });
+  if (detail === '') detail = '(troppi eventi, vedi sommario)';
+
+  const fields = [
+    { name: `⚠️ Comportamenti sospetti (${cheatLog.length} eventi)`, value: summary.trim() || '—' },
+    { name: '📋 Log dettagliato', value: '```\n' + detail.trim() + '\n```' },
+  ];
+  return fields;
 }
 
 /* ══════════════════════════════════════════
@@ -862,6 +961,7 @@ async function inviaRisultatiAuto(timedOut) {
         { name: '📊 Punteggio',       value: `${corr}/30 (${pct}%)`,                  inline: true },
         { name: '📅 Data',            value: oggi,                                     inline: true },
         { name: timedOut ? '⏰ Note' : '📝 Note', value: timedOut ? 'Tempo scaduto durante il quiz' : '—', inline: true },
+        ...buildCheatFields(),
         ...errateFields,
       ],
       footer: { text: 'I.R.C.C.S. Ospedale San Raffaele — Sistema Quiz di Ingresso' },
@@ -889,6 +989,74 @@ async function inviaRisultatiAuto(timedOut) {
     $('result-desc').textContent  = 'Si è verificato un errore durante l\'invio (' + e.message + '). Contatta lo staff su Discord.';
   }
 }
+
+/* ══════════════════════════════════════════
+   ANTI-CHEAT
+══════════════════════════════════════════ */
+
+// Blocca tasto destro
+document.addEventListener('contextmenu', e => {
+  e.preventDefault();
+  logCheat('TASTO_DESTRO', 'contextmenu');
+});
+
+// Blocca tasti pericolosi (F12, Ctrl+U, Ctrl+S, Ctrl+Shift+I/J/C, Ctrl+P)
+document.addEventListener('keydown', e => {
+  const ctrl  = e.ctrlKey || e.metaKey;
+  const shift = e.shiftKey;
+  const k     = e.key;
+
+  if (k === 'F12') {
+    e.preventDefault();
+    logCheat('F12', 'keydown F12');
+    return;
+  }
+  if (ctrl && k.toLowerCase() === 'u') {
+    e.preventDefault();
+    logCheat('CTRL_U', 'keydown Ctrl+U');
+    return;
+  }
+  if (ctrl && k.toLowerCase() === 's') {
+    e.preventDefault();
+    logCheat('CTRL_S', 'keydown Ctrl+S');
+    return;
+  }
+  if (ctrl && k.toLowerCase() === 'p') {
+    e.preventDefault();
+    logCheat('CTRL_P', 'keydown Ctrl+P');
+    return;
+  }
+  if (ctrl && shift && ['i','j','c','k'].includes(k.toLowerCase())) {
+    e.preventDefault();
+    logCheat('DEVTOOLS_SHORTCUT', `keydown Ctrl+Shift+${k.toUpperCase()}`);
+    return;
+  }
+});
+
+// Rileva visibilità pagina (cambio scheda / minimizza / alt+tab)
+document.addEventListener('visibilitychange', () => {
+  if (document.hidden) {
+    logCheat('PAGINA_NASCOSTA', 'visibilitychange → hidden');
+  }
+});
+
+// Rileva uscita dalla finestra (blur)
+window.addEventListener('blur', () => {
+  logCheat('FOCUS_PERSO', 'window blur');
+});
+
+// Rileva ridimensionamento finestra
+let _lastW = window.innerWidth, _lastH = window.innerHeight;
+window.addEventListener('resize', () => {
+  const dw = Math.abs(window.innerWidth  - _lastW);
+  const dh = Math.abs(window.innerHeight - _lastH);
+  // Soglia: variazioni > 50px (evita falsi positivi da scroll bar)
+  if (dw > 50 || dh > 50) {
+    logCheat('RIDIMENSIONAMENTO', `${_lastW}x${_lastH} → ${window.innerWidth}x${window.innerHeight}`);
+  }
+  _lastW = window.innerWidth;
+  _lastH = window.innerHeight;
+});
 
 /* ══════════════════════════════════════════
    INIT
