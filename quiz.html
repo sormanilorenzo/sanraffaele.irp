@@ -189,27 +189,13 @@
       font-size: 14px; font-weight: 500; color: var(--dark);
     }
     .opt:hover:not(.locked) { border-color: var(--blue); background: var(--blue-light); }
-    .opt.chosen:not(.locked) { border-color: var(--blue); background: var(--blue-light); font-weight: 700; }
-    .opt.correct  { border-color: var(--green) !important; background: var(--green-bg) !important; color: var(--green) !important; font-weight: 700; }
-    .opt.wrong    { border-color: var(--red)   !important; background: var(--red-bg)   !important; color: var(--red)   !important; font-weight: 700; }
+    .opt.chosen { border-color: var(--blue); background: var(--blue-light); font-weight: 700; }
     .opt-letter {
       width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--border);
       display: flex; align-items: center; justify-content: center;
       font-size: 11.5px; font-weight: 700; color: var(--gray); flex-shrink: 0; transition: all .15s;
     }
-    .opt.chosen:not(.locked) .opt-letter { border-color: var(--blue); background: var(--blue); color: #fff; }
-    .opt.correct .opt-letter { border-color: var(--green); background: var(--green); color: #fff; }
-    .opt.wrong   .opt-letter { border-color: var(--red);   background: var(--red);   color: #fff; }
-
-    /* Feedback */
-    .feedback {
-      margin-top: 12px; padding: 11px 15px; border-radius: 8px;
-      font-size: 13.5px; font-weight: 600; display: none;
-      align-items: center; gap: 9px;
-    }
-    .feedback.show { display: flex; }
-    .feedback.ok  { background: var(--green-bg); border: 1.5px solid var(--green); color: var(--green); }
-    .feedback.err { background: var(--red-bg);   border: 1.5px solid var(--red);   color: var(--red); }
+    .opt.chosen .opt-letter { border-color: var(--blue); background: var(--blue); color: #fff; }
 
     /* Nav quiz */
     .quiz-nav { display: flex; justify-content: flex-end; }
@@ -235,11 +221,7 @@
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       margin: 0 auto 18px; border: 4px solid var(--blue);
     }
-    .score-ring.pass { border-color: var(--green); }
-    .score-ring.fail { border-color: var(--red); }
     .score-n { font-family: 'Playfair Display', serif; font-size: 2.4rem; font-weight: 700; line-height: 1; }
-    .score-ring.pass .score-n { color: var(--green); }
-    .score-ring.fail .score-n { color: var(--red); }
     .score-sub { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--gray); }
     #result-title { font-family: 'Playfair Display', serif; font-size: 1.55rem; color: var(--dark); margin-bottom: 8px; }
     #result-desc  { font-size: 14px; color: var(--gray); line-height: 1.7; max-width: 460px; margin: 0 auto; }
@@ -247,18 +229,7 @@
     .stat-box { background: var(--bg); border-radius: 9px; padding: 14px; text-align: center; }
     .stat-box .sn { font-family: 'Playfair Display', serif; font-size: 1.55rem; font-weight: 700; }
     .stat-box .sl { font-size: 11px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .5px; }
-    .stat-box.c .sn { color: var(--green); }
-    .stat-box.w .sn { color: var(--red); }
-    .stat-box.t .sn { color: var(--blue); }
     .result-footer { padding: 0 32px 32px; display: flex; flex-direction: column; gap: 14px; }
-    .btn-send {
-      width: 100%; padding: 14px; background: var(--blue); color: #fff;
-      border: none; border-radius: 9px; font-family: 'DM Sans', sans-serif;
-      font-size: 15px; font-weight: 700; cursor: pointer; transition: all .2s;
-      display: flex; align-items: center; justify-content: center; gap: 10px;
-    }
-    .btn-send:hover:not(:disabled) { background: var(--blue-dark); transform: translateY(-2px); box-shadow: 0 8px 24px rgba(26,78,143,.28); }
-    .btn-send:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
     .success-box {
       background: var(--green-bg); border: 1.5px solid var(--green);
       border-radius: 10px; padding: 20px 22px; text-align: center; display: none;
@@ -267,13 +238,6 @@
     .success-box i   { font-size: 1.9rem; color: var(--green); margin-bottom: 8px; display: block; }
     .success-box h3  { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--dark); margin-bottom: 5px; }
     .success-box p   { font-size: 13.5px; color: var(--gray); }
-    .btn-dl {
-      display: inline-flex; align-items: center; gap: 8px; margin-top: 12px;
-      background: var(--green); color: #fff; border: none; border-radius: 8px;
-      padding: 9px 22px; font-size: 13.5px; font-weight: 700; cursor: pointer;
-      font-family: 'DM Sans', sans-serif; transition: background .2s;
-    }
-    .btn-dl:hover { background: #157a4a; }
     .err-strip {
       background: var(--red-bg); border: 1.5px solid var(--red);
       border-radius: 8px; padding: 11px 14px; font-size: 13.5px;
@@ -425,9 +389,6 @@
       </div>
       <div class="question-body">
         <div class="options" id="optList"></div>
-        <div class="feedback" id="feedback">
-          <i id="fbIcon"></i><span id="fbText"></span>
-        </div>
       </div>
     </div>
 
@@ -445,29 +406,15 @@
     <div class="result-top">
       <div class="score-ring" id="scoreRing">
         <span class="score-n" id="scoreN">—</span>
-        <span class="score-sub">/ 30</span>
       </div>
       <h2 id="result-title">Risultato</h2>
       <p id="result-desc"></p>
     </div>
-    <div class="stat-row">
-      <div class="stat-box c"><div class="sn" id="stC">0</div><div class="sl">Corrette</div></div>
-      <div class="stat-box w"><div class="sn" id="stW">0</div><div class="sl">Errate</div></div>
-      <div class="stat-box t"><div class="sn">30</div><div class="sl">Totali</div></div>
-    </div>
     <div class="result-footer">
-      <div class="err-strip" id="resErr">
-        <i class="fa-solid fa-circle-exclamation"></i>
-        <span id="resErrTxt"></span>
-      </div>
-      <button class="btn-send" id="btnSend" onclick="inviaRisultati()">
-        <i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia allo Staff
-      </button>
       <div class="success-box" id="successBox">
         <i class="fa-solid fa-circle-check"></i>
-        <h3>PDF inviato con successo!</h3>
-        <p>I tuoi risultati sono stati inviati allo staff del San Raffaele. Sarai contattato su Discord.</p>
-        <button class="btn-dl" id="btnDl"><i class="fa-solid fa-file-pdf"></i> Scarica copia PDF</button>
+        <h3>Risposte inviate!</h3>
+        <p>Le tue risposte sono state inviate allo staff del San Raffaele. Sarai contattato su Discord.</p>
       </div>
     </div>
   </div>
@@ -476,8 +423,6 @@
 
 <footer>© 2026 I.R.C.C.S. Ospedale San Raffaele S.r.l. — P.IVA 07636600962</footer>
 
-<!-- jsPDF -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 /* ══════════════════════════════════════════
    CONFIG
@@ -598,17 +543,15 @@ let candidato  = {};
 let questions  = [];
 let current    = 0;
 let answered   = false;
-let answers    = [];      // { q, shuffled, chosen, correctIdx, correct }
+let answers    = [];
 let timerID    = null;
 let secsLeft   = TIMER_SEC;
-let pdfBlob    = null;
 let quizDone   = false;
 
 /* ══════════════════════════════════════════
    UTILITY
 ══════════════════════════════════════════ */
 function $(id) { return document.getElementById(id); }
-
 function show(id) { $(id).style.display = ''; }
 function hide(id) { $(id).style.display = 'none'; }
 
@@ -689,13 +632,6 @@ function mostraInfo() {
   showScreen('info');
 }
 
-function logout() {
-  sessionStorage.removeItem('quser');
-  user = null;
-  $('navUser').classList.remove('show');
-  showScreen('login');
-}
-
 /* ══════════════════════════════════════════
    AVVIO QUIZ
 ══════════════════════════════════════════ */
@@ -746,7 +682,7 @@ function startTimer() {
 
 function updateTimerUI() {
   const pct = (secsLeft / TIMER_SEC) * 100;
-  const urgent = secsLeft <= 120; // ultimi 2 minuti
+  const urgent = secsLeft <= 120;
   $('timerVal').textContent = fmtTime(secsLeft);
   $('timerVal').className   = 'timer-val' + (urgent ? ' urgent' : '');
   $('timerFill').style.width = pct + '%';
@@ -773,14 +709,8 @@ function renderQ() {
   $('btnNext').disabled   = true;
   $('btnNext').innerHTML  = n < 30
     ? 'Avanti <i class="fa-solid fa-arrow-right"></i>'
-    : 'Vedi risultati <i class="fa-solid fa-flag-checkered"></i>';
+    : 'Termina Quiz <i class="fa-solid fa-flag-checkered"></i>';
 
-  // Reset feedback
-  const fb = $('feedback');
-  fb.className = 'feedback';
-  fb.style.display = 'none';
-
-  // Opzioni
   const list = $('optList');
   list.innerHTML = '';
   const letters = ['A','B','C','D'];
@@ -796,19 +726,21 @@ function renderQ() {
 
 /* ══════════════════════════════════════════
    SELEZIONE RISPOSTA
+   — nessun feedback visivo giusto/sbagliato —
 ══════════════════════════════════════════ */
 function selectOpt(idx, correctIdx, shuffled) {
   if (answered) return;
   answered = true;
 
   const opts = $('optList').querySelectorAll('.opt');
+  // Blocca tutte le opzioni
   opts.forEach(o => o.classList.add('locked'));
-  opts[correctIdx].classList.add('correct');
+  // Evidenzia solo la risposta selezionata, senza indicare se è giusta o sbagliata
+  opts[idx].classList.add('chosen');
 
   const isRight = idx === correctIdx;
-  if (!isRight) opts[idx].classList.add('wrong');
 
-  // Salva
+  // Salva la risposta internamente
   answers[current] = {
     q:          questions[current].q,
     shuffled:   shuffled,
@@ -817,19 +749,6 @@ function selectOpt(idx, correctIdx, shuffled) {
     correct:    isRight,
     skipped:    false,
   };
-
-  // Feedback
-  const fb = $('feedback');
-  if (isRight) {
-    fb.className = 'feedback ok show';
-    $('fbIcon').className = 'fa-solid fa-circle-check';
-    $('fbText').textContent = 'Risposta corretta!';
-  } else {
-    fb.className = 'feedback err show';
-    $('fbIcon').className = 'fa-solid fa-circle-xmark';
-    $('fbText').textContent = 'Sbagliato. Corretta: "' + shuffled[correctIdx] + '"';
-  }
-  fb.style.display = 'flex';
 
   $('btnNext').disabled = false;
 }
@@ -869,7 +788,7 @@ function fineQuiz(timedOut) {
       answers[i] = {
         q:          qd.q,
         shuffled:   qd._shuffled,
-        chosen:     -1,           // -1 = non risposta
+        chosen:     -1,
         correctIdx: qd._correctIdx,
         correct:    false,
         skipped:    true,
@@ -877,222 +796,99 @@ function fineQuiz(timedOut) {
     }
   }
 
-  mostraRisultato(timedOut);
+  // Invia automaticamente e mostra schermata di attesa
+  inviaRisultatiAuto(timedOut);
 }
 
 /* ══════════════════════════════════════════
-   RISULTATO
+   INVIO AUTOMATICO WEBHOOK
+   — il candidato NON vede punteggio né risposte —
+   — il webhook mostra SOLO le domande errate —
 ══════════════════════════════════════════ */
-function mostraRisultato(timedOut) {
-  const corr  = answers.filter(a => a.correct).length;
-  const wrong = 30 - corr;
-  const pct   = Math.round(corr / 30 * 100);
-  const pass  = pct >= 60;
-
-  $('scoreN').textContent  = corr;
-  $('scoreRing').className = 'score-ring ' + (pass ? 'pass' : 'fail');
-  $('result-title').textContent = pass ? '🎉 Quiz Superato!' : '❌ Quiz Non Superato';
-  $('result-desc').textContent  = timedOut
-    ? `Il tempo è scaduto. Hai risposto correttamente a ${corr}/30 domande (${pct}%). Le domande senza risposta sono state conteggiate come errate.`
-    : (pass
-        ? `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Ottimo risultato!`
-        : `Hai risposto correttamente a ${corr}/30 domande (${pct}%). Non hai raggiunto la soglia minima del 60%.`);
-  $('stC').textContent = corr;
-  $('stW').textContent = wrong;
-
+async function inviaRisultatiAuto(timedOut) {
+  // Mostra schermata di attesa generica
   showScreen('result');
-}
+  $('scoreRing').innerHTML = '<i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--blue)"></i>';
+  $('result-title').textContent = 'Invio in corso…';
+  $('result-desc').textContent  = 'Le tue risposte vengono elaborate. Attendi.';
 
-/* ══════════════════════════════════════════
-   GENERA PDF
-══════════════════════════════════════════ */
-function generaPDF() {
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'a4' });
-  const W=210, ML=14, CW=182;
-  let y = 0;
-
-  const BLUE  = [26,78,143];
-  const DARK  = [13,27,42];
-  const GRAY  = [107,122,141];
-  const LGRAY = [244,247,252];
-  const GREEN = [26,143,90];
-  const RED   = [192,57,43];
-  const WHITE = [255,255,255];
-
-  const oggi = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const corr = answers.filter(a=>a.correct).length;
-  const pct  = Math.round(corr/30*100);
+  const corr = answers.filter(a => a.correct).length;
+  const pct  = Math.round(corr / 30 * 100);
   const pass = pct >= 60;
+  const oggi = new Date().toLocaleDateString('it-IT', {day:'2-digit', month:'2-digit', year:'numeric'});
 
-  function checkY(n=12) {
-    if (y + n > 278) { doc.addPage(); y = 16; }
-  }
+  // Costruisce la lista delle sole risposte errate
+  const errate = answers
+    .map((ans, i) => ({ ...ans, num: i + 1 }))
+    .filter(ans => !ans.correct);
 
-  // ── HEADER ──
-  doc.setFillColor(...BLUE);
-  doc.rect(0,0,W,36,'F');
-  doc.setFillColor(13,43,94);
-  doc.rect(0,0,7,36,'F');
-  doc.setTextColor(...WHITE);
-  doc.setFont('helvetica','bold'); doc.setFontSize(15);
-  doc.text('I.R.C.C.S. OSPEDALE SAN RAFFAELE', ML+4,13);
-  doc.setFont('helvetica','normal'); doc.setFontSize(9.5);
-  doc.text('RISULTATI QUIZ DI INGRESSO — PERSONALE SANITARIO', ML+4,20);
-  doc.setFontSize(8);
-  doc.text('Discord: '+user.username+' ('+user.id+')', ML+4,27);
-  doc.text('Data: '+oggi, ML+4,32);
-
-  y = 44;
-
-  // ── DATI CANDIDATO ──
-  doc.setFillColor(...LGRAY);
-  doc.roundedRect(ML,y,CW,20,2,2,'F');
-  doc.setTextColor(...GRAY); doc.setFont('helvetica','normal'); doc.setFontSize(7.5);
-  doc.text('CANDIDATO', ML+4, y+4.5);
-  doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(10);
-  doc.text(candidato.nome+' '+candidato.cognome, ML+4, y+10.5);
-  doc.setFont('helvetica','normal'); doc.setFontSize(8.5);
-  doc.text('Ruolo richiesto: '+candidato.ruolo+'   |   Nato/a il: '+candidato.nascita, ML+4, y+16);
-  y += 26;
-
-  // ── BANNER ESITO ──
-  checkY(14);
-  doc.setFillColor(pass ? ...GREEN : ...RED);
-  doc.roundedRect(ML,y,CW,13,2,2,'F');
-  doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(12.5);
-  doc.text((pass?'✓  SUPERATO':'✗  NON SUPERATO')+'   —   '+corr+'/30 corrette  ('+pct+'%)', ML+5, y+9);
-  y += 20;
-
-  // ── DOMANDE ──
-  const letters = ['A','B','C','D'];
-  answers.forEach((ans, i) => {
-    const linesNeeded = 12 + ans.shuffled.length * 9 + 6;
-    checkY(linesNeeded);
-
-    // Header domanda
-    const isOk = ans.correct;
-    doc.setFillColor(isOk ? 220,240,230 : 253,240,239);
-    doc.roundedRect(ML, y, CW, 10, 1.5, 1.5, 'F');
-    doc.setFillColor(isOk ? ...GREEN : ...RED);
-    doc.roundedRect(ML,y,6,10,1,1,'F');
-    doc.setTextColor(...WHITE); doc.setFont('helvetica','bold'); doc.setFontSize(9);
-    doc.text(isOk ? '✓' : '✗', ML+1.2, y+7);
-    doc.setTextColor(...DARK); doc.setFont('helvetica','bold'); doc.setFontSize(8.5);
-    const qtxt = (i+1)+'. '+ans.q;
-    const qlines = doc.splitTextToSize(qtxt, CW-12);
-    doc.text(qlines[0].substring(0,90), ML+9, y+6.8);
-    y += 12;
-
-    // Opzioni
-    ans.shuffled.forEach((opt, oi) => {
-      checkY(8.5);
-      const isCorrect = oi === ans.correctIdx;
-      const isChosen  = oi === ans.chosen;
-      const isSkipped = ans.skipped && isCorrect;
-
-      let bg, tc;
-      if (isCorrect) { bg=GREEN; tc=WHITE; }
-      else if (isChosen && !isCorrect) { bg=RED; tc=WHITE; }
-      else { bg=[235,240,248]; tc=DARK; }
-
-      doc.setFillColor(...bg);
-      doc.roundedRect(ML+3,y,CW-3,7.5,1,1,'F');
-
-      // Lettera
-      doc.setFillColor(isCorrect||(isChosen&&!isCorrect) ? WHITE : BLUE);
-      doc.circle(ML+8.5,y+3.75,2.8,'F');
-      doc.setTextColor(isCorrect ? ...GREEN : isChosen ? ...RED : ...WHITE);
-      doc.setFont('helvetica','bold'); doc.setFontSize(7);
-      doc.text(letters[oi], ML+7.2, y+5.3);
-
-      doc.setTextColor(...tc);
-      doc.setFont('helvetica', isCorrect||(isChosen&&!isCorrect) ? 'bold' : 'normal');
-      doc.setFontSize(8);
-      doc.text(opt.substring(0,82), ML+13.5, y+5.3);
-
-      // Tag
-      doc.setFontSize(7); doc.setFont('helvetica','bold');
-      if (isCorrect && !ans.skipped)    doc.text('[CORRETTA]', W-24, y+5.3);
-      if (isChosen && !isCorrect)       doc.text('[TUA RISPOSTA]', W-30, y+5.3);
-      if (ans.skipped && isCorrect)     doc.text('[NON RISPOSTA – ERRATA]', W-42, y+5.3);
-
-      y += 9;
+  // Spezza in chunk da max 1024 caratteri per i campi embed Discord
+  function buildErrateFields(errate) {
+    if (errate.length === 0) {
+      return [{ name: '✅ Risposte errate (0)', value: 'Nessuna risposta errata — punteggio perfetto!' }];
+    }
+    const fields = [];
+    let chunk = '';
+    let chunkNum = 1;
+    errate.forEach((ans) => {
+      const scelta   = ans.skipped ? '*(non risposta)*' : ans.shuffled[ans.chosen];
+      const corretta = ans.shuffled[ans.correctIdx];
+      const line = `**${ans.num}. ${ans.q}**\n❌ Data: ${scelta}\n✅ Corretta: ${corretta}\n\n`;
+      if ((chunk + line).length > 1000) {
+        fields.push({ name: chunkNum === 1 ? `❌ Risposte errate (${errate.length})` : `↳ continua`, value: chunk.trim() });
+        chunk = line;
+        chunkNum++;
+      } else {
+        chunk += line;
+      }
     });
-    y += 5;
-  });
-
-  // ── FOOTER ogni pagina ──
-  const tot = doc.internal.getNumberOfPages();
-  for (let p=1;p<=tot;p++) {
-    doc.setPage(p);
-    doc.setFillColor(...BLUE);
-    doc.rect(0,287,W,10,'F');
-    doc.setTextColor(...WHITE); doc.setFont('helvetica','normal'); doc.setFontSize(7);
-    doc.text('I.R.C.C.S. Ospedale San Raffaele — Quiz di Ingresso — '+oggi, ML, 293);
-    doc.text('Pag.'+p+'/'+tot, 194, 293);
+    if (chunk.trim()) {
+      fields.push({ name: chunkNum === 1 ? `❌ Risposte errate (${errate.length})` : `↳ continua`, value: chunk.trim() });
+    }
+    return fields;
   }
 
-  return doc;
-}
+  const errateFields = buildErrateFields(errate);
 
-/* ══════════════════════════════════════════
-   INVIA RISULTATI
-══════════════════════════════════════════ */
-async function inviaRisultati() {
-  const btn = $('btnSend');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generazione PDF…';
-
-  const corr = answers.filter(a=>a.correct).length;
-  const pct  = Math.round(corr/30*100);
-  const pass = pct >= 60;
-  const oggi = new Date().toLocaleDateString('it-IT',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const webhookPayload = {
+    username: 'San Raffaele – Quiz',
+    embeds: [{
+      title: (pass ? '✅ SUPERATO' : '❌ NON SUPERATO') + ' — Quiz di Ingresso',
+      color: pass ? 0x1a8f5a : 0xc0392b,
+      fields: [
+        { name: '👤 Candidato',       value: `${candidato.nome} ${candidato.cognome}`, inline: true },
+        { name: '🏥 Ruolo richiesto', value: candidato.ruolo,                          inline: true },
+        { name: '🎮 Discord',         value: `${user.username} (\`${user.id}\`)`,      inline: true },
+        { name: '📊 Punteggio',       value: `${corr}/30 (${pct}%)`,                  inline: true },
+        { name: '📅 Data',            value: oggi,                                     inline: true },
+        { name: timedOut ? '⏰ Note' : '📝 Note', value: timedOut ? 'Tempo scaduto durante il quiz' : '—', inline: true },
+        ...errateFields,
+      ],
+      footer: { text: 'I.R.C.C.S. Ospedale San Raffaele — Sistema Quiz di Ingresso' },
+      timestamp: new Date().toISOString(),
+    }]
+  };
 
   try {
-    const doc = generaPDF();
-    pdfBlob = new Blob([doc.output('arraybuffer')], {type:'application/pdf'});
+    const res = await fetch(WEBHOOK, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify(webhookPayload),
+    });
+    if (!res.ok) throw new Error('HTTP ' + res.status);
 
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Invio al server…';
-
-    const fd = new FormData();
-    fd.append('file', pdfBlob, 'Quiz_'+candidato.cognome+'_'+candidato.nome+'_'+oggi.replace(/\//g,'-')+'.pdf');
-    fd.append('payload_json', JSON.stringify({
-      username: 'San Raffaele – Quiz',
-      content:
-        (pass ? '✅' : '❌') +
-        ` **Quiz di Ingresso**\n` +
-        `👤 **${candidato.nome} ${candidato.cognome}** — Ruolo: **${candidato.ruolo}**\n` +
-        `🎮 Discord: **${user.username}** (\`${user.id}\`)\n` +
-        `📊 Punteggio: **${corr}/30 (${pct}%)** — Esito: **${pass?'SUPERATO':'NON SUPERATO'}**\n` +
-        `📅 Data: **${oggi}**`
-    }));
-
-    const res = await fetch(WEBHOOK, {method:'POST', body:fd});
-    if (!res.ok) throw new Error('HTTP '+res.status);
-
-    btn.style.display = 'none';
-    $('successBox').classList.add('show');
+    // Mostra solo conferma di invio — nessun punteggio visibile al candidato
+    $('scoreRing').innerHTML = '<i class="fa-solid fa-circle-check" style="font-size:2.5rem;color:var(--green)"></i>';
+    $('result-title').textContent = 'Quiz completato!';
+    $('result-desc').textContent  = 'Le tue risposte sono state inviate allo staff del San Raffaele. Sarai contattato su Discord.';
     $('successBox').style.display = 'block';
 
   } catch(e) {
-    btn.disabled = false;
-    btn.innerHTML = '<i class="fa-solid fa-file-pdf"></i> Genera PDF e Invia allo Staff';
-    $('resErrTxt').textContent = 'Errore durante l\'invio (' + e.message + '). Riprova.';
-    $('resErr').style.display = 'flex';
-    setTimeout(() => { $('resErr').style.display = 'none'; }, 7000);
+    $('scoreRing').innerHTML = '<i class="fa-solid fa-circle-xmark" style="font-size:2.5rem;color:var(--red)"></i>';
+    $('result-title').textContent = 'Errore di invio';
+    $('result-desc').textContent  = 'Si è verificato un errore durante l\'invio (' + e.message + '). Contatta lo staff su Discord.';
   }
 }
-
-$('btnDl').addEventListener('click', () => {
-  if (!pdfBlob) return;
-  const url = URL.createObjectURL(pdfBlob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'Quiz_'+candidato.cognome+'_'+candidato.nome+'.pdf';
-  a.click();
-  URL.revokeObjectURL(url);
-});
 
 /* ══════════════════════════════════════════
    INIT
@@ -1100,13 +896,10 @@ $('btnDl').addEventListener('click', () => {
 $('loginBtn').href = oauthURL();
 
 (async function init() {
-  // Callback OAuth2?
   if (location.hash.includes('access_token') || location.search.includes('access_token')) {
     await handleCallback();
     return;
   }
-
-  // Sessione salvata?
   try {
     const saved = sessionStorage.getItem('quser');
     if (saved) {
@@ -1114,8 +907,6 @@ $('loginBtn').href = oauthURL();
       if (user && user.id) { mostraInfo(); return; }
     }
   } catch(e) { sessionStorage.removeItem('quser'); }
-
-  // Default: mostra login
   showScreen('login');
 })();
 </script>
