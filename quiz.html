@@ -389,6 +389,9 @@
       </div>
       <div class="question-body">
         <div class="options" id="optList"></div>
+        <div id="changeHint" style="display:none; align-items:center; gap:8px; margin-top:10px; padding:9px 14px; background:#fff8e1; border:1.5px solid #f0c040; border-radius:8px; font-size:12.5px; font-weight:600; color:#7a5c00;">
+          <i class="fa-solid fa-rotate-left"></i> Puoi ancora cambiare risposta una volta — poi si avanza automaticamente
+        </div>
       </div>
     </div>
 
@@ -700,8 +703,9 @@ function updateTimerUI() {
    RENDER DOMANDA
 ══════════════════════════════════════════ */
 function renderQ() {
-  answered  = false;
-  canChange = true;
+  answered      = false;
+  canChange     = true;
+  _autoAdvTimer = null;
   const qd = questions[current];
   const correctText = qd.opts[0];
   const shuffled    = shuffle(qd.opts);
@@ -734,78 +738,84 @@ function renderQ() {
 
 /* ══════════════════════════════════════════
    SELEZIONE RISPOSTA
-   — nessun feedback visivo giusto/sbagliato —
-   — cambio risposta consentito una sola volta —
-   — avanzamento automatico tranne all'ultima —
+   — nessun feedback giusto/sbagliato —
+   — cambio risposta consentito UNA SOLA VOLTA —
+   — avanzamento automatico dopo 2s (tranne ultima) —
 ══════════════════════════════════════════ */
+let _autoAdvTimer = null;   // handle per il setTimeout di auto-avanzamento
+
 function selectOpt(idx, correctIdx, shuffled) {
-  const opts = $('optList').querySelectorAll('.opt');
+  const opts   = $('optList').querySelectorAll('.opt');
   const isLast = (current === 29);
 
+  /* ── PRIMA SELEZIONE ── */
   if (!answered) {
-    // Prima selezione
     answered = true;
-
     opts[idx].classList.add('chosen');
 
-    const isRight = idx === correctIdx;
-    answers[current] = {
-      q:          questions[current].q,
-      shuffled:   shuffled,
-      chosen:     idx,
-      correctIdx: correctIdx,
-      correct:    isRight,
-      skipped:    false,
-    };
+    // Mostra hint "Puoi cambiare risposta"
+    const hint = $('changeHint');
+    if (hint) { hint.style.display = 'flex'; }
 
+    salvaRisposta(idx, correctIdx, shuffled);
     $('btnNext').disabled = false;
 
-    // Avanza automaticamente dopo 600ms, tranne all'ultima domanda
     if (!isLast) {
-      setTimeout(() => {
-        // Controlla che non abbiano già cambiato idea nel frattempo
-        if (answered && !canChange) {
-          nextQ();
-        } else if (answered && canChange) {
-          // L'utente non ha cambiato: blocca e avanza
+      // Avanza automaticamente dopo 2 secondi
+      // Durante questi 2s l'utente può cambiare risposta una volta
+      _autoAdvTimer = setTimeout(() => {
+        if (canChange) {
           canChange = false;
           opts.forEach(o => o.classList.add('locked'));
-          nextQ();
+          if (hint) hint.style.display = 'none';
         }
-      }, 600);
+        nextQ();
+      }, 2000);
     } else {
-      // Ultima domanda: blocca subito, il pulsante lo deve cliccare
+      // Ultima: blocca subito, avanza solo col pulsante
       opts.forEach(o => o.classList.add('locked'));
       canChange = false;
+      if (hint) hint.style.display = 'none';
     }
+    return;
+  }
 
-  } else if (canChange && idx !== answers[current].chosen) {
-    // Secondo click su opzione diversa: cambio consentito una volta
+  /* ── CAMBIO RISPOSTA (una volta sola, solo su opzione diversa) ── */
+  if (canChange && idx !== answers[current].chosen) {
     canChange = false;
 
-    // Rimuove chosen dalla vecchia scelta
+    // Annulla l'auto-avanzamento pendente
+    if (_autoAdvTimer) { clearTimeout(_autoAdvTimer); _autoAdvTimer = null; }
+
+    // Sposta la selezione
     opts.forEach(o => o.classList.remove('chosen'));
     opts[idx].classList.add('chosen');
 
-    // Blocca definitivamente tutte le opzioni
+    // Blocca tutto definitivamente
     opts.forEach(o => o.classList.add('locked'));
 
-    const isRight = idx === correctIdx;
-    answers[current] = {
-      q:          questions[current].q,
-      shuffled:   shuffled,
-      chosen:     idx,
-      correctIdx: correctIdx,
-      correct:    isRight,
-      skipped:    false,
-    };
+    const hint = $('changeHint');
+    if (hint) hint.style.display = 'none';
 
-    // Avanza automaticamente dopo il cambio, tranne all'ultima
+    salvaRisposta(idx, correctIdx, shuffled);
+
+    // Avanza automaticamente dopo 600ms (il cambio è già stato usato)
     if (!isLast) {
       setTimeout(() => nextQ(), 600);
     }
   }
-  // Se canChange è false e hanno già risposto: ignora il click
+  // canChange === false → ignora ulteriori click
+}
+
+function salvaRisposta(idx, correctIdx, shuffled) {
+  answers[current] = {
+    q:          questions[current].q,
+    shuffled:   shuffled,
+    chosen:     idx,
+    correctIdx: correctIdx,
+    correct:    idx === correctIdx,
+    skipped:    false,
+  };
 }
 
 /* ══════════════════════════════════════════
