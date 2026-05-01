@@ -198,7 +198,15 @@
     .opt.chosen .opt-letter { border-color: var(--blue); background: var(--blue); color: #fff; }
 
     /* Nav quiz */
-    .quiz-nav { display: flex; justify-content: flex-end; }
+    .quiz-nav { display: flex; justify-content: space-between; align-items: center; }
+    .btn-back {
+      display: flex; align-items: center; gap: 8px;
+      padding: 12px 22px; background: var(--white); color: var(--blue);
+      border: 1.5px solid var(--blue); border-radius: 9px;
+      font-family: 'DM Sans', sans-serif; font-size: 14px; font-weight: 700;
+      cursor: pointer; transition: all .2s;
+    }
+    .btn-back:hover { background: var(--blue-light); }
     .btn-next {
       display: flex; align-items: center; gap: 8px;
       padding: 12px 26px; background: var(--blue); color: #fff;
@@ -390,15 +398,18 @@
       <div class="question-body">
         <div class="options" id="optList"></div>
         <div id="changeHint" style="display:none; align-items:center; gap:8px; margin-top:10px; padding:9px 14px; background:#fff8e1; border:1.5px solid #f0c040; border-radius:8px; font-size:12.5px; font-weight:600; color:#7a5c00;">
-          <i class="fa-solid fa-rotate-left"></i> Puoi ancora cambiare risposta una volta — poi si avanza automaticamente
+          <i class="fa-solid fa-rotate-left"></i> Puoi ancora cambiare questa risposta una volta sola
         </div>
       </div>
     </div>
 
     <!-- Navigazione -->
     <div class="quiz-nav">
-      <button class="btn-next" id="btnNext" onclick="nextQ()" disabled>
-        Avanti <i class="fa-solid fa-arrow-right"></i>
+      <button class="btn-back" id="btnBack" onclick="prevQ()" style="display:none;">
+        <i class="fa-solid fa-arrow-left"></i> Indietro
+      </button>
+      <button class="btn-next" id="btnNext" onclick="nextQ()" style="display:none;">
+        Termina Quiz <i class="fa-solid fa-flag-checkered"></i>
       </button>
     </div>
 
@@ -706,108 +717,131 @@ function renderQ() {
   answered      = false;
   canChange     = true;
   _autoAdvTimer = null;
+
   const qd = questions[current];
-  const correctText = qd.opts[0];
-  const shuffled    = shuffle(qd.opts);
-  const correctIdx  = shuffled.indexOf(correctText);
 
-  qd._shuffled    = shuffled;
-  qd._correctIdx  = correctIdx;
+  // Se la domanda non è ancora stata mescolata, la mescoliamo ora
+  if (!qd._shuffled) {
+    const correctText = qd.opts[0];
+    const shuffled    = shuffle(qd.opts);
+    qd._shuffled   = shuffled;
+    qd._correctIdx = shuffled.indexOf(correctText);
+  }
 
-  const n = current + 1;
+  const shuffled   = qd._shuffled;
+  const correctIdx = qd._correctIdx;
+  const n          = current + 1;
+  const isLast     = current === 29;
+  const hasPrev    = current > 0;
+  const prevAns    = answers[current]; // eventuale risposta già data
+
   $('qBadge').textContent = n;
   $('qCur').textContent   = n;
   $('qText').textContent  = qd.q;
-  $('btnNext').disabled   = true;
-  $('btnNext').innerHTML  = n < 30
-    ? 'Avanti <i class="fa-solid fa-arrow-right"></i>'
-    : 'Termina Quiz <i class="fa-solid fa-flag-checkered"></i>';
 
-  const list = $('optList');
+  // Pulsante indietro
+  $('btnBack').style.display = hasPrev ? 'flex' : 'none';
+
+  // Pulsante "Termina Quiz" visibile solo all'ultima domanda E solo se già risposto
+  $('btnNext').style.display = (isLast && prevAns) ? 'flex' : 'none';
+
+  // Nascondi hint cambio
+  const hint = $('changeHint');
+  if (hint) hint.style.display = 'none';
+
+  // Opzioni
+  const list    = $('optList');
   list.innerHTML = '';
   const letters = ['A','B','C','D'];
+
   shuffled.forEach((opt, i) => {
     const div = document.createElement('div');
     div.className   = 'opt';
     div.dataset.idx = i;
     div.innerHTML   = `<span class="opt-letter">${letters[i]}</span><span>${opt}</span>`;
-    div.onclick = () => selectOpt(i, correctIdx, shuffled);
+
+    // Se la domanda era già stata risposta
+    if (prevAns) {
+      div.classList.add('locked');
+      if (i === prevAns.chosen) div.classList.add('chosen');
+      // Se ha già usato il cambio, non può più cambiare
+      if (prevAns.changed) {
+        // tutto bloccato, nessun onclick
+      } else {
+        // Può ancora cambiare una volta
+        div.onclick = () => selectOpt(i, correctIdx, shuffled);
+      }
+    } else {
+      div.onclick = () => selectOpt(i, correctIdx, shuffled);
+    }
+
     list.appendChild(div);
   });
+
+  // Se era già risposta mostra hint cambio se può ancora cambiare
+  if (prevAns && !prevAns.changed && !isLast) {
+    answered = true;
+    canChange = true;
+    if (hint) hint.style.display = 'flex';
+  } else if (prevAns) {
+    answered  = true;
+    canChange = false;
+  }
 }
 
 /* ══════════════════════════════════════════
    SELEZIONE RISPOSTA
-   — nessun feedback giusto/sbagliato —
-   — cambio risposta consentito UNA SOLA VOLTA —
-   — avanzamento automatico dopo 2s (tranne ultima) —
+   — click → avanza subito alla successiva —
+   — tranne ultima: mostra pulsante Termina —
+   — tornando indietro si può cambiare 1 volta —
 ══════════════════════════════════════════ */
-let _autoAdvTimer = null;   // handle per il setTimeout di auto-avanzamento
+let _autoAdvTimer = null;
 
 function selectOpt(idx, correctIdx, shuffled) {
   const opts   = $('optList').querySelectorAll('.opt');
-  const isLast = (current === 29);
+  const isLast = current === 29;
+  const hint   = $('changeHint');
 
-  /* ── PRIMA SELEZIONE ── */
+  /* ── PRIMA SELEZIONE su questa domanda ── */
   if (!answered) {
-    answered = true;
+    answered  = true;
+    canChange = false; // in avanzamento diretto non serve il cambio
+
     opts[idx].classList.add('chosen');
+    opts.forEach(o => o.classList.add('locked'));
+    if (hint) hint.style.display = 'none';
 
-    // Mostra hint "Puoi cambiare risposta"
-    const hint = $('changeHint');
-    if (hint) { hint.style.display = 'flex'; }
-
-    salvaRisposta(idx, correctIdx, shuffled);
-    $('btnNext').disabled = false;
+    salvaRisposta(idx, correctIdx, shuffled, false);
 
     if (!isLast) {
-      // Avanza automaticamente dopo 2 secondi
-      // Durante questi 2s l'utente può cambiare risposta una volta
-      _autoAdvTimer = setTimeout(() => {
-        if (canChange) {
-          canChange = false;
-          opts.forEach(o => o.classList.add('locked'));
-          if (hint) hint.style.display = 'none';
-        }
-        nextQ();
-      }, 2000);
+      // Avanza subito alla prossima
+      nextQ();
     } else {
-      // Ultima: blocca subito, avanza solo col pulsante
-      opts.forEach(o => o.classList.add('locked'));
-      canChange = false;
-      if (hint) hint.style.display = 'none';
+      // Ultima: mostra il pulsante Termina
+      $('btnNext').style.display = 'flex';
     }
     return;
   }
 
-  /* ── CAMBIO RISPOSTA (una volta sola, solo su opzione diversa) ── */
-  if (canChange && idx !== answers[current].chosen) {
+  /* ── CAMBIO RISPOSTA (tornati indietro, una sola volta) ── */
+  if (canChange && answers[current] && !answers[current].changed && idx !== answers[current].chosen) {
     canChange = false;
 
-    // Annulla l'auto-avanzamento pendente
-    if (_autoAdvTimer) { clearTimeout(_autoAdvTimer); _autoAdvTimer = null; }
-
-    // Sposta la selezione
-    opts.forEach(o => o.classList.remove('chosen'));
+    opts.forEach(o => { o.classList.remove('chosen'); o.classList.add('locked'); o.onclick = null; });
     opts[idx].classList.add('chosen');
-
-    // Blocca tutto definitivamente
-    opts.forEach(o => o.classList.add('locked'));
-
-    const hint = $('changeHint');
     if (hint) hint.style.display = 'none';
 
-    salvaRisposta(idx, correctIdx, shuffled);
+    salvaRisposta(idx, correctIdx, shuffled, true); // true = ha usato il cambio
 
-    // Avanza automaticamente dopo 600ms (il cambio è già stato usato)
     if (!isLast) {
-      setTimeout(() => nextQ(), 600);
+      nextQ();
+    } else {
+      $('btnNext').style.display = 'flex';
     }
   }
-  // canChange === false → ignora ulteriori click
 }
 
-function salvaRisposta(idx, correctIdx, shuffled) {
+function salvaRisposta(idx, correctIdx, shuffled, changed) {
   answers[current] = {
     q:          questions[current].q,
     shuffled:   shuffled,
@@ -815,20 +849,26 @@ function salvaRisposta(idx, correctIdx, shuffled) {
     correctIdx: correctIdx,
     correct:    idx === correctIdx,
     skipped:    false,
+    changed:    changed,
   };
 }
 
 /* ══════════════════════════════════════════
-   AVANTI
+   AVANTI / INDIETRO
 ══════════════════════════════════════════ */
 function nextQ() {
-  if (!answered) return;
   current++;
   if (current >= 30) {
     fineQuiz(false);
   } else {
     renderQ();
   }
+}
+
+function prevQ() {
+  if (current <= 0) return;
+  current--;
+  renderQ();
 }
 
 /* ══════════════════════════════════════════
